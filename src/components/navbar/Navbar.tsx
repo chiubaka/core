@@ -18,8 +18,8 @@ export class Navbar extends React.Component<NavbarProps> {
   public createLinks(): JSX.Element[] {
     return this.props.links.map((link, index) => {
       return (
-        <li className={classnames("nav-item", link.current ? "active" : "")}>
-          <NavLink key={index} className="nav-link" to={link.path}>{link.text}{link.current ? <span className="sr-only">(current)</span> : ""}</NavLink>
+        <li key={index} className={classnames("nav-item", link.current ? "active" : "")}>
+          <NavLink className="nav-link" to={link.path}>{link.text}{link.current ? <span className="sr-only">(current)</span> : ""}</NavLink>
         </li>
       );
     });
