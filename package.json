@@ -1,0 +1,36 @@
+{
+  "name": "@chiubaka/core",
+  "version": "0.0.0",
+  "description": "Core common code for Chiubaka Technologies projects.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "start": "webpack-dev-server --config webpack.config.dev.js --content-base dist/ --hot --inline"
+  },
+  "author": "Daniel Chiu <daniel@chiubaka.com>",
+  "license": "ISC",
+  "peerDependencies": {
+    "bootstrap": "4.0.0-beta",
+    "react": "^16.0.0",
+    "react-router-dom": "^4.2.2"
+  },
+  "devDependencies": {
+    "@types/classnames": "^2.2.3",
+    "@types/react": "^16.0.13",
+    "@types/react-router-dom": "^4.0.8",
+    "awesome-typescript-loader": "^3.2.3",
+    "bootstrap": "4.0.0-beta",
+    "classnames": "^2.2.5",
+    "dts-bundle": "^0.7.3",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-hot-loader": "^3.1.1",
+    "react-router-dom": "^4.2.2",
+    "source-map-loader": "^0.2.2",
+    "typescript": "^2.5.3",
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.2"
+  }
+}
