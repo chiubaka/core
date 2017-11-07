@@ -5,8 +5,15 @@ export interface ProductProps {
   port?: number;
 }
 
+export interface OAuth2Props {
+  hostname: string;
+  oAuth2CallbackBasePath?: string;
+  useSsl?: boolean;
+  port?: number;
+}
+
 export interface ISocialLoginProvider {
-  name: string;
+  providerName: string;
   clientId: string;
 }
 

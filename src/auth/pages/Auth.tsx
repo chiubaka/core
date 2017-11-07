@@ -3,6 +3,7 @@ import { Route, Switch } from "react-router";
 
 import LoginPage, { LoginPageOwnProps } from "./LoginPage";
 import OAuth2CompletionPage from "./OAuth2CompletionPage";
+import LogoutPage from "./LogoutPage";
 
 export default class Auth extends React.Component<LoginPageOwnProps> {
   public static defaultProps: Partial<LoginPageOwnProps> = {
@@ -26,6 +27,7 @@ export default class Auth extends React.Component<LoginPageOwnProps> {
               <LoginPage {...props} {...this.props}/>
             );
           }}/>
+          <Route path="/auth/logout" component={LogoutPage}/>
         </Switch>
       </div>
     );

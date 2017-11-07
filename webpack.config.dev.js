@@ -68,14 +68,14 @@ module.exports = {
         loader: "url-loader",
         options: {
           limit: 10000,
-          name: "fonts/[name].[hash].[ext]"
+          name: "fonts/[providerName].[hash].[ext]"
         }
       },
       {
         test: /\.(eot|ttf|otf)$/,
         loader: "file-loader",
         options: {
-          name: "fonts/[name].[hash].[ext]"
+          name: "fonts/[providerName].[hash].[ext]"
         }
       },
       {
@@ -84,7 +84,7 @@ module.exports = {
           loader: "url-loader",
           options: {
             limit: 10000,
-            name: "images/[name].[hash].[ext]"
+            name: "images/[providerName].[hash].[ext]"
           }
         }
       },

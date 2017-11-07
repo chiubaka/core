@@ -6,10 +6,15 @@ import { AuthState, LoginState } from '../model/AuthenticationState';
 import { SocialLoginButton } from "../components/SocialLoginButton";
 import { ISocialLoginProvider, ProductProps } from "../../types/index";
 import { OAuth2CompletionPageOwnProps } from "./OAuth2CompletionPage";
-import { buildOAuthCallbackUri, buildUri } from "../utils/uri";
+import { Dispatch } from "redux";
+import { setRedirect } from "../actions/index";
 
 export interface LoginPageStateProps {
   loggedIn: boolean;
+}
+
+export interface LoginPageDispatchProps {
+  setRedirect: (redirectPath: string) => void;
 }
 
 export interface LoginPageOwnProps extends ProductProps, OAuth2CompletionPageOwnProps {
@@ -17,7 +22,7 @@ export interface LoginPageOwnProps extends ProductProps, OAuth2CompletionPageOwn
   providers?: ISocialLoginProvider[];
 }
 
-declare type LoginPageProps = RouteComponentProps<any> & LoginPageStateProps & LoginPageOwnProps;
+declare type LoginPageProps = RouteComponentProps<any> & LoginPageStateProps & LoginPageDispatchProps & LoginPageOwnProps;
 
 class LoginPage extends React.Component<LoginPageProps, React.ComponentState> {
   public static defaultProps: Partial<LoginPageProps> = {
@@ -32,38 +37,45 @@ class LoginPage extends React.Component<LoginPageProps, React.ComponentState> {
 
   public componentWillReceiveProps(props?: LoginPageProps) {
     this.checkAuthentication(props);
+    this.setRedirect(props);
   }
 
   public componentWillMount() {
     this.checkAuthentication(this.props);
+    this.setRedirect(this.props);
   }
 
   public createSocialLoginButtons(): JSX.Element[] {
-    const {providers, hostname, oAuth2CallbackBasePath, port, useSsl } = this.props;
-
+    const providers = this.props.providers;
 
     return providers.map((provider) => {
-      const {clientId, name} = provider;
-      const redirectUri = buildOAuthCallbackUri(hostname, oAuth2CallbackBasePath, name, port, useSsl);
+      const {clientId, providerName} = provider;
+
       return (
-        <SocialLoginButton key={name} clientId={clientId} providerName={name} redirectUri={redirectUri}/>
+        <SocialLoginButton
+          key={providerName}
+          clientId={clientId}
+          providerName={providerName}
+          {...this.props}
+        />
       );
     });
   }
   
   public render(): JSX.Element {
-    console.log(this.props.match);
-    console.log(this.props.location);
     return (
-      <div className="login-page">
-        <div className="horizontal-center vertical-center">
-          <div className="content">
-            <img
-              className="logo"
-              src={this.props.logo}
-            />
-            {this.createSocialLoginButtons()}
-          </div>
+      <div className="login-page container d-table">
+        <div className="content d-table-cell align-middle">
+          <img
+            width="250"
+            height="250"
+            className="logo mx-auto d-block"
+            src={this.props.logo}
+          />
+          <span className="product-name">
+            {this.props.productName}
+          </span>
+          {this.createSocialLoginButtons()}
         </div>
       </div>
     );
@@ -71,12 +83,20 @@ class LoginPage extends React.Component<LoginPageProps, React.ComponentState> {
 
   private checkAuthentication(props: LoginPageProps) {
     if (props.loggedIn) {
-      if (props.location.state && props.location.state.nextPathname) {
-        props.history.push(props.location.state.nextPathname);
+      if (props.location.state && props.location.state.redirectPath) {
+        props.history.push(props.location.state.redirectPath);
       }
       else {
         props.history.push(props.defaultRedirectPath);
       }
+    }
+  }
+
+  private setRedirect(props: LoginPageProps) {
+    const redirectPath = props.location.state && props.location.state.redirectPath;
+
+    if (redirectPath) {
+      props.setRedirect(redirectPath);
     }
   }
 }
@@ -87,4 +107,12 @@ function mapStateToProps(state: AuthState): LoginPageStateProps {
   };
 }
 
-export default connect(mapStateToProps)(withRouter<LoginPageProps>(LoginPage));
+function mapDispatchToProps(dispatch: Dispatch<AuthState>): LoginPageDispatchProps {
+  return {
+    setRedirect: (redirectPath: string) => {
+      dispatch(setRedirect(redirectPath));
+    }
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter<LoginPageProps>(LoginPage));

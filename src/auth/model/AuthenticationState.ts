@@ -14,17 +14,20 @@ export interface AuthState {
 export interface AuthInnerState {
   accessToken?: string;
   loginState: LoginState;
+  redirectPath?: string;
 }
 
 export const DEFAULT_AUTH_STATE: AuthInnerState = {
   loginState: LoginState.NotLoggedIn
-}
+};
 
 export function getExistingAuthState(): AuthInnerState {
   const accessToken = Cookies.getAccessToken();
+  const redirectPath = Cookies.getRedirectPath();
   
   return {
     accessToken,
     loginState: accessToken ? LoginState.LoggedIn : LoginState.NotLoggedIn,
+    redirectPath
   };
 }

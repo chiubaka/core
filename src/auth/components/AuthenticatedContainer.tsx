@@ -17,7 +17,7 @@ declare type AuthenticatedContainerProps = RouteComponentProps<any> & Authentica
 
 class AuthenticatedContainer extends React.Component<AuthenticatedContainerProps, {}> {
   public static defaultProps: Partial<AuthenticatedContainerProps> = {
-    loginPath: "/login"
+    loginPath: "/auth/login"
   };
   
   public componentWillMount() {
@@ -31,6 +31,7 @@ class AuthenticatedContainer extends React.Component<AuthenticatedContainerProps
   }
 
   public render(): JSX.Element {
+    console.log("AuthenticatedContainer render");
     if (this.props.isLoggedIn) {
       return (
         <div>
@@ -46,7 +47,7 @@ class AuthenticatedContainer extends React.Component<AuthenticatedContainerProps
   private checkAuthentication(props: AuthenticatedContainerProps) {
     const { history } = props;
     if (!props.isLoggedIn) {
-      history.replace({ pathname: props.loginPath, state: { nextPathname: props.location.pathname }});
+      history.replace({ pathname: props.loginPath, state: { redirectPath: props.location.pathname }});
     }
   }
 }
