@@ -7,6 +7,7 @@ import { clearRedirect, login } from "../actions/index";
 import { connect } from "react-redux";
 import { buildOAuth2CallbackUri } from "../utils/uri";
 import { OAuth2Props } from "../../types/index";
+import { ProgressBar } from "../../components/ProgressBar";
 
 export interface OAuth2CompletionPageParams {
   provider: string;
@@ -37,7 +38,13 @@ class OAuth2CompletionPage extends React.Component<OAuth2CompletionPageProps> {
   }
 
   public render(): JSX.Element {
-    return null;
+    return (
+      <div className="oauth2-completion container d-table">
+        <div className="d-table-cell align-middle">
+          <ProgressBar progress={100} striped={true} animated={true}/>
+        </div>
+      </div>
+    );
   }
 
   private handleOAuth2AndRedirect(props: OAuth2CompletionPageProps) {
