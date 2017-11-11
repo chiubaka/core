@@ -1,15 +1,16 @@
-export interface ProductProps {
+export interface ProductProps extends ServiceProps {
   logo: string;
   productName: string;
-  hostname: string;
-  port?: number;
 }
 
-export interface OAuth2Props {
+export interface ServiceProps {
   hostname: string;
-  oAuth2CallbackBasePath?: string;
-  useSsl?: boolean;
   port?: number;
+  useSsl?: boolean;
+}
+
+export interface OAuth2Props extends ServiceProps {
+  oAuth2CallbackBasePath?: string;
 }
 
 export interface ISocialLoginProvider {
