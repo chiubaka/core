@@ -1,6 +1,7 @@
 export interface ProductProps extends ServiceProps {
   logo: string;
   productName: string;
+  testMarketingMode: boolean;
 }
 
 export interface ServiceProps {

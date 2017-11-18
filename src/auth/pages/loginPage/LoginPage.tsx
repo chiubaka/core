@@ -2,12 +2,12 @@ import * as React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { withRouter } from "react-router";
 import { connect } from "react-redux";
-import { AuthState, LoginState } from '../model/AuthenticationState';
-import { SocialLoginButton } from "../components/SocialLoginButton";
-import { ISocialLoginProvider, ProductProps } from "../../types/index";
-import { OAuth2CompletionPageOwnProps } from "./OAuth2CompletionPage";
+import { AuthState, LoginState } from '../../model/AuthenticationState';
+import { SocialLoginButton } from "../../components/SocialLoginButton";
+import { ISocialLoginProvider, ProductProps } from "../../../types/index";
+import { OAuth2CompletionPageOwnProps } from "../oAuth2CompletionPage/OAuth2CompletionPage";
 import { Dispatch } from "redux";
-import { setRedirect } from "../actions/index";
+import { setRedirect } from "../../actions/index";
 
 export interface LoginPageStateProps {
   loggedIn: boolean;

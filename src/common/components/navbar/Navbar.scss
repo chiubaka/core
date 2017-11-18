@@ -1,0 +1,16 @@
+nav.navbar {
+  @extend .container;
+  text-transform: uppercase;
+
+  img.logo {
+    margin-right: $spacer;
+  }
+  a.navbar-brand {
+    font-weight: 100;
+    letter-spacing: .25em;
+  }
+
+  .nav-item {
+    font-size: .9rem;
+  }
+}

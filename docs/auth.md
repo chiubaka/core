@@ -6,6 +6,7 @@ Authentication to access/view.
 
 ### Usage
 To use the auth components, you need to do a few things in your project:
+#### Client-Side
 1. Import the `Auth` page and hook it into your routing system at the path `/auth`. Pass any OAuth2
    providers you want to use or other auth options to this component.
 2. Tell your app state to extend the `AuthState` export--this will ensure that redux has the properties
@@ -14,6 +15,17 @@ To use the auth components, you need to do a few things in your project:
 3. For cookie support: import the `getExistingAuthState` function and include it under the `auth` key
    of your `getExistingState` function.
 4. Create a React component which wraps its render contents in the `AuthenticatedContainer` component. 
+#### Server-Side
+The client library makes a few assumptions about the way the server API is set up. This assumes
+you're using Django as the backend framework with a few nifty plugins installed (all of these can be installed with `pip`):
+* `djangorestframework` - provides easy REST API creation. The other plugins extend this.
+* `social-auth-app-django` - provides social auth backends to enable things like FB and Google login
+* `djangorestframework-jwt` - provides support for JWT tokens with Django REST Framework.
+* `rest-social-auth` - provides the glue between JWT and `social-auth-app-django`.
+
+The above libraries do require a bit of configuration:
+1. http://python-social-auth-docs.readthedocs.io/en/latest/configuration/django.html - for `social-auth-app-django` configuration. Should specify `AUTHENTICATION_BVACKENDS` and keys/secrets for any social providers. Can most likely ignore documentation about setting up URL paths/views here, as the only path we require comes from `rest-social-auth`.
+2. https://github.com/st4lk/django-rest-social-auth - for `rest-social-auth` configuration. Really just need to add the urls for JWT authentication. 
 
 ### How it works
 When a user hits a component that's wrapped in the `AuthenticatedContainer`, the container checks

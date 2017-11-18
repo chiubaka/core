@@ -1,0 +1,24 @@
+@import "../../../../node_modules/bootstrap-social/bootstrap-social";
+
+.login-page {
+  height: 90vh;
+  width: 300px;
+
+  img.logo {
+    margin-bottom: $spacer;
+  }
+
+  span.product-name {
+    display: block;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: $font-size-lg;
+    font-weight: 200;
+    letter-spacing: .5em;
+    margin-bottom: $spacer;
+  }
+
+  .btn-social {
+    font-weight: 300;
+  }
+}

@@ -9,6 +9,8 @@ export interface AuthenticatedContainerStateProps {
 }
 
 export interface AuthenticatedContainerOwnProps {
+  id?: string;
+  className?: string;
   loginPath?: string;
 }
 
@@ -31,10 +33,9 @@ class AuthenticatedContainer extends React.Component<AuthenticatedContainerProps
   }
 
   public render(): JSX.Element {
-    console.log("AuthenticatedContainer render");
     if (this.props.isLoggedIn) {
       return (
-        <div>
+        <div id={this.props.id} className={this.props.className}>
           {this.props.children}
         </div>
       );

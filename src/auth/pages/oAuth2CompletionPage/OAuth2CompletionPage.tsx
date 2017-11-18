@@ -2,12 +2,12 @@ import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { parse } from "query-string";
 import { Dispatch } from "redux";
-import { AuthState, LoginState } from "../model/AuthenticationState";
-import { clearRedirect, login } from "../actions/index";
+import { AuthState, LoginState } from "../../model/AuthenticationState";
+import { clearRedirect, login } from "../../actions/index";
 import { connect } from "react-redux";
-import { buildOAuth2CallbackUri } from "../utils/uri";
-import { OAuth2Props } from "../../types/index";
-import { ProgressBar } from "../../components/ProgressBar";
+import { buildOAuth2CallbackUri } from "../../utils/uri";
+import { OAuth2Props } from "../../../types/index";
+import { ProgressBar } from "../../../app/components/ProgressBar";
 
 export interface OAuth2CompletionPageParams {
   provider: string;
