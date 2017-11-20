@@ -1,14 +1,26 @@
 import * as React from "react";
-import { ICallToAction } from "../features/Features";
+import { AnalyticsInnerState, AnalyticsState } from "../../../analytics/model/AnalyticsState";
+import { connect } from "react-redux";
 
-export interface MailChimpSubscribeFormProps {
+export declare type MailChimpSubscribeFormStateProps = AnalyticsInnerState;
+
+export interface MailChimpSubscribeFormOwnProps {
   username: string;
   userId: string;
   listId: string;
   callToAction: string;
 }
 
-export class MailChimpSubscribeForm extends React.Component<MailChimpSubscribeFormProps> {
+export declare type MailChimpSubscribeFormProps = MailChimpSubscribeFormOwnProps & MailChimpSubscribeFormStateProps;
+
+declare global {
+  interface Window {
+    fbq: (type: string, event: string, options?: any) => void,
+    gtag: (command: string, type: string, options?: any) => void
+  }
+}
+
+class MailChimpSubscribeForm extends React.Component<MailChimpSubscribeFormProps> {
   constructor() {
     super();
 
@@ -17,11 +29,17 @@ export class MailChimpSubscribeForm extends React.Component<MailChimpSubscribeFo
 
   public onSubmit(): void {
     // TODO: Re-enable metrics in production
-    // window.fbq("track", "Lead");
-    // window.gtag("event", "click", {event_category: "button", event_label: "Beta SignUp"});
-    // window.gtag('event', 'conversion', {
-    //   'send_to': 'AW-834157566/5-CHCPKo8XYQ_vfgjQM',
-    // });
+    if (this.props.enableFacebookAnalytics) {
+      window.fbq("track", "Lead");
+    }
+    if (this.props.googleAnalyticsId) {
+      window.gtag("event", "click", {event_category: "button", event_label: "Beta SignUp"});
+    }
+    if (this.props.googleEmailSignUpConversionEventId) {
+      window.gtag('event', 'conversion', {
+        'send_to': this.props.googleEmailSignUpConversionEventId,
+      });
+    }
   }
 
   public render(): JSX.Element {
@@ -42,3 +60,9 @@ export class MailChimpSubscribeForm extends React.Component<MailChimpSubscribeFo
     );
   }
 }
+
+function mapStateToProps(state: AnalyticsState): MailChimpSubscribeFormStateProps {
+  return state.analytics;
+}
+
+export default connect(mapStateToProps)(MailChimpSubscribeForm);
