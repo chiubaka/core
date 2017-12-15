@@ -1,10 +1,10 @@
 import * as React from "react";
-import { RouteComponentProps } from 'react-router-dom';
-import { withRouter } from 'react-router';
-import { connect } from 'react-redux';
-import { AuthState } from '../model/AuthenticationState';
-import { Dispatch } from 'redux';
+import { connect } from "react-redux";
+import { withRouter } from "react-router";
+import { RouteComponentProps } from "react-router-dom";
+import { Dispatch } from "redux";
 import { completeLogout } from "../actions/index";
+import { AuthState } from "../model/AuthenticationState";
 
 export interface LogoutPageDispatchProps {
   onLogout: () => void;
@@ -14,7 +14,7 @@ declare type LogoutPageOwnProps = RouteComponentProps<any> & {
   redirectUri?: string;
 };
 
-declare type LogoutPageProps = LogoutPageOwnProps & LogoutPageDispatchProps
+declare type LogoutPageProps = LogoutPageOwnProps & LogoutPageDispatchProps;
 
 class LogoutPage extends React.Component<LogoutPageProps, {}> {
   public componentWillMount() {
@@ -32,7 +32,7 @@ function mapDispatchToProps(dispatch: Dispatch<AuthState>, ownProps: LogoutPageO
       dispatch(completeLogout());
       const redirectUri = ownProps.redirectUri ? ownProps.redirectUri : "/";
       ownProps.history.replace(redirectUri);
-    }
+    },
   };
 }
 

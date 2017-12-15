@@ -1,6 +1,6 @@
 import * as React from "react";
-import { RouteComponentProps } from "react-router";
 import { connect } from "react-redux";
+import { RouteComponentProps } from "react-router";
 import { AnalyticsInnerState, AnalyticsState } from "./model/AnalyticsState";
 
 declare type PageStateProps = AnalyticsInnerState;
@@ -9,8 +9,8 @@ declare type PageProps<MatchParams> = PageStateProps & RouteComponentProps<Match
 
 declare global {
   interface Window {
-    fbq: (type: string, event: string, options?: any) => void,
-    gtag: (command: string, type: string, options?: any) => void
+    fbq: (type: string, event: string, options?: any) => void;
+    gtag: (command: string, type: string, options?: any) => void;
   }
 }
 

@@ -1,6 +1,6 @@
+import * as classnames from "classnames";
 import * as React from "react";
 import { Link, NavLink } from "react-router-dom";
-import * as classnames from "classnames";
 
 export interface NavbarProps {
   brandLink?: string;
@@ -19,7 +19,7 @@ export interface NavbarEntry {
 export class Navbar extends React.Component<NavbarProps> {
   public static defaultProps: Partial<NavbarProps> = {
     brandLink: "/",
-    logoSize: 30
+    logoSize: 30,
   };
 
   public createLinks(): JSX.Element[] {

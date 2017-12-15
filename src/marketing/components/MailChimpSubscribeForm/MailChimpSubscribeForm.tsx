@@ -1,6 +1,6 @@
 import * as React from "react";
-import { AnalyticsInnerState, AnalyticsState } from "../../../analytics/model/AnalyticsState";
 import { connect } from "react-redux";
+import { AnalyticsInnerState, AnalyticsState } from "../../../analytics/model/AnalyticsState";
 
 export declare type MailChimpSubscribeFormStateProps = AnalyticsInnerState;
 
@@ -15,8 +15,8 @@ export declare type MailChimpSubscribeFormProps = MailChimpSubscribeFormOwnProps
 
 declare global {
   interface Window {
-    fbq: (type: string, event: string, options?: any) => void,
-    gtag: (command: string, type: string, options?: any) => void
+    fbq: (type: string, event: string, options?: any) => void;
+    gtag: (command: string, type: string, options?: any) => void;
   }
 }
 
@@ -36,8 +36,8 @@ class MailChimpSubscribeForm extends React.Component<MailChimpSubscribeFormProps
       window.gtag("event", "click", {event_category: "button", event_label: "Beta SignUp"});
     }
     if (this.props.googleEmailSignUpConversionEventId) {
-      window.gtag('event', 'conversion', {
-        'send_to': this.props.googleEmailSignUpConversionEventId,
+      window.gtag("event", "conversion", {
+        send_to: this.props.googleEmailSignUpConversionEventId,
       });
     }
   }

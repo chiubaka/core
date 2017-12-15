@@ -1,8 +1,8 @@
 import * as React from "react";
-import { RouteComponentProps } from 'react-router-dom';
-import { withRouter } from 'react-router';
-import { AuthState, LoginState } from '../model/AuthenticationState';
-import { connect, DispatchProp } from 'react-redux';
+import { connect } from "react-redux";
+import { withRouter } from "react-router";
+import { RouteComponentProps } from "react-router-dom";
+import { AuthState, LoginState } from "../model/AuthenticationState";
 
 export interface AuthenticatedContainerStateProps {
   isLoggedIn: boolean;
@@ -14,18 +14,18 @@ export interface AuthenticatedContainerOwnProps {
   loginPath?: string;
 }
 
-declare type AuthenticatedContainerProps = RouteComponentProps<any> & AuthenticatedContainerStateProps 
-  & AuthenticatedContainerOwnProps
+declare type AuthenticatedContainerProps = RouteComponentProps<any> & AuthenticatedContainerStateProps
+  & AuthenticatedContainerOwnProps;
 
 class AuthenticatedContainer extends React.Component<AuthenticatedContainerProps, {}> {
   public static defaultProps: Partial<AuthenticatedContainerProps> = {
-    loginPath: "/auth/login"
+    loginPath: "/auth/login",
   };
-  
+
   public componentWillMount() {
     this.checkAuthentication(this.props);
   }
-  
+
   public componentWillReceiveProps(nextProps: AuthenticatedContainerProps) {
     if (nextProps.location !== this.props.location) {
       this.checkAuthentication(nextProps);
@@ -39,8 +39,7 @@ class AuthenticatedContainer extends React.Component<AuthenticatedContainerProps
           {this.props.children}
         </div>
       );
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -55,7 +54,7 @@ class AuthenticatedContainer extends React.Component<AuthenticatedContainerProps
 
 function mapStateToProps<S extends AuthState>(state: S): AuthenticatedContainerStateProps {
   return {
-    isLoggedIn: !(state.auth.loginState === LoginState.NotLoggedIn)
+    isLoggedIn: !(state.auth.loginState === LoginState.NotLoggedIn),
   };
 }
 

@@ -1,6 +1,6 @@
 import * as React from "react";
-import { Icon } from "../../../common/components/Icon";
 import { Link } from "react-router-dom";
+import { Icon } from "../../../common/components/Icon";
 
 export interface ICallToAction {
   text: string;
@@ -23,7 +23,7 @@ export interface FeaturesProps {
 
 export class Features extends React.Component<FeaturesProps> {
   public static defaultProps: Partial<FeaturesProps> = {
-    featuresPerRow: 3
+    featuresPerRow: 3,
   };
 
   private renderFeatures(features: IFeature[], featuresPerRow: number): JSX.Element[] {
@@ -40,7 +40,7 @@ export class Features extends React.Component<FeaturesProps> {
           <ul>
             {featureElements.splice(0, featuresPerRow)}
           </ul>
-        </div>
+        </div>,
       );
       i++;
     }

@@ -1,7 +1,7 @@
+import "font-awesome-webpack";
 import * as React from "react";
 import { OAuth2Props } from "../../types/index";
 import { buildOAuth2CallbackUri } from "../utils/uri";
-import "font-awesome-webpack";
 
 export interface SocialLoginButtonProps extends OAuth2Props {
   clientId: string;
@@ -16,27 +16,27 @@ export interface SocialLoginButtonState {
 export class SocialLoginButton extends React.Component<SocialLoginButtonProps, SocialLoginButtonState> {
   public static OAUTH2_GATEWAYS: {[provider: string]: string} = {
     facebook: "https://www.facebook.com/v2.10/dialog/oauth",
-    google: "https://accounts.google.com/o/oauth2/v2/auth"
+    google: "https://accounts.google.com/o/oauth2/v2/auth",
   };
 
   // Provides provider providerName aliases as shims since social-app-django differentiates between Google and
   // Google OAuth2. We don't support anything other than OAuth2, so internally there's no need for that.
   public static OAUTH2_PROVIDER_ALIAS: {[provider: string]: string} = {
-    google: "google-oauth2"
+    google: "google-oauth2",
   };
 
   public static OAUTH2_ADDITIONAL_PARAMETERS: {[provider: string]: {[parameter: string]: string}} = {
     facebook: {
-      response_type: "code"
+      response_type: "code",
     },
     google: {
       response_type: "code",
       scope: "profile email",
-    }
+    },
   };
 
   public state = {
-    oAuth2Uri: ""
+    oAuth2Uri: "",
   };
 
   public componentWillMount() {
@@ -48,7 +48,7 @@ export class SocialLoginButton extends React.Component<SocialLoginButtonProps, S
       oAuth2CallbackBasePath,
       providerAlias ? providerAlias : providerName,
       port,
-      useSsl
+      useSsl,
     );
 
     if (!(providerName in SocialLoginButton.OAUTH2_GATEWAYS)) {
@@ -60,12 +60,12 @@ export class SocialLoginButton extends React.Component<SocialLoginButtonProps, S
     const additionalParameters = SocialLoginButton.OAUTH2_ADDITIONAL_PARAMETERS[providerName];
 
     if (additionalParameters) {
-      for (let key in additionalParameters) {
-        oAuth2Uri += `&${key}=${additionalParameters[key]}`
+      for (const key in additionalParameters) {
+        oAuth2Uri += `&${key}=${additionalParameters[key]}`;
       }
     }
 
-    this.setState({...this.state, oAuth2Uri: oAuth2Uri});
+    this.setState({...this.state, oAuth2Uri});
   }
 
   public render(): JSX.Element {

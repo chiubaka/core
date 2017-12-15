@@ -78,6 +78,6 @@ export class PrivacyPolicyModal extends React.Component<PrivacyPolicyModalProps>
           </div>
         </div>
       </div>
-    )
+    );
   }
 }

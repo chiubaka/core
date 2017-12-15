@@ -9,5 +9,5 @@ export interface AnalyticsInnerState {
 }
 
 export const DEFAULT_ANALYTICS_STATE: AnalyticsInnerState = {
-  enableFacebookAnalytics: false
+  enableFacebookAnalytics: false,
 };

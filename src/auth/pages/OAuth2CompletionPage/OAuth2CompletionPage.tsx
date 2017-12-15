@@ -1,13 +1,13 @@
-import * as React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
 import { parse } from "query-string";
-import { Dispatch } from "redux";
-import { AuthState, LoginState } from "../../model/AuthenticationState";
-import { clearRedirect, login } from "../../actions/index";
+import * as React from "react";
 import { connect } from "react-redux";
-import { buildOAuth2CallbackUri } from "../../utils/uri";
-import { OAuth2Props } from "../../../types/index";
+import { RouteComponentProps, withRouter } from "react-router";
+import { Dispatch } from "redux";
 import { ProgressBar } from "../../../app/components/ProgressBar";
+import { OAuth2Props } from "../../../types/index";
+import { clearRedirect, login } from "../../actions/index";
+import { AuthState, LoginState } from "../../model/AuthenticationState";
+import { buildOAuth2CallbackUri } from "../../utils/uri";
 
 export interface OAuth2CompletionPageParams {
   provider: string;
@@ -59,8 +59,7 @@ class OAuth2CompletionPage extends React.Component<OAuth2CompletionPageProps> {
       const oAuth2CallbackUri = buildOAuth2CallbackUri(hostname, oAuth2CallbackBasePath, provider, port, useSsl);
 
       props.onOAuth2Completion(provider, code, oAuth2CallbackUri);
-    }
-    else {
+    } else {
       props.clearRedirect();
       // TODO: Should not be "/" here, should be a parameterized default path
       props.history.replace(props.redirectPath ? props.redirectPath : "/");
@@ -71,7 +70,7 @@ class OAuth2CompletionPage extends React.Component<OAuth2CompletionPageProps> {
 function mapStateToProps(state: AuthState): OAuth2CompletionPageStateProps {
   return {
     loggedIn: state.auth.loginState === LoginState.LoggedIn,
-    redirectPath: state.auth.redirectPath
+    redirectPath: state.auth.redirectPath,
   };
 }
 
@@ -82,7 +81,7 @@ function mapDispatchToProps(dispatch: Dispatch<AuthState>): OAuth2CompletionPage
     },
     onOAuth2Completion: (provider: string, code: string, oAuth2CallbackUri: string) => {
       dispatch(login(provider, code, oAuth2CallbackUri));
-    }
+    },
   };
 }
 

@@ -1,20 +1,19 @@
-import { AuthState } from './../model/AuthenticationState';
-import { push } from "react-router-redux";
 import { Action, Dispatch } from "redux";
 // This import will remap the typing for Dispatch so it's more tolerant of passing functions
 import "redux-thunk";
 import { IUser } from "../../types/index";
+import { AuthState } from "./../model/AuthenticationState";
 
 const typeCache: { [label: string]: boolean } = {};
 
 function type<T>(label: T | ""): T {
-	if (typeCache[<string>label]) {
+	if (typeCache[label as string]) {
 		throw new Error(`Action type "${label}" is not unique`);
 	}
 
-	typeCache[<string>label] = true;
+	typeCache[label as string] = true;
 
-	return <T>label;
+	return label as T;
 }
 
 export const ActionTypes = {
@@ -33,8 +32,8 @@ export interface StartLogin extends Action {}
 
 function startLogin() {
   return {
-    type: ActionTypes.START_LOGIN
-  }
+    type: ActionTypes.START_LOGIN,
+  };
 }
 
 export interface CompleteLogin extends Action {
@@ -57,7 +56,7 @@ export interface FailLogin extends Action {
 function failLogin(error: string): FailLogin {
   return {
     type: ActionTypes.FAIL_LOGIN,
-    error
+    error,
   };
 }
 
@@ -65,7 +64,7 @@ export interface StartLogout extends Action {}
 
 function startLogout(): StartLogout {
   return {
-    type: ActionTypes.START_LOGOUT
+    type: ActionTypes.START_LOGOUT,
   };
 }
 
@@ -73,7 +72,7 @@ export interface CompleteLogout extends Action {}
 
 export function completeLogout(): CompleteLogout {
   return {
-    type: ActionTypes.COMPLETE_LOGOUT
+    type: ActionTypes.COMPLETE_LOGOUT,
   };
 }
 
@@ -84,7 +83,7 @@ export interface SetRedirect extends Action {
 export function setRedirect(redirectPath: string): SetRedirect {
   return {
     type: ActionTypes.SET_REDIRECT,
-    redirectPath
+    redirectPath,
   };
 }
 
@@ -92,7 +91,7 @@ export interface ClearRedirect extends Action {}
 
 export function clearRedirect(): ClearRedirect {
   return {
-    type: ActionTypes.CLEAR_REDIRECT
+    type: ActionTypes.CLEAR_REDIRECT,
   };
 }
 
@@ -102,15 +101,15 @@ export function login(provider: string, code: string, redirectUri: string) {
     return fetch("/api/login/social/jwt/", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         provider,
         code,
-        redirect_uri: redirectUri
-      })
+        redirect_uri: redirectUri,
+      }),
     })
-      .then(response => response.json())
+      .then((response) => response.json())
       .then((response: IUser) => {
         dispatch(completeLogin(response.token));
       })
@@ -118,7 +117,7 @@ export function login(provider: string, code: string, redirectUri: string) {
         // TODO: /auth/login should be a variable somewhere
         return dispatch(failLogin(error));
       });
-  }
+  };
 }
 
 // Since we're using JWT, login/logout state is not held by the server. The logout process

@@ -4,7 +4,7 @@ export enum LoginState {
   NotLoggedIn,
   LoggingIn,
   LoggedIn,
-  LoggingOut
+  LoggingOut,
 }
 
 export interface AuthState {
@@ -18,16 +18,16 @@ export interface AuthInnerState {
 }
 
 export const DEFAULT_AUTH_STATE: AuthInnerState = {
-  loginState: LoginState.NotLoggedIn
+  loginState: LoginState.NotLoggedIn,
 };
 
 export function getExistingAuthState(): AuthInnerState {
   const accessToken = Cookies.getAccessToken();
   const redirectPath = Cookies.getRedirectPath();
-  
+
   return {
     accessToken,
     loginState: accessToken ? LoginState.LoggedIn : LoginState.NotLoggedIn,
-    redirectPath
+    redirectPath,
   };
 }

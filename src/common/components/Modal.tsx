@@ -8,7 +8,7 @@ export interface ModalProps {
 
 export class Modal extends React.Component<ModalProps> {
   public render(): JSX.Element {
-    const {footer, id, title}= this.props;
+    const {footer, id, title} = this.props;
 
     return (
       <div className="modal fade" id={id} tabIndex={-1} role="dialog" aria-labelledby={`${id}-label`} aria-hidden="true">

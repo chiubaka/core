@@ -2,14 +2,14 @@ import * as React from "react";
 import { Route, Switch } from "react-router";
 
 import LoginPage, { LoginPageOwnProps } from "./LoginPage/LoginPage";
-import OAuth2CompletionPage from "./OAuth2CompletionPage/OAuth2CompletionPage";
 import LogoutPage from "./LogoutPage";
+import OAuth2CompletionPage from "./OAuth2CompletionPage/OAuth2CompletionPage";
 
 export default class Auth extends React.Component<LoginPageOwnProps> {
   public static defaultProps: Partial<LoginPageOwnProps> = {
     // TODO: Figure out how to use SSL in local development, and remove this as an option--always use SSL
     useSsl: false,
-    oAuth2CallbackBasePath: "/auth/login/oauth2/complete/"
+    oAuth2CallbackBasePath: "/auth/login/oauth2/complete/",
   };
 
   public render(): JSX.Element {

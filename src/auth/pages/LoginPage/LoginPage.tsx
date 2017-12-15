@@ -1,13 +1,13 @@
 import * as React from "react";
-import { RouteComponentProps } from "react-router-dom";
-import { withRouter } from "react-router";
 import { connect } from "react-redux";
-import { AuthState, LoginState } from '../../model/AuthenticationState';
-import { SocialLoginButton } from "../../components/SocialLoginButton";
-import { ISocialLoginProvider, ProductProps } from "../../../types/index";
-import { OAuth2CompletionPageOwnProps } from "../OAuth2CompletionPage/OAuth2CompletionPage";
+import { withRouter } from "react-router";
+import { RouteComponentProps } from "react-router-dom";
 import { Dispatch } from "redux";
+import { ISocialLoginProvider, ProductProps } from "../../../types/index";
 import { setRedirect } from "../../actions/index";
+import { SocialLoginButton } from "../../components/SocialLoginButton";
+import { AuthState, LoginState } from "../../model/AuthenticationState";
+import { OAuth2CompletionPageOwnProps } from "../OAuth2CompletionPage/OAuth2CompletionPage";
 
 export interface LoginPageStateProps {
   loggedIn: boolean;
@@ -61,7 +61,7 @@ class LoginPage extends React.Component<LoginPageProps, React.ComponentState> {
       );
     });
   }
-  
+
   public render(): JSX.Element {
     return (
       <div className="login-page container d-table">
@@ -85,8 +85,7 @@ class LoginPage extends React.Component<LoginPageProps, React.ComponentState> {
     if (props.loggedIn) {
       if (props.location.state && props.location.state.redirectPath) {
         props.history.push(props.location.state.redirectPath);
-      }
-      else {
+      } else {
         props.history.push(props.defaultRedirectPath);
       }
     }
@@ -103,7 +102,7 @@ class LoginPage extends React.Component<LoginPageProps, React.ComponentState> {
 
 function mapStateToProps(state: AuthState): LoginPageStateProps {
   return {
-    loggedIn: state.auth.loginState === LoginState.LoggedIn
+    loggedIn: state.auth.loginState === LoginState.LoggedIn,
   };
 }
 
@@ -111,7 +110,7 @@ function mapDispatchToProps(dispatch: Dispatch<AuthState>): LoginPageDispatchPro
   return {
     setRedirect: (redirectPath: string) => {
       dispatch(setRedirect(redirectPath));
-    }
+    },
   };
 }
 
