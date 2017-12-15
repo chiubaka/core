@@ -12,9 +12,9 @@ button.btn {
   cursor: pointer;
 }
 
-@import "../src/marketing/components/features/Features";
-@import "../src/marketing/components/footer/Footer";
-@import "../src/marketing/components/jumbotron/Jumbotron";
-@import "../src/auth/pages/loginPage/LoginPage";
-@import "../src/common/components/navbar/Navbar";
-@import "../src/auth/pages/oAuth2CompletionPage/OAuth2CompletionPage";
+@import "../src/marketing/components/Features/Features";
+@import "../src/marketing/components/Footer/Footer";
+@import "../src/marketing/components/Jumbotron/Jumbotron";
+@import "../src/auth/pages/LoginPage/LoginPage";
+@import "../src/common/components/Navbar/Navbar";
+@import "../src/auth/pages/OAuth2CompletionPage/OAuth2CompletionPage";

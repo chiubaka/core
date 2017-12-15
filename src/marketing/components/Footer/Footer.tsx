@@ -1,5 +1,5 @@
 import * as React from "react";
-import { PrivacyPolicyModal, PrivacyPolicyModalProps } from "../privacyPolicyModal/PrivacyPolicyModal";
+import { PrivacyPolicyModal, PrivacyPolicyModalProps } from "../PrivacyPolicyModal/PrivacyPolicyModal";
 
 export interface FooterProps extends PrivacyPolicyModalProps {
   disclaimer?: string;

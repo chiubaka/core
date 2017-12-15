@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { AuthState, LoginState } from '../../model/AuthenticationState';
 import { SocialLoginButton } from "../../components/SocialLoginButton";
 import { ISocialLoginProvider, ProductProps } from "../../../types/index";
-import { OAuth2CompletionPageOwnProps } from "../oAuth2CompletionPage/OAuth2CompletionPage";
+import { OAuth2CompletionPageOwnProps } from "../OAuth2CompletionPage/OAuth2CompletionPage";
 import { Dispatch } from "redux";
 import { setRedirect } from "../../actions/index";
 

@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Route, Switch } from "react-router";
 
-import LoginPage, { LoginPageOwnProps } from "./loginPage/LoginPage";
-import OAuth2CompletionPage from "./oAuth2CompletionPage/OAuth2CompletionPage";
+import LoginPage, { LoginPageOwnProps } from "./LoginPage/LoginPage";
+import OAuth2CompletionPage from "./OAuth2CompletionPage/OAuth2CompletionPage";
 import LogoutPage from "./LogoutPage";
 
 export default class Auth extends React.Component<LoginPageOwnProps> {

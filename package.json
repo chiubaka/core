@@ -6,8 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "start": "webpack-dev-server --config webpack.config.dev.js --content-base dist/ --hot --inline"
+    "build": "tsc",
+    "start": "tsc --watch"
   },
   "author": "Daniel Chiu <daniel@chiubaka.com>",
   "license": "ISC",
