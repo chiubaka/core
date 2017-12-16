@@ -13,7 +13,7 @@ export interface IFeature {
   description: string;
 }
 
-export interface FeaturesProps {
+export interface IFeaturesProps {
   callToAction?: ICallToAction;
   emotionalBenefit: string;
   features: IFeature[];
@@ -21,34 +21,12 @@ export interface FeaturesProps {
   sectionName: string;
 }
 
-export class Features extends React.Component<FeaturesProps> {
-  public static defaultProps: Partial<FeaturesProps> = {
+export class Features extends React.Component<IFeaturesProps> {
+  public static defaultProps: Partial<IFeaturesProps> = {
     featuresPerRow: 3,
   };
 
-  private renderFeatures(features: IFeature[], featuresPerRow: number): JSX.Element[] {
-    const featureRows = [];
-
-    const featureElements = features.map((feature) => {
-      return this.renderFeature(feature);
-    });
-
-    let i = 0;
-    while (featureElements.length > 0) {
-      featureRows.push(
-        <div key={i}>
-          <ul>
-            {featureElements.splice(0, featuresPerRow)}
-          </ul>
-        </div>,
-      );
-      i++;
-    }
-
-    return featureRows;
-  }
-
-  private renderFeature(feature: IFeature): JSX.Element {
+  private static renderFeature(feature: IFeature): JSX.Element {
     return (
       <li key={feature.name}>
         <div className="icon-container">
@@ -60,7 +38,7 @@ export class Features extends React.Component<FeaturesProps> {
     );
   }
 
-  private renderCallToAction(callToAction: ICallToAction): JSX.Element {
+  private static renderCallToAction(callToAction: ICallToAction): JSX.Element {
     if (!callToAction) {
       return null;
     }
@@ -83,8 +61,30 @@ export class Features extends React.Component<FeaturesProps> {
         <div className="feature-rows d-flex flex-column">
           {this.renderFeatures(this.props.features, this.props.featuresPerRow)}
         </div>
-        {this.renderCallToAction(this.props.callToAction)}
+        {Features.renderCallToAction(this.props.callToAction)}
       </section>
     );
+  }
+
+  private renderFeatures(features: IFeature[], featuresPerRow: number): JSX.Element[] {
+    const featureRows = [];
+
+    const featureElements = features.map((feature) => {
+      return Features.renderFeature(feature);
+    });
+
+    let i = 0;
+    while (featureElements.length > 0) {
+      featureRows.push(
+        <div key={i}>
+          <ul>
+            {featureElements.splice(0, featuresPerRow)}
+          </ul>
+        </div>,
+      );
+      i++;
+    }
+
+    return featureRows;
   }
 }

@@ -3,17 +3,17 @@ import * as React from "react";
 import { IOAuth2Props } from "../../types/index";
 import { buildOAuth2CallbackUri } from "../utils/uri";
 
-export interface SocialLoginButtonProps extends IOAuth2Props {
+export interface ISocialLoginButtonProps extends IOAuth2Props {
   clientId: string;
   providerName: string;
   redirectPath?: string;
 }
 
-export interface SocialLoginButtonState {
+export interface ISocialLoginButtonState {
   oAuth2Uri: string;
 }
 
-export class SocialLoginButton extends React.Component<SocialLoginButtonProps, SocialLoginButtonState> {
+export class SocialLoginButton extends React.Component<ISocialLoginButtonProps, ISocialLoginButtonState> {
   public static OAUTH2_GATEWAYS: {[provider: string]: string} = {
     facebook: "https://www.facebook.com/v2.10/dialog/oauth",
     google: "https://accounts.google.com/o/oauth2/v2/auth",
@@ -55,13 +55,15 @@ export class SocialLoginButton extends React.Component<SocialLoginButtonProps, S
       console.error(`Unrecognized social auth provider ${providerName}.`);
     }
 
-    let oAuth2Uri = `${SocialLoginButton.OAUTH2_GATEWAYS[providerName]}?client_id=${clientId}&redirect_uri=${redirectUri}`;
-
+    const oAuth2Gateway = SocialLoginButton.OAUTH2_GATEWAYS[providerName];
+    let oAuth2Uri = `${oAuth2Gateway}?client_id=${clientId}&redirect_uri=${redirectUri}`;
     const additionalParameters = SocialLoginButton.OAUTH2_ADDITIONAL_PARAMETERS[providerName];
 
     if (additionalParameters) {
       for (const key in additionalParameters) {
-        oAuth2Uri += `&${key}=${additionalParameters[key]}`;
+        if (additionalParameters.hasOwnProperty(key)) {
+          oAuth2Uri += `&${key}=${additionalParameters[key]}`;
+        }
       }
     }
 
@@ -74,8 +76,10 @@ export class SocialLoginButton extends React.Component<SocialLoginButtonProps, S
     return (
       <a
         className={`btn btn-block btn-social btn-${providerName}`}
-        href={`${this.state.oAuth2Uri}`}>
-        <span className={`fa fa-${providerName}`}></span> Sign in with {providerName[0].toUpperCase() + providerName.slice(1)}
+        href={`${this.state.oAuth2Uri}`}
+      >
+        <span className={`fa fa-${providerName}`}/>
+        Sign in with {providerName[0].toUpperCase() + providerName.slice(1)}
       </a>
     );
   }

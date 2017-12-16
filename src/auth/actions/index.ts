@@ -2,18 +2,18 @@ import { Action, Dispatch } from "redux";
 // This import will remap the typing for Dispatch so it's more tolerant of passing functions
 import "redux-thunk";
 import { IUser } from "../../types/index";
-import { AuthState } from "./../model/AuthenticationState";
+import { IAuthState } from "./../model/AuthenticationState";
 
 const typeCache: { [label: string]: boolean } = {};
 
 function type<T>(label: T | ""): T {
-	if (typeCache[label as string]) {
-		throw new Error(`Action type "${label}" is not unique`);
-	}
+  if (typeCache[label as string]) {
+    throw new Error(`Action type "${label}" is not unique`);
+  }
 
-	typeCache[label as string] = true;
+  typeCache[label as string] = true;
 
-	return label as T;
+  return label as T;
 }
 
 export const ActionTypes = {
@@ -25,10 +25,6 @@ export const ActionTypes = {
   SET_REDIRECT: type<"SET_REDIRECT">("SET_REDIRECT"),
   CLEAR_REDIRECT: type<"CLEAR_REDIRECT">("CLEAR_REDIRECT"),
 };
-
-export type AuthAction = IStartLogin | ICompleteLogin | IStartLogout | ICompleteLogout;
-
-export interface IStartLogin extends Action {}
 
 function startLogin() {
   return {
@@ -49,28 +45,18 @@ function completeLogin(accessToken: string) {
   };
 }
 
-export interface FailLogin extends Action {
+export interface IFailLogin extends Action {
   error: string;
 }
 
-function failLogin(error: string): FailLogin {
+function failLogin(error: string): IFailLogin {
   return {
     type: ActionTypes.FAIL_LOGIN,
     error,
   };
 }
 
-export interface IStartLogout extends Action {}
-
-function startLogout(): IStartLogout {
-  return {
-    type: ActionTypes.START_LOGOUT,
-  };
-}
-
-export interface ICompleteLogout extends Action {}
-
-export function completeLogout(): ICompleteLogout {
+export function completeLogout(): Action {
   return {
     type: ActionTypes.COMPLETE_LOGOUT,
   };
@@ -87,16 +73,14 @@ export function setRedirect(redirectPath: string): ISetRedirect {
   };
 }
 
-export interface IClearRedirect extends Action {}
-
-export function clearRedirect(): IClearRedirect {
+export function clearRedirect(): Action {
   return {
     type: ActionTypes.CLEAR_REDIRECT,
   };
 }
 
 export function login(provider: string, code: string, redirectUri: string) {
-  return (dispatch: Dispatch<AuthState>) => {
+  return (dispatch: Dispatch<IAuthState>) => {
     dispatch(startLogin());
     return fetch("/api/login/social/jwt/", {
       method: "POST",

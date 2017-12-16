@@ -1,15 +1,13 @@
-import { ActionTypes, AuthAction, ISetRedirect } from "../actions/index";
-import { LoginState } from "../model/AuthenticationState";
+import { ActionTypes, AuthAction, ICompleteLogin, ISetRedirect } from "../actions/index";
+import { DEFAULT_AUTH_STATE, IAuthInnerState, LoginState } from "../model/AuthenticationState";
 import Cookies from "../utils/cookies";
-import { ICompleteLogin } from "./../actions/index";
-import { AuthInnerState, DEFAULT_AUTH_STATE } from "./../model/AuthenticationState";
 
 const SECONDS_IN_MINUTE = 60;
 const MINUTES_IN_HOUR = 60;
 const HOURS_IN_DAY = 24;
 const SECONDS_IN_DAY = SECONDS_IN_MINUTE * MINUTES_IN_HOUR * HOURS_IN_DAY;
 
-export function auth(state: AuthInnerState = DEFAULT_AUTH_STATE, action: AuthAction) {
+export function auth(state: IAuthInnerState = DEFAULT_AUTH_STATE, action: AuthAction) {
   switch (action.type) {
     case ActionTypes.START_LOGIN:
       return {...state, loginState: LoginState.LoggingIn};

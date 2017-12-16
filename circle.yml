@@ -12,6 +12,7 @@ dependencies:
 
 test:
   override:
+    - yarn lint
     - yarn build
 
 deployment:

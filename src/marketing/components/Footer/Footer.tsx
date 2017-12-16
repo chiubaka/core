@@ -1,11 +1,11 @@
 import * as React from "react";
-import { PrivacyPolicyModal, PrivacyPolicyModalProps } from "../PrivacyPolicyModal/PrivacyPolicyModal";
+import { IPrivacyPolicyModalProps, PrivacyPolicyModal } from "../PrivacyPolicyModal/PrivacyPolicyModal";
 
-export interface FooterProps extends PrivacyPolicyModalProps {
+export interface IFooterProps extends IPrivacyPolicyModalProps {
   disclaimer?: string;
 }
 
-export class Footer extends React.Component<FooterProps> {
+export class Footer extends React.Component<IFooterProps> {
   public render(): JSX.Element {
     const disclaimer = this.props.disclaimer;
 

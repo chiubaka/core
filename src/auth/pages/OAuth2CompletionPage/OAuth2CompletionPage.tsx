@@ -1,39 +1,37 @@
 import { parse } from "query-string";
 import * as React from "react";
 import { connect } from "react-redux";
-import { RouteComponentProps, withRouter } from "react-router";
+import { RouteComponentProps, withRouter } from "react-router-dom";
 import { Dispatch } from "redux";
 import { ProgressBar } from "../../../app/components/ProgressBar";
 import { IOAuth2Props } from "../../../types/index";
 import { clearRedirect, login } from "../../actions/index";
-import { AuthState, LoginState } from "../../model/AuthenticationState";
+import { IAuthState, LoginState } from "../../model/AuthenticationState";
 import { buildOAuth2CallbackUri } from "../../utils/uri";
 
-export interface OAuth2CompletionPageParams {
+export interface IOAuth2CompletionPageParams {
   provider: string;
 }
 
-export interface OAuth2CompletionPageStateProps {
+export interface IOAuth2CompletionPageStateProps {
   loggedIn: boolean;
   redirectPath: string;
 }
 
-export interface OAuth2CompletionPageDispatchProps {
+export interface IOAuth2CompletionPageDispatchProps {
   clearRedirect: () => void;
   onOAuth2Completion: (provider: string, code: string, redirectUri: string) => void;
 }
 
-export interface OAuth2CompletionPageOwnProps extends IOAuth2Props {}
+export interface IOAuth2CompletionPageProps extends RouteComponentProps<IOAuth2CompletionPageParams>, IOAuth2Props,
+  IOAuth2CompletionPageStateProps, IOAuth2CompletionPageDispatchProps {}
 
-export declare type OAuth2CompletionPageProps = RouteComponentProps<OAuth2CompletionPageParams> & OAuth2CompletionPageOwnProps
-  & OAuth2CompletionPageStateProps & OAuth2CompletionPageDispatchProps;
-
-class OAuth2CompletionPage extends React.Component<OAuth2CompletionPageProps> {
+class OAuth2CompletionPage extends React.Component<IOAuth2CompletionPageProps> {
   public componentWillMount() {
     this.handleOAuth2AndRedirect(this.props);
   }
 
-  public componentWillReceiveProps(nextProps: OAuth2CompletionPageProps) {
+  public componentWillReceiveProps(nextProps: IOAuth2CompletionPageProps) {
     this.handleOAuth2AndRedirect(nextProps);
   }
 
@@ -47,7 +45,7 @@ class OAuth2CompletionPage extends React.Component<OAuth2CompletionPageProps> {
     );
   }
 
-  private handleOAuth2AndRedirect(props: OAuth2CompletionPageProps) {
+  private handleOAuth2AndRedirect(props: IOAuth2CompletionPageProps) {
     const queryParams = parse(props.location.search);
     const code = queryParams.code;
 
@@ -67,14 +65,14 @@ class OAuth2CompletionPage extends React.Component<OAuth2CompletionPageProps> {
   }
 }
 
-function mapStateToProps(state: AuthState): OAuth2CompletionPageStateProps {
+function mapStateToProps(state: IAuthState): IOAuth2CompletionPageStateProps {
   return {
     loggedIn: state.auth.loginState === LoginState.LoggedIn,
     redirectPath: state.auth.redirectPath,
   };
 }
 
-function mapDispatchToProps(dispatch: Dispatch<AuthState>): OAuth2CompletionPageDispatchProps {
+function mapDispatchToProps(dispatch: Dispatch<IAuthState>): IOAuth2CompletionPageDispatchProps {
   return {
     clearRedirect: () => {
       dispatch(clearRedirect());
@@ -85,4 +83,7 @@ function mapDispatchToProps(dispatch: Dispatch<AuthState>): OAuth2CompletionPage
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter<OAuth2CompletionPageProps>(OAuth2CompletionPage));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withRouter<IOAuth2CompletionPageProps>(OAuth2CompletionPage));
