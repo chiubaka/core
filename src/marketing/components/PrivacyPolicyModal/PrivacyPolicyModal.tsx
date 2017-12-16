@@ -77,8 +77,8 @@ export class PrivacyPolicyModal extends React.Component<IPrivacyPolicyModalProps
               <p>
                 In addition, we use Google Analytics as a third-party service to collect, monitor, and analyze this
                 data. Log Data about your Site usage is sent to Google Analytics via “cookies”. For a full disclosure of
-                how Google makes use of this data, please see their privacy and terms
-                <a href="https://www.google.com/policies/privacy/partners/">here</a>.
+                how Google makes use of this data, please see their privacy and
+                terms <a href="https://www.google.com/policies/privacy/partners/">here</a>.
               </p>
               <p>
                 This Site makes use of advanced Google Analytics Advertising Features such as Remarketing with Google
@@ -91,10 +91,10 @@ export class PrivacyPolicyModal extends React.Component<IPrivacyPolicyModalProps
                 Facebook Tools, which provide additional site analytics and ad targeting services.
               </p>
               <p>You have the right to opt-out of allowing your data to be used for analytics and advertising purposes.
-                For Google Analytics, you may opt-out by following Google’s instructions
-                <a href="https://tools.google.com/dlpage/gaoptout/">here</a>.
-                You can find more information about opting out of third party advertising cookies
-                <a href="http://www.aboutads.info/choices">here</a>.
+                For Google Analytics, you may opt-out by following Google’s
+                instructions <a href="https://tools.google.com/dlpage/gaoptout/">here</a>.
+                You can find more information about opting out of third party advertising
+                cookies <a href="http://www.aboutads.info/choices">here</a>.
               </p>
 
               <h4>Communications</h4>
@@ -130,8 +130,8 @@ export class PrivacyPolicyModal extends React.Component<IPrivacyPolicyModalProps
 
               <h4>Contact Us</h4>
 
-              If you have any questions about this Privacy Policy, please contact us by sending an email to
-              <a href={`mailto:privacy@${hostname}`}>privacy@{hostname}</a>.
+              If you have any questions about this Privacy Policy, please contact us by sending an email
+              to <a href={`mailto:privacy@${hostname}`}>privacy@{hostname}</a>.
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
