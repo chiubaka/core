@@ -19,7 +19,7 @@ declare global {
   }
 }
 
-class MailChimpSubscribeForm extends React.Component<IMailChimpSubscribeFormProps> {
+class MailChimpSubscribeFormImpl extends React.Component<IMailChimpSubscribeFormProps> {
   constructor() {
     super();
 
@@ -92,4 +92,4 @@ function mapStateToProps(state: IAnalyticsState): IAnalyticsInnerState {
   return state.analytics;
 }
 
-export default connect(mapStateToProps)(MailChimpSubscribeForm);
+export const MailChimpSubscribeForm = connect(mapStateToProps)(MailChimpSubscribeFormImpl);

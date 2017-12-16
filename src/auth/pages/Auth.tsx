@@ -5,7 +5,7 @@ import LoginPage, { ILoginPageOwnProps } from "./LoginPage/LoginPage";
 import LogoutPage from "./LogoutPage";
 import OAuth2CompletionPage from "./OAuth2CompletionPage/OAuth2CompletionPage";
 
-export default class Auth extends React.Component<ILoginPageOwnProps> {
+export class Auth extends React.Component<ILoginPageOwnProps> {
   public static defaultProps: Partial<ILoginPageOwnProps> = {
     // TODO: Figure out how to use SSL in local development, and remove this as an option--always use SSL
     useSsl: false,
