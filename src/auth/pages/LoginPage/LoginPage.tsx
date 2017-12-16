@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router";
 import { RouteComponentProps } from "react-router-dom";
 import { Dispatch } from "redux";
-import { ISocialLoginProvider, ProductProps } from "../../../types/index";
+import { ISocialLoginProvider, IProductProps } from "../../../types/index";
 import { setRedirect } from "../../actions/index";
 import { SocialLoginButton } from "../../components/SocialLoginButton";
 import { AuthState, LoginState } from "../../model/AuthenticationState";
@@ -17,7 +17,7 @@ export interface LoginPageDispatchProps {
   setRedirect: (redirectPath: string) => void;
 }
 
-export interface LoginPageOwnProps extends ProductProps, OAuth2CompletionPageOwnProps {
+export interface LoginPageOwnProps extends IProductProps, OAuth2CompletionPageOwnProps {
   defaultRedirectPath?: string;
   providers?: ISocialLoginProvider[];
 }

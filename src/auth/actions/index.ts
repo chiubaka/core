@@ -26,9 +26,9 @@ export const ActionTypes = {
   CLEAR_REDIRECT: type<"CLEAR_REDIRECT">("CLEAR_REDIRECT"),
 };
 
-export type AuthAction = StartLogin | CompleteLogin | StartLogout | CompleteLogout;
+export type AuthAction = IStartLogin | ICompleteLogin | IStartLogout | ICompleteLogout;
 
-export interface StartLogin extends Action {}
+export interface IStartLogin extends Action {}
 
 function startLogin() {
   return {
@@ -36,7 +36,7 @@ function startLogin() {
   };
 }
 
-export interface CompleteLogin extends Action {
+export interface ICompleteLogin extends Action {
   accessToken: string;
   expires: number;
 }
@@ -60,36 +60,36 @@ function failLogin(error: string): FailLogin {
   };
 }
 
-export interface StartLogout extends Action {}
+export interface IStartLogout extends Action {}
 
-function startLogout(): StartLogout {
+function startLogout(): IStartLogout {
   return {
     type: ActionTypes.START_LOGOUT,
   };
 }
 
-export interface CompleteLogout extends Action {}
+export interface ICompleteLogout extends Action {}
 
-export function completeLogout(): CompleteLogout {
+export function completeLogout(): ICompleteLogout {
   return {
     type: ActionTypes.COMPLETE_LOGOUT,
   };
 }
 
-export interface SetRedirect extends Action {
+export interface ISetRedirect extends Action {
   redirectPath: string;
 }
 
-export function setRedirect(redirectPath: string): SetRedirect {
+export function setRedirect(redirectPath: string): ISetRedirect {
   return {
     type: ActionTypes.SET_REDIRECT,
     redirectPath,
   };
 }
 
-export interface ClearRedirect extends Action {}
+export interface IClearRedirect extends Action {}
 
-export function clearRedirect(): ClearRedirect {
+export function clearRedirect(): IClearRedirect {
   return {
     type: ActionTypes.CLEAR_REDIRECT,
   };
@@ -119,13 +119,3 @@ export function login(provider: string, code: string, redirectUri: string) {
       });
   };
 }
-
-// Since we're using JWT, login/logout state is not held by the server. The logout process
-// can be handled entirely client-side by destroying the JWT token and changing the app
-// state.
-// export function logout() {
-//   return (dispatch: Dispatch<AuthState>) => {
-//     dispatch(completeLogout());
-//     //dispatch(push("/"));
-//   };
-// }

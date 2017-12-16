@@ -1,9 +1,9 @@
 import "font-awesome-webpack";
 import * as React from "react";
-import { OAuth2Props } from "../../types/index";
+import { IOAuth2Props } from "../../types/index";
 import { buildOAuth2CallbackUri } from "../utils/uri";
 
-export interface SocialLoginButtonProps extends OAuth2Props {
+export interface SocialLoginButtonProps extends IOAuth2Props {
   clientId: string;
   providerName: string;
   redirectPath?: string;

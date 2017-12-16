@@ -1,8 +1,8 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { AnalyticsInnerState, AnalyticsState } from "../../../analytics/model/AnalyticsState";
+import { IAnalyticsInnerState, IAnalyticsState } from "../../../analytics/model/AnalyticsState";
 
-export declare type MailChimpSubscribeFormStateProps = AnalyticsInnerState;
+export declare type MailChimpSubscribeFormStateProps = IAnalyticsInnerState;
 
 export interface MailChimpSubscribeFormOwnProps {
   username: string;
@@ -61,7 +61,7 @@ class MailChimpSubscribeForm extends React.Component<MailChimpSubscribeFormProps
   }
 }
 
-function mapStateToProps(state: AnalyticsState): MailChimpSubscribeFormStateProps {
+function mapStateToProps(state: IAnalyticsState): MailChimpSubscribeFormStateProps {
   return state.analytics;
 }
 

@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Dispatch } from "redux";
 import { ProgressBar } from "../../../app/components/ProgressBar";
-import { OAuth2Props } from "../../../types/index";
+import { IOAuth2Props } from "../../../types/index";
 import { clearRedirect, login } from "../../actions/index";
 import { AuthState, LoginState } from "../../model/AuthenticationState";
 import { buildOAuth2CallbackUri } from "../../utils/uri";
@@ -23,7 +23,7 @@ export interface OAuth2CompletionPageDispatchProps {
   onOAuth2Completion: (provider: string, code: string, redirectUri: string) => void;
 }
 
-export interface OAuth2CompletionPageOwnProps extends OAuth2Props {}
+export interface OAuth2CompletionPageOwnProps extends IOAuth2Props {}
 
 export declare type OAuth2CompletionPageProps = RouteComponentProps<OAuth2CompletionPageParams> & OAuth2CompletionPageOwnProps
   & OAuth2CompletionPageStateProps & OAuth2CompletionPageDispatchProps;

@@ -1,7 +1,7 @@
-import { ActionTypes, AuthAction, SetRedirect } from "../actions/index";
+import { ActionTypes, AuthAction, ISetRedirect } from "../actions/index";
 import { LoginState } from "../model/AuthenticationState";
 import Cookies from "../utils/cookies";
-import { CompleteLogin } from "./../actions/index";
+import { ICompleteLogin } from "./../actions/index";
 import { AuthInnerState, DEFAULT_AUTH_STATE } from "./../model/AuthenticationState";
 
 const SECONDS_IN_MINUTE = 60;
@@ -14,7 +14,7 @@ export function auth(state: AuthInnerState = DEFAULT_AUTH_STATE, action: AuthAct
     case ActionTypes.START_LOGIN:
       return {...state, loginState: LoginState.LoggingIn};
     case ActionTypes.COMPLETE_LOGIN:
-      const completeLogin = (action as CompleteLogin);
+      const completeLogin = (action as ICompleteLogin);
       // Backend returns expiration in seconds, while front-end cookie framework takes expiration in days
       Cookies.setAccessToken(completeLogin.accessToken, completeLogin.expires / SECONDS_IN_DAY);
       return {...state, loginState: LoginState.LoggedIn, accessToken: completeLogin.accessToken};
@@ -26,7 +26,7 @@ export function auth(state: AuthInnerState = DEFAULT_AUTH_STATE, action: AuthAct
       Cookies.removeAccessToken();
       return {...state, accessToken: undefined, loginState: LoginState.NotLoggedIn};
     case ActionTypes.SET_REDIRECT:
-      const redirectPath = (action as SetRedirect).redirectPath;
+      const redirectPath = (action as ISetRedirect).redirectPath;
       Cookies.setRedirectPath(redirectPath);
       return {...state, redirectPath};
     case ActionTypes.CLEAR_REDIRECT:
