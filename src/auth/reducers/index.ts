@@ -1,13 +1,14 @@
-import { ActionTypes, AuthAction, ICompleteLogin, ISetRedirect } from "../actions/index";
+import { Action } from "redux";
+import { ActionTypes, ICompleteLogin, ISetRedirect } from "../actions/index";
 import { DEFAULT_AUTH_STATE, IAuthInnerState, LoginState } from "../model/AuthenticationState";
-import Cookies from "../utils/cookies";
+import * as Cookies from "../utils/cookies";
 
 const SECONDS_IN_MINUTE = 60;
 const MINUTES_IN_HOUR = 60;
 const HOURS_IN_DAY = 24;
 const SECONDS_IN_DAY = SECONDS_IN_MINUTE * MINUTES_IN_HOUR * HOURS_IN_DAY;
 
-export function auth(state: IAuthInnerState = DEFAULT_AUTH_STATE, action: AuthAction) {
+export function auth(state: IAuthInnerState = DEFAULT_AUTH_STATE, action: Action) {
   switch (action.type) {
     case ActionTypes.START_LOGIN:
       return {...state, loginState: LoginState.LoggingIn};

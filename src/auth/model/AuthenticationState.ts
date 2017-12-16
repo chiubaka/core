@@ -1,4 +1,4 @@
-import Cookies from "../utils/cookies";
+import * as Cookies from "../utils/cookies";
 
 export enum LoginState {
   NotLoggedIn,
