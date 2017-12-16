@@ -16,7 +16,7 @@ export interface IAuthenticatedContainerOwnProps {
 export interface IAuthenticatedContainerProps extends RouteComponentProps<any>, IAuthenticatedContainerStateProps,
   IAuthenticatedContainerOwnProps {}
 
-class AuthenticatedContainer extends React.Component<IAuthenticatedContainerProps, {}> {
+class AuthenticatedContainerImpl extends React.Component<IAuthenticatedContainerProps, {}> {
   public static defaultProps: Partial<IAuthenticatedContainerProps> = {
     loginPath: "/auth/login",
   };
@@ -57,4 +57,6 @@ function mapStateToProps<S extends IAuthState>(state: S): IAuthenticatedContaine
   };
 }
 
-export default connect(mapStateToProps)(withRouter<IAuthenticatedContainerProps>(AuthenticatedContainer));
+export const AuthenticatedContainer = connect(
+  mapStateToProps
+)(withRouter<IAuthenticatedContainerProps>(AuthenticatedContainerImpl));
