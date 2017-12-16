@@ -1,18 +1,18 @@
-export interface ProductState {
-  product: ProductInnerState;
+export interface IProductState {
+  product: IProductInnerState;
 }
 
-export interface ProductInnerState {
+export interface IProductInnerState {
   logoPath: string;
   productName: string;
   testMarketingMode: boolean;
 }
 
-export interface ServiceState {
-  service: ServiceInnerState;
+export interface IServiceState {
+  service: IServiceInnerState;
 }
 
-export interface ServiceInnerState {
+export interface IServiceInnerState {
   hostname: string;
   port: number;
   useSsl: boolean;

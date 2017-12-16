@@ -12,7 +12,7 @@ export class Icon extends React.Component<IconProps> {
     const sizeClass = size ? `fa-${size}` : "";
     const fixedWidthClass = fixedWidth ? "fa-fw" : "";
     return (
-      <i className={`fa fa-${iconName} ${sizeClass} ${fixedWidthClass}`}></i>
+      <i className={`fa fa-${iconName} ${sizeClass} ${fixedWidthClass}`}/>
     );
   }
 }

@@ -1,26 +1,25 @@
 import * as React from "react";
-import { AnalyticsInnerState, AnalyticsState } from "../../../analytics/model/AnalyticsState";
 import { connect } from "react-redux";
+import { IAnalyticsInnerState, IAnalyticsState } from "../../../analytics/model/AnalyticsState";
 
-export declare type MailChimpSubscribeFormStateProps = AnalyticsInnerState;
-
-export interface MailChimpSubscribeFormOwnProps {
+export interface IMailChimpSubscribeFormOwnProps {
   username: string;
   userId: string;
   listId: string;
   callToAction: string;
 }
 
-export declare type MailChimpSubscribeFormProps = MailChimpSubscribeFormOwnProps & MailChimpSubscribeFormStateProps;
+export interface IMailChimpSubscribeFormProps extends IMailChimpSubscribeFormOwnProps, IAnalyticsInnerState {}
 
 declare global {
+  // tslint:disable-next-line:interface-name
   interface Window {
-    fbq: (type: string, event: string, options?: any) => void,
-    gtag: (command: string, type: string, options?: any) => void
+    fbq: (type: string, event: string, options?: any) => void;
+    gtag: (command: string, type: string, options?: any) => void;
   }
 }
 
-class MailChimpSubscribeForm extends React.Component<MailChimpSubscribeFormProps> {
+class MailChimpSubscribeForm extends React.Component<IMailChimpSubscribeFormProps> {
   constructor() {
     super();
 
@@ -36,8 +35,8 @@ class MailChimpSubscribeForm extends React.Component<MailChimpSubscribeFormProps
       window.gtag("event", "click", {event_category: "button", event_label: "Beta SignUp"});
     }
     if (this.props.googleEmailSignUpConversionEventId) {
-      window.gtag('event', 'conversion', {
-        'send_to': this.props.googleEmailSignUpConversionEventId,
+      window.gtag("event", "conversion", {
+        send_to: this.props.googleEmailSignUpConversionEventId,
       });
     }
   }
@@ -48,12 +47,40 @@ class MailChimpSubscribeForm extends React.Component<MailChimpSubscribeFormProps
     return (
       <div>
         <div id="mc_embed_signup">
-          <form action={`//${username}.us16.list-manage.com/subscribe/post?u=${userId}&amp;id=${listId}`} method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" className="validate" target="_blank" noValidate>
+          <form
+            action={`//${username}.us16.list-manage.com/subscribe/post?u=${userId}&amp;id=${listId}`}
+            method="post"
+            id="mc-embedded-subscribe-form"
+            name="mc-embedded-subscribe-form"
+            className="validate"
+            target="_blank"
+            noValidate={true}
+          >
             <div id="mc_embed_signup_scroll" className="form-group">
-              <input type="email" name="EMAIL" className="email form-control" id="mce-EMAIL" placeholder="Enter email address" required/>
-              <div style={{position: "absolute", left: "-5000px"}} aria-hidden="true"><input type="text" name={`b_${userId}_${listId}`} tabIndex={-1} value=""/></div>
+              <input
+                type="email"
+                name="EMAIL"
+                className="email form-control"
+                id="mce-EMAIL"
+                placeholder="Enter email address"
+                required={true}
+              />
+              <div
+                style={{position: "absolute", left: "-5000px"}}
+                aria-hidden="true"
+              >
+                <input type="text" name={`b_${userId}_${listId}`} tabIndex={-1} value=""/>
+              </div>
             </div>
-            <button type="submit" name="subscribe" id="mc-embedded-subscribe" className="btn call-to-action" onClick={this.onSubmit}>{callToAction}</button>
+            <button
+              type="submit"
+              name="subscribe"
+              id="mc-embedded-subscribe"
+              className="btn call-to-action"
+              onClick={this.onSubmit}
+            >
+              {callToAction}
+            </button>
           </form>
         </div>
       </div>
@@ -61,7 +88,7 @@ class MailChimpSubscribeForm extends React.Component<MailChimpSubscribeFormProps
   }
 }
 
-function mapStateToProps(state: AnalyticsState): MailChimpSubscribeFormStateProps {
+function mapStateToProps(state: IAnalyticsState): IAnalyticsInnerState {
   return state.analytics;
 }
 

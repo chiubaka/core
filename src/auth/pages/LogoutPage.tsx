@@ -1,22 +1,21 @@
 import * as React from "react";
-import { RouteComponentProps } from 'react-router-dom';
-import { withRouter } from 'react-router';
-import { connect } from 'react-redux';
-import { AuthState } from '../model/AuthenticationState';
-import { Dispatch } from 'redux';
+import { connect } from "react-redux";
+import { RouteComponentProps, withRouter } from "react-router-dom";
+import { Dispatch } from "redux";
 import { completeLogout } from "../actions/index";
+import { IAuthState } from "../model/AuthenticationState";
 
-export interface LogoutPageDispatchProps {
+export interface ILogoutPageDispatchProps {
   onLogout: () => void;
 }
 
-declare type LogoutPageOwnProps = RouteComponentProps<any> & {
+export interface ILogoutPageOwnProps extends RouteComponentProps<any> {
   redirectUri?: string;
-};
+}
 
-declare type LogoutPageProps = LogoutPageOwnProps & LogoutPageDispatchProps
+export interface ILogoutPageProps extends ILogoutPageOwnProps, ILogoutPageDispatchProps {}
 
-class LogoutPage extends React.Component<LogoutPageProps, {}> {
+class LogoutPage extends React.Component<ILogoutPageProps, {}> {
   public componentWillMount() {
     this.props.onLogout();
   }
@@ -26,14 +25,14 @@ class LogoutPage extends React.Component<LogoutPageProps, {}> {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch<AuthState>, ownProps: LogoutPageOwnProps): LogoutPageDispatchProps {
+function mapDispatchToProps(dispatch: Dispatch<IAuthState>, ownProps: ILogoutPageOwnProps): ILogoutPageDispatchProps {
   return {
     onLogout: () => {
       dispatch(completeLogout());
       const redirectUri = ownProps.redirectUri ? ownProps.redirectUri : "/";
       ownProps.history.replace(redirectUri);
-    }
+    },
   };
 }
 
-export default connect(null, mapDispatchToProps)(withRouter<LogoutPageProps>(LogoutPage));
+export default connect(null, mapDispatchToProps)(withRouter<ILogoutPageProps>(LogoutPage));

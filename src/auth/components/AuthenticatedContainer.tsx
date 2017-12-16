@@ -1,32 +1,31 @@
 import * as React from "react";
-import { RouteComponentProps } from 'react-router-dom';
-import { withRouter } from 'react-router';
-import { AuthState, LoginState } from '../model/AuthenticationState';
-import { connect, DispatchProp } from 'react-redux';
+import { connect } from "react-redux";
+import { RouteComponentProps, withRouter } from "react-router-dom";
+import { IAuthState, LoginState } from "../model/AuthenticationState";
 
-export interface AuthenticatedContainerStateProps {
+export interface IAuthenticatedContainerStateProps {
   isLoggedIn: boolean;
 }
 
-export interface AuthenticatedContainerOwnProps {
+export interface IAuthenticatedContainerOwnProps {
   id?: string;
   className?: string;
   loginPath?: string;
 }
 
-declare type AuthenticatedContainerProps = RouteComponentProps<any> & AuthenticatedContainerStateProps 
-  & AuthenticatedContainerOwnProps
+export interface IAuthenticatedContainerProps extends RouteComponentProps<any>, IAuthenticatedContainerStateProps,
+  IAuthenticatedContainerOwnProps {}
 
-class AuthenticatedContainer extends React.Component<AuthenticatedContainerProps, {}> {
-  public static defaultProps: Partial<AuthenticatedContainerProps> = {
-    loginPath: "/auth/login"
+class AuthenticatedContainerImpl extends React.Component<IAuthenticatedContainerProps, {}> {
+  public static defaultProps: Partial<IAuthenticatedContainerProps> = {
+    loginPath: "/auth/login",
   };
-  
+
   public componentWillMount() {
     this.checkAuthentication(this.props);
   }
-  
-  public componentWillReceiveProps(nextProps: AuthenticatedContainerProps) {
+
+  public componentWillReceiveProps(nextProps: IAuthenticatedContainerProps) {
     if (nextProps.location !== this.props.location) {
       this.checkAuthentication(nextProps);
     }
@@ -39,13 +38,12 @@ class AuthenticatedContainer extends React.Component<AuthenticatedContainerProps
           {this.props.children}
         </div>
       );
-    }
-    else {
+    } else {
       return null;
     }
   }
 
-  private checkAuthentication(props: AuthenticatedContainerProps) {
+  private checkAuthentication(props: IAuthenticatedContainerProps) {
     const { history } = props;
     if (!props.isLoggedIn) {
       history.replace({ pathname: props.loginPath, state: { redirectPath: props.location.pathname }});
@@ -53,10 +51,12 @@ class AuthenticatedContainer extends React.Component<AuthenticatedContainerProps
   }
 }
 
-function mapStateToProps<S extends AuthState>(state: S): AuthenticatedContainerStateProps {
+function mapStateToProps<S extends IAuthState>(state: S): IAuthenticatedContainerStateProps {
   return {
-    isLoggedIn: !(state.auth.loginState === LoginState.NotLoggedIn)
+    isLoggedIn: !(state.auth.loginState === LoginState.NotLoggedIn),
   };
 }
 
-export default connect(mapStateToProps)(withRouter<AuthenticatedContainerProps>(AuthenticatedContainer));
+export const AuthenticatedContainer = connect(
+  mapStateToProps,
+)(withRouter<IAuthenticatedContainerProps>(AuthenticatedContainerImpl));

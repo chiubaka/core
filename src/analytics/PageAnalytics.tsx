@@ -1,20 +1,20 @@
 import * as React from "react";
-import { RouteComponentProps } from "react-router";
 import { connect } from "react-redux";
-import { AnalyticsInnerState, AnalyticsState } from "./model/AnalyticsState";
+import { RouteComponentProps } from "react-router-dom";
+import { IAnalyticsInnerState, IAnalyticsState } from "./model/AnalyticsState";
 
-declare type PageStateProps = AnalyticsInnerState;
-
-declare type PageProps<MatchParams> = PageStateProps & RouteComponentProps<MatchParams>;
+declare type PageProps<MatchParams> = IAnalyticsInnerState & RouteComponentProps<MatchParams>;
 
 declare global {
+  // tslint:disable-next-line:interface-name
   interface Window {
-    fbq: (type: string, event: string, options?: any) => void,
-    gtag: (command: string, type: string, options?: any) => void
+    fbq: (type: string, event: string, options?: any) => void;
+    gtag: (command: string, type: string, options?: any) => void;
   }
 }
 
-export function withPageAnalytics<WrappedComponentProps>(WrappedComponent: React.ComponentClass<RouteComponentProps<any>>) {
+export function withPageAnalytics<WrappedComponentProps>(
+  WrappedComponent: React.ComponentClass<RouteComponentProps<any>>) {
   class Page<MatchParams> extends React.Component<PageProps<MatchParams> & WrappedComponentProps> {
     public componentDidMount(): void {
       const path = this.props.location.pathname;
@@ -33,7 +33,7 @@ export function withPageAnalytics<WrappedComponentProps>(WrappedComponent: React
     }
   }
 
-  function mapStateToProps(state: AnalyticsState): PageStateProps {
+  function mapStateToProps(state: IAnalyticsState): IAnalyticsInnerState {
     return state.analytics;
   }
 

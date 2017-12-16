@@ -1,0 +1,10 @@
+{
+  "extends": ["tslint:latest", "tslint-react", "tslint-blueprint"],
+  "rules": {
+    "no-console": [true, "log"],
+    "no-unused-variable": [true, {"ignore-pattern": "^_"}],
+    "no-var-requires": false,
+    "object-literal-sort-keys": false,
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"]
+  }
+}

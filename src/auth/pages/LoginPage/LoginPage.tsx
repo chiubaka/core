@@ -1,41 +1,40 @@
 import * as React from "react";
-import { RouteComponentProps } from "react-router-dom";
-import { withRouter } from "react-router";
 import { connect } from "react-redux";
-import { AuthState, LoginState } from '../../model/AuthenticationState';
-import { SocialLoginButton } from "../../components/SocialLoginButton";
-import { ISocialLoginProvider, ProductProps } from "../../../types/index";
-import { OAuth2CompletionPageOwnProps } from "../OAuth2CompletionPage/OAuth2CompletionPage";
+import { RouteComponentProps, withRouter } from "react-router-dom";
 import { Dispatch } from "redux";
+import { IOAuth2Props, IProductProps, ISocialLoginProvider } from "../../../types/index";
 import { setRedirect } from "../../actions/index";
+import { SocialLoginButton } from "../../components/SocialLoginButton";
+import { IAuthState, LoginState } from "../../model/AuthenticationState";
 
-export interface LoginPageStateProps {
+export interface ILoginPageStateProps {
   loggedIn: boolean;
 }
 
-export interface LoginPageDispatchProps {
+export interface ILoginPageDispatchProps {
   setRedirect: (redirectPath: string) => void;
 }
 
-export interface LoginPageOwnProps extends ProductProps, OAuth2CompletionPageOwnProps {
+export interface ILoginPageOwnProps extends IProductProps, IOAuth2Props {
   defaultRedirectPath?: string;
   providers?: ISocialLoginProvider[];
 }
 
-declare type LoginPageProps = RouteComponentProps<any> & LoginPageStateProps & LoginPageDispatchProps & LoginPageOwnProps;
+export interface ILoginPageProps extends RouteComponentProps<any>, ILoginPageStateProps, ILoginPageDispatchProps,
+  ILoginPageOwnProps {}
 
-class LoginPage extends React.Component<LoginPageProps, React.ComponentState> {
-  public static defaultProps: Partial<LoginPageProps> = {
+class LoginPage extends React.Component<ILoginPageProps, React.ComponentState> {
+  public static defaultProps: Partial<ILoginPageProps> = {
     loggedIn: false,
     defaultRedirectPath: "/",
     providers: [],
   };
 
-  constructor(props?: LoginPageProps) {
+  constructor(props?: ILoginPageProps) {
     super(props);
   }
 
-  public componentWillReceiveProps(props?: LoginPageProps) {
+  public componentWillReceiveProps(props?: ILoginPageProps) {
     this.checkAuthentication(props);
     this.setRedirect(props);
   }
@@ -61,7 +60,7 @@ class LoginPage extends React.Component<LoginPageProps, React.ComponentState> {
       );
     });
   }
-  
+
   public render(): JSX.Element {
     return (
       <div className="login-page container d-table">
@@ -81,18 +80,17 @@ class LoginPage extends React.Component<LoginPageProps, React.ComponentState> {
     );
   }
 
-  private checkAuthentication(props: LoginPageProps) {
+  private checkAuthentication(props: ILoginPageProps) {
     if (props.loggedIn) {
       if (props.location.state && props.location.state.redirectPath) {
         props.history.push(props.location.state.redirectPath);
-      }
-      else {
+      } else {
         props.history.push(props.defaultRedirectPath);
       }
     }
   }
 
-  private setRedirect(props: LoginPageProps) {
+  private setRedirect(props: ILoginPageProps) {
     const redirectPath = props.location.state && props.location.state.redirectPath;
 
     if (redirectPath) {
@@ -101,18 +99,18 @@ class LoginPage extends React.Component<LoginPageProps, React.ComponentState> {
   }
 }
 
-function mapStateToProps(state: AuthState): LoginPageStateProps {
+function mapStateToProps(state: IAuthState): ILoginPageStateProps {
   return {
-    loggedIn: state.auth.loginState === LoginState.LoggedIn
+    loggedIn: state.auth.loginState === LoginState.LoggedIn,
   };
 }
 
-function mapDispatchToProps(dispatch: Dispatch<AuthState>): LoginPageDispatchProps {
+function mapDispatchToProps(dispatch: Dispatch<IAuthState>): ILoginPageDispatchProps {
   return {
     setRedirect: (redirectPath: string) => {
       dispatch(setRedirect(redirectPath));
-    }
+    },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter<LoginPageProps>(LoginPage));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter<ILoginPageProps>(LoginPage));

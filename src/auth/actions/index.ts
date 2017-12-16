@@ -1,20 +1,19 @@
-import { AuthState } from './../model/AuthenticationState';
-import { push } from "react-router-redux";
 import { Action, Dispatch } from "redux";
 // This import will remap the typing for Dispatch so it's more tolerant of passing functions
 import "redux-thunk";
 import { IUser } from "../../types/index";
+import { IAuthState } from "./../model/AuthenticationState";
 
 const typeCache: { [label: string]: boolean } = {};
 
 function type<T>(label: T | ""): T {
-	if (typeCache[<string>label]) {
-		throw new Error(`Action type "${label}" is not unique`);
-	}
+  if (typeCache[label as string]) {
+    throw new Error(`Action type "${label}" is not unique`);
+  }
 
-	typeCache[<string>label] = true;
+  typeCache[label as string] = true;
 
-	return <T>label;
+  return label as T;
 }
 
 export const ActionTypes = {
@@ -27,17 +26,13 @@ export const ActionTypes = {
   CLEAR_REDIRECT: type<"CLEAR_REDIRECT">("CLEAR_REDIRECT"),
 };
 
-export type AuthAction = StartLogin | CompleteLogin | StartLogout | CompleteLogout;
-
-export interface StartLogin extends Action {}
-
 function startLogin() {
   return {
-    type: ActionTypes.START_LOGIN
-  }
+    type: ActionTypes.START_LOGIN,
+  };
 }
 
-export interface CompleteLogin extends Action {
+export interface ICompleteLogin extends Action {
   accessToken: string;
   expires: number;
 }
@@ -50,67 +45,55 @@ function completeLogin(accessToken: string) {
   };
 }
 
-export interface FailLogin extends Action {
+export interface IFailLogin extends Action {
   error: string;
 }
 
-function failLogin(error: string): FailLogin {
+function failLogin(error: string): IFailLogin {
   return {
     type: ActionTypes.FAIL_LOGIN,
-    error
+    error,
   };
 }
 
-export interface StartLogout extends Action {}
-
-function startLogout(): StartLogout {
+export function completeLogout(): Action {
   return {
-    type: ActionTypes.START_LOGOUT
+    type: ActionTypes.COMPLETE_LOGOUT,
   };
 }
 
-export interface CompleteLogout extends Action {}
-
-export function completeLogout(): CompleteLogout {
-  return {
-    type: ActionTypes.COMPLETE_LOGOUT
-  };
-}
-
-export interface SetRedirect extends Action {
+export interface ISetRedirect extends Action {
   redirectPath: string;
 }
 
-export function setRedirect(redirectPath: string): SetRedirect {
+export function setRedirect(redirectPath: string): ISetRedirect {
   return {
     type: ActionTypes.SET_REDIRECT,
-    redirectPath
+    redirectPath,
   };
 }
 
-export interface ClearRedirect extends Action {}
-
-export function clearRedirect(): ClearRedirect {
+export function clearRedirect(): Action {
   return {
-    type: ActionTypes.CLEAR_REDIRECT
+    type: ActionTypes.CLEAR_REDIRECT,
   };
 }
 
 export function login(provider: string, code: string, redirectUri: string) {
-  return (dispatch: Dispatch<AuthState>) => {
+  return (dispatch: Dispatch<IAuthState>) => {
     dispatch(startLogin());
     return fetch("/api/login/social/jwt/", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         provider,
         code,
-        redirect_uri: redirectUri
-      })
+        redirect_uri: redirectUri,
+      }),
     })
-      .then(response => response.json())
+      .then((response) => response.json())
       .then((response: IUser) => {
         dispatch(completeLogin(response.token));
       })
@@ -118,15 +101,5 @@ export function login(provider: string, code: string, redirectUri: string) {
         // TODO: /auth/login should be a variable somewhere
         return dispatch(failLogin(error));
       });
-  }
+  };
 }
-
-// Since we're using JWT, login/logout state is not held by the server. The logout process
-// can be handled entirely client-side by destroying the JWT token and changing the app
-// state.
-// export function logout() {
-//   return (dispatch: Dispatch<AuthState>) => {
-//     dispatch(completeLogout());
-//     //dispatch(push("/"));
-//   };
-// }

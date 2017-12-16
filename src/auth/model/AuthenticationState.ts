@@ -1,33 +1,33 @@
-import Cookies from "../utils/cookies";
+import * as Cookies from "../utils/cookies";
 
 export enum LoginState {
   NotLoggedIn,
   LoggingIn,
   LoggedIn,
-  LoggingOut
+  LoggingOut,
 }
 
-export interface AuthState {
-  auth: AuthInnerState;
+export interface IAuthState {
+  auth: IAuthInnerState;
 }
 
-export interface AuthInnerState {
+export interface IAuthInnerState {
   accessToken?: string;
   loginState: LoginState;
   redirectPath?: string;
 }
 
-export const DEFAULT_AUTH_STATE: AuthInnerState = {
-  loginState: LoginState.NotLoggedIn
+export const DEFAULT_AUTH_STATE: IAuthInnerState = {
+  loginState: LoginState.NotLoggedIn,
 };
 
-export function getExistingAuthState(): AuthInnerState {
+export function getExistingAuthState(): IAuthInnerState {
   const accessToken = Cookies.getAccessToken();
   const redirectPath = Cookies.getRedirectPath();
-  
+
   return {
     accessToken,
     loginState: accessToken ? LoginState.LoggedIn : LoginState.NotLoggedIn,
-    redirectPath
+    redirectPath,
   };
 }

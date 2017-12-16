@@ -1,17 +1,24 @@
 import * as React from "react";
 
-export interface ModalProps {
+export interface IModalProps {
   footer?: JSX.Element[];
   id?: string;
   title: string;
 }
 
-export class Modal extends React.Component<ModalProps> {
+export class Modal extends React.Component<IModalProps> {
   public render(): JSX.Element {
-    const {footer, id, title}= this.props;
+    const {footer, id, title} = this.props;
 
     return (
-      <div className="modal fade" id={id} tabIndex={-1} role="dialog" aria-labelledby={`${id}-label`} aria-hidden="true">
+      <div
+        className="modal fade"
+        id={id}
+        tabIndex={-1}
+        role="dialog"
+        aria-labelledby={`${id}-label`}
+        aria-hidden="true"
+      >
         <div className="modal-dialog" role="document">
           <div className="modal-content">
             <div className="modal-header">
