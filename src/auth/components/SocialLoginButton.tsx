@@ -1,4 +1,3 @@
-import "font-awesome-webpack";
 import * as React from "react";
 import { IOAuth2Props } from "../../types/index";
 import { buildOAuth2CallbackUri } from "../utils/uri";
