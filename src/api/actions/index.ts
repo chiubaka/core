@@ -91,7 +91,7 @@ export class ModelApi<T extends IModel> {
 
   public update(original: T, updated: T) {
     return this.putRequest(
-      `${this.endpoint}${updated.id}`,
+      `${this.endpoint}${updated.id}/`,
       updated,
       (dispatch, response: T) => {
         dispatch(this.successfulUpdateAction(original, response));
