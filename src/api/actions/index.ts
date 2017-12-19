@@ -61,7 +61,6 @@ export class ModelApi<T extends IModel> {
   public SUCCESSFUL_CREATE_TYPE: string;
   public SUCCESSFUL_UPDATE_TYPE: string;
 
-  private getAccessToken: () => string;
   private endpoint: string;
 
   constructor(modelName: string) {
@@ -70,10 +69,6 @@ export class ModelApi<T extends IModel> {
     this.SUCCESSFUL_CREATE_TYPE = `SUCCESSFUL_CREATE_${modelName.toUpperCase()}`;
     this.SUCCESSFUL_UPDATE_TYPE = `SUCCESSFUL_UPDATE_${modelName.toUpperCase()}`;
     this.endpoint = `${ModelApi.API_PATH}/${modelName.toLowerCase()}s/`;
-  }
-
-  public initialize(accessTokenGetter: () => string) {
-    this.getAccessToken = accessTokenGetter;
   }
 
   public getAll() {
@@ -154,9 +149,9 @@ export class ModelApi<T extends IModel> {
 
   private apiRequest<ResponseType>(pathname: string, onSuccess: ApiSuccessCallback<ResponseType>,
                                    requestOptions: RequestInit = {}) {
-    return (dispatch: Dispatch<IAuthState>) => {
+    return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
       return fetch(pathname, {
-        headers: this.apiHeaders(),
+        headers: this.apiHeaders(getState().auth.accessToken),
         ...requestOptions,
       })
         .then<T>(ModelApi.handleApiResponse.bind(this, dispatch))
@@ -166,14 +161,9 @@ export class ModelApi<T extends IModel> {
     };
   }
 
-  private apiHeaders() {
+  private apiHeaders(accessToken: string) {
     const headers = new Headers();
-    if (this.getAccessToken) {
-      headers.append("Authorization", `JWT ${this.getAccessToken()}`);
-    } else {
-      console.warn("API class is uninitialized. Responses will likely come back unauthorized (401)." +
-        " To resolve this, call #initialize() with a valid function that returns the user's API accessToken.");
-    }
+    headers.append("Authorization", `JWT ${accessToken}`);
     headers.append("Content-Type", "application/json");
     return headers;
   }
