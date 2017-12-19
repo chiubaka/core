@@ -3,6 +3,7 @@ import { push } from "react-router-redux";
 import { Action, Dispatch } from "redux";
 
 import { IAuthState } from "../../auth/model/AuthenticationState";
+import { completeLogout } from "../../auth/actions/index";
 
 export declare type ApiSuccessCallback<T> = (dispatch: Dispatch<IAuthState>, response: T) => void;
 
@@ -41,7 +42,10 @@ export class ModelApi<T extends IModel> {
       case HttpStatus.CREATED:
         return Promise.resolve(response.json());
       case HttpStatus.UNAUTHORIZED:
-        dispatch(push("/auth/logout"));
+        dispatch(completeLogout());
+        dispatch(push("/auth/login", {
+          redirectPath: "/app",
+        }));
         return Promise.reject("You are not logged in.");
       case HttpStatus.BAD_REQUEST:
       case HttpStatus.INTERNAL_SERVER_ERROR:
