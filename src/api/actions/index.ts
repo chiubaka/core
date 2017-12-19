@@ -2,8 +2,8 @@ import * as HttpStatus from "http-status-codes";
 import { push } from "react-router-redux";
 import { Action, Dispatch } from "redux";
 
-import { IAuthState } from "../../auth/model/AuthenticationState";
 import { completeLogout } from "../../auth/actions/index";
+import { IAuthState } from "../../auth/model/AuthenticationState";
 
 export declare type ApiSuccessCallback<T> = (dispatch: Dispatch<IAuthState>, response: T) => void;
 
@@ -170,6 +170,9 @@ export class ModelApi<T extends IModel> {
     const headers = new Headers();
     if (this.getAccessToken) {
       headers.append("Authorization", `JWT ${this.getAccessToken()}`);
+    } else {
+      console.warn("API class is uninitialized. Responses will likely come back unauthorized (401)." +
+        " To resolve this, call #initialize() with a valid function that returns the user's API accessToken.");
     }
     headers.append("Content-Type", "application/json");
     return headers;
