@@ -61,5 +61,5 @@ export function modelApiAsArray<T extends IModel>(Api: ModelApi<T>) {
       default:
         return state;
     }
-  }
+  };
 }
