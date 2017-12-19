@@ -11,6 +11,7 @@ export function modelApiById<T extends IModel>(Api: ModelApi<T>) {
         objects.forEach((object) => {
           newState[object.id] = object;
         });
+        return newState;
       }
       case Api.SUCCESSFUL_CREATE_TYPE: {
         const object = (action as IApiResponse<T>).payload;
