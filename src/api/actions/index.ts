@@ -85,7 +85,7 @@ export class ModelApi<T extends IModel> {
 
   public create(payload: T) {
     return this.postRequest(this.endpoint, payload, (dispatch, response: T) => {
-      dispatch(this.successfulCreateAction(payload));
+      dispatch(this.successfulCreateAction(response));
     });
   }
 
