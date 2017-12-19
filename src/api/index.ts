@@ -57,11 +57,11 @@ export class ModelApi<T extends {id?: number}> {
   private endpoint: string;
 
   constructor(modelName: string) {
-    this.SUCCESSFUL_GET_ALL_TYPE = `SUCCESSFUL_GET_ALL_${modelName.toUpperCase()}`;
+    this.SUCCESSFUL_GET_ALL_TYPE = `SUCCESSFUL_GET_ALL_${modelName.toUpperCase()}S`;
     this.SUCCESSFUL_GET_TYPE = `SUCCESSFUL_GET_${modelName.toUpperCase()}`;
     this.SUCCESSFUL_CREATE_TYPE = `SUCCESSFUL_CREATE_${modelName.toUpperCase()}`;
     this.SUCCESSFUL_UPDATE_TYPE = `SUCCESSFUL_UPDATE_${modelName.toUpperCase()}`;
-    this.endpoint = `${ModelApi.API_PATH}/${modelName.toLowerCase()}/`;
+    this.endpoint = `${ModelApi.API_PATH}/${modelName.toLowerCase()}s/`;
   }
 
   public initialize(accessTokenGetter: () => string) {
