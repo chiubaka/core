@@ -1,18 +1,21 @@
 import * as JsCookies from "js-cookie";
+import { IUser } from "../../types/index";
 
-export const ACCESS_TOKEN_KEY = "accessToken";
+export const USER_KEY = "user";
 export const REDIRECT_PATH_KEY = "redirectPath";
 
-export function setAccessToken(accessToken: string, expires: number) {
-  JsCookies.set(ACCESS_TOKEN_KEY, accessToken, { expires });
+// TODO: Default value of 1 here, represents the 1 day value placed in the Django server code
+// for auth token expiry. Would be great to not define this in both places...
+export function setUser(user: IUser, expires: number = 1) {
+  JsCookies.set(USER_KEY, user, { expires });
 }
 
-export function getAccessToken() {
-  return JsCookies.get(ACCESS_TOKEN_KEY);
+export function getUser(): IUser {
+  return JsCookies.getJSON(USER_KEY) as IUser;
 }
 
-export function removeAccessToken() {
-  JsCookies.remove(ACCESS_TOKEN_KEY);
+export function removeUser() {
+  JsCookies.remove(USER_KEY);
 }
 
 export function setRedirectPath(redirectPath: string) {

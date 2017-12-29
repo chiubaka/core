@@ -1,7 +1,7 @@
 import { Action, Dispatch } from "redux";
 // This import will remap the typing for Dispatch so it's more tolerant of passing functions
 import "redux-thunk";
-import { IUser } from "../../types/index";
+import { IUser, IUserResponse } from "../../types/index";
 import { IAuthState } from "./../model/AuthenticationState";
 
 const typeCache: { [label: string]: boolean } = {};
@@ -33,15 +33,14 @@ function startLogin() {
 }
 
 export interface ICompleteLogin extends Action {
-  accessToken: string;
-  expires: number;
+  user: IUser;
 }
 
 // TODO: rest-social-auth documentation doesn't reference a token expiration parameter, but I should find and set one
-function completeLogin(accessToken: string) {
+function completeLogin(user: IUser): ICompleteLogin {
   return {
     type: ActionTypes.COMPLETE_LOGIN,
-    accessToken,
+    user,
   };
 }
 
@@ -82,7 +81,7 @@ export function clearRedirect(): Action {
 export function login(provider: string, code: string, redirectUri: string) {
   return (dispatch: Dispatch<IAuthState>) => {
     dispatch(startLogin());
-    return fetch("/api/login/social/jwt/", {
+    return fetch("/api/login/social/jwt_user/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -94,8 +93,16 @@ export function login(provider: string, code: string, redirectUri: string) {
       }),
     })
       .then((response) => response.json())
-      .then((response: IUser) => {
-        dispatch(completeLogin(response.token));
+      .then((response: IUserResponse) => {
+        const user: IUser = {
+          id: response.id,
+          token: response.token,
+          username: response.username,
+          email: response.email,
+          firstName: response.first_name,
+          lastName: response.last_name,
+        };
+        dispatch(completeLogin(user));
       })
       .catch((error) => {
         // TODO: /auth/login should be a variable somewhere

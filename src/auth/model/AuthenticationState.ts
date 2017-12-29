@@ -1,3 +1,4 @@
+import { IUser } from "../../types/index";
 import * as Cookies from "../utils/cookies";
 
 export enum LoginState {
@@ -12,7 +13,7 @@ export interface IAuthState {
 }
 
 export interface IAuthInnerState {
-  accessToken?: string;
+  user?: IUser;
   loginState: LoginState;
   redirectPath?: string;
 }
@@ -22,12 +23,12 @@ export const DEFAULT_AUTH_STATE: IAuthInnerState = {
 };
 
 export function getExistingAuthState(): IAuthInnerState {
-  const accessToken = Cookies.getAccessToken();
+  const user = Cookies.getUser();
   const redirectPath = Cookies.getRedirectPath();
 
   return {
-    accessToken,
-    loginState: accessToken ? LoginState.LoggedIn : LoginState.NotLoggedIn,
+    user,
+    loginState: user && user.token ? LoginState.LoggedIn : LoginState.NotLoggedIn,
     redirectPath,
   };
 }

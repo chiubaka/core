@@ -151,7 +151,7 @@ export class ModelApi<T extends IModel> {
                                    requestOptions: RequestInit = {}) {
     return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
       return fetch(pathname, {
-        headers: this.apiHeaders(getState().auth.accessToken),
+        headers: this.apiHeaders(getState().auth.user.token),
         ...requestOptions,
       })
         .then<T>(ModelApi.handleApiResponse.bind(this, dispatch))
