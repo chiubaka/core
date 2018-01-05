@@ -1,5 +1,5 @@
 import { ISocialLoginProvider, IUser } from "../../app/types/index";
-import * as Cookies from "../utils/cookies";
+import * as Cookies from "../utils/storage";
 
 export enum LoginState {
   NotLoggedIn,

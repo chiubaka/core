@@ -1,7 +1,7 @@
 import { Action } from "redux";
 import { ActionTypes, ICompleteLogin, ISetRedirect, ISuccessfulGetUserDetails } from "../actions/index";
 import { DEFAULT_AUTH_STATE, IAuthInnerState, LoginState } from "../model/AuthenticationState";
-import * as Cookies from "../utils/cookies";
+import * as Cookies from "../utils/storage";
 
 export function auth(state: IAuthInnerState = DEFAULT_AUTH_STATE, action: Action) {
   switch (action.type) {
