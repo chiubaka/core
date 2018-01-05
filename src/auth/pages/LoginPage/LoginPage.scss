@@ -18,7 +18,23 @@
     margin-bottom: $spacer;
   }
 
+  .login-form {
+    margin-bottom: $spacer;
+  }
+
   .btn-social {
     font-weight: 300;
+  }
+
+  .login-type-helper {
+    display: block;
+    font-size: 12px;
+    margin-top: $spacer / 2;
+    width: 100%;
+    text-align: center;
+
+    a {
+      color: $pt-intent-primary;
+    }
   }
 }

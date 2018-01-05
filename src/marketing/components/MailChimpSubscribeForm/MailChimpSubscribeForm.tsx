@@ -20,8 +20,8 @@ declare global {
 }
 
 class MailChimpSubscribeFormImpl extends React.Component<IMailChimpSubscribeFormProps> {
-  constructor() {
-    super();
+  constructor(props: IMailChimpSubscribeFormProps) {
+    super(props);
 
     this.onSubmit = this.onSubmit.bind(this);
   }

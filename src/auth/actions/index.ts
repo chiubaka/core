@@ -1,7 +1,7 @@
 import { Action, Dispatch } from "redux";
 // This import will remap the typing for Dispatch so it's more tolerant of passing functions
 import "redux-thunk";
-import { IUser, IUserResponse } from "../../app/types/index";
+import { IJwtResponse, IJwtUserResponse, IUser, IUserResponse } from "../../app/types/index";
 import { IAuthState } from "./../model/AuthenticationState";
 
 const typeCache: { [label: string]: boolean } = {};
@@ -19,6 +19,7 @@ function type<T>(label: T | ""): T {
 export const ActionTypes = {
   START_LOGIN: type<"START_LOGIN">("START_LOGIN"),
   COMPLETE_LOGIN: type<"COMPLETE_LOGIN">("COMPLETE_LOGIN"),
+  SUCCESSFUL_GET_USER_DETAILS: type<"SUCCESSFUL_GET_USER_DETAILS">("SUCCESSFUL_GET_USER_DETAILS"),
   FAIL_LOGIN: type<"FAIL_LOGIN">("FAIL_LOGIN"),
   START_LOGOUT: type<"START_LOGOUT">("START_LOGOUT"),
   COMPLETE_LOGOUT: type<"COMPLETE_LOGOUT">("COMPLETE_LOGOUT"),
@@ -33,13 +34,24 @@ function startLogin() {
 }
 
 export interface ICompleteLogin extends Action {
-  user: IUser;
+  token: string;
 }
 
 // TODO: rest-social-auth documentation doesn't reference a token expiration parameter, but I should find and set one
-function completeLogin(user: IUser): ICompleteLogin {
+function completeLogin(token: string): ICompleteLogin {
   return {
     type: ActionTypes.COMPLETE_LOGIN,
+    token,
+  };
+}
+
+export interface ISuccessfulGetUserDetails extends Action {
+  user: IUser;
+}
+
+function successfulGetUserDetails(user: IUser) {
+  return {
+    type: ActionTypes.SUCCESSFUL_GET_USER_DETAILS,
     user,
   };
 }
@@ -78,7 +90,52 @@ export function clearRedirect(): Action {
   };
 }
 
-export function login(provider: string, code: string, redirectUri: string) {
+function userFromUserResponse(response: IUserResponse): IUser {
+  return {
+    id: response.id,
+    username: response.username,
+    email: response.email,
+    firstName: response.first_name,
+    lastName: response.last_name,
+  };
+}
+
+export function login(username: string, password: string) {
+  return (dispatch: Dispatch<IAuthState>) => {
+    dispatch(startLogin());
+    return fetch("/api/login/username/jwt/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    })
+      .then((response) => response.json())
+      .then((response: IJwtResponse) => {
+        dispatch(completeLogin(response.token));
+        return fetch("/api/users/me/", {
+          method: "GET",
+          headers: {
+            "Authorization": `JWT ${response.token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      })
+      .then((response) => response.json())
+      .then((response: IUserResponse) => {
+        const user = userFromUserResponse(response);
+        dispatch(successfulGetUserDetails(user));
+      })
+      .catch((error) => {
+        return dispatch(failLogin(error));
+      });
+  };
+}
+
+export function socialLogin(provider: string, code: string, redirectUri: string) {
   return (dispatch: Dispatch<IAuthState>) => {
     dispatch(startLogin());
     return fetch("/api/login/social/jwt_user/", {
@@ -93,19 +150,12 @@ export function login(provider: string, code: string, redirectUri: string) {
       }),
     })
       .then((response) => response.json())
-      .then((response: IUserResponse) => {
-        const user: IUser = {
-          id: response.id,
-          token: response.token,
-          username: response.username,
-          email: response.email,
-          firstName: response.first_name,
-          lastName: response.last_name,
-        };
-        dispatch(completeLogin(user));
+      .then((response: IJwtUserResponse) => {
+        const user = userFromUserResponse(response);
+        dispatch(completeLogin(response.token));
+        dispatch(successfulGetUserDetails(user));
       })
       .catch((error) => {
-        // TODO: /auth/login should be a variable somewhere
         return dispatch(failLogin(error));
       });
   };
