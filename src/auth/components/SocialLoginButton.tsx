@@ -1,18 +1,21 @@
 import * as React from "react";
-import { IOAuth2Props } from "../../types/index";
+import { connect } from "react-redux";
+import { IServiceState } from "../../app/model/index";
+import { IAuthState } from "../model/AuthenticationState";
 import { buildOAuth2CallbackUri } from "../utils/uri";
 
-export interface ISocialLoginButtonProps extends IOAuth2Props {
+export interface ISocialLoginButtonOwnProps {
   clientId: string;
   providerName: string;
-  redirectPath?: string;
 }
 
-export interface ISocialLoginButtonState {
+export interface ISocialLoginButtonStateProps {
   oAuth2Uri: string;
 }
 
-export class SocialLoginButton extends React.Component<ISocialLoginButtonProps, ISocialLoginButtonState> {
+export interface ISocialLoginButtonProps extends ISocialLoginButtonOwnProps, ISocialLoginButtonStateProps {}
+
+class SocialLoginButtonImpl extends React.Component<ISocialLoginButtonProps> {
   public static OAUTH2_GATEWAYS: {[provider: string]: string} = {
     facebook: "https://www.facebook.com/v2.10/dialog/oauth",
     google: "https://accounts.google.com/o/oauth2/v2/auth",
@@ -34,48 +37,13 @@ export class SocialLoginButton extends React.Component<ISocialLoginButtonProps, 
     },
   };
 
-  public state = {
-    oAuth2Uri: "",
-  };
-
-  public componentWillMount() {
-    const { clientId, providerName, hostname, oAuth2CallbackBasePath, port, useSsl } = this.props;
-    const providerAlias = SocialLoginButton.OAUTH2_PROVIDER_ALIAS[providerName];
-
-    const redirectUri = buildOAuth2CallbackUri(
-      hostname,
-      oAuth2CallbackBasePath,
-      providerAlias ? providerAlias : providerName,
-      port,
-      useSsl,
-    );
-
-    if (!(providerName in SocialLoginButton.OAUTH2_GATEWAYS)) {
-      console.error(`Unrecognized social auth provider ${providerName}.`);
-    }
-
-    const oAuth2Gateway = SocialLoginButton.OAUTH2_GATEWAYS[providerName];
-    let oAuth2Uri = `${oAuth2Gateway}?client_id=${clientId}&redirect_uri=${redirectUri}`;
-    const additionalParameters = SocialLoginButton.OAUTH2_ADDITIONAL_PARAMETERS[providerName];
-
-    if (additionalParameters) {
-      for (const key in additionalParameters) {
-        if (additionalParameters.hasOwnProperty(key)) {
-          oAuth2Uri += `&${key}=${additionalParameters[key]}`;
-        }
-      }
-    }
-
-    this.setState({...this.state, oAuth2Uri});
-  }
-
   public render(): JSX.Element {
     const providerName = this.props.providerName;
 
     return (
       <a
         className={`btn btn-block btn-social btn-${providerName}`}
-        href={`${this.state.oAuth2Uri}`}
+        href={`${this.props.oAuth2Uri}`}
       >
         <span className={`fa fa-${providerName}`}/>
         Sign in with {providerName[0].toUpperCase() + providerName.slice(1)}
@@ -83,3 +51,41 @@ export class SocialLoginButton extends React.Component<ISocialLoginButtonProps, 
     );
   }
 }
+
+function mapStateToProps(state: IAuthState & IServiceState,
+                         ownProps: ISocialLoginButtonOwnProps): ISocialLoginButtonStateProps {
+  const { clientId, providerName } = ownProps;
+  const { hostname, port, useSsl } = state.service;
+  const oAuth2CallbackBasePath = state.auth.oAuth2CallbackBasePath;
+  const providerAlias = SocialLoginButtonImpl.OAUTH2_PROVIDER_ALIAS[ownProps.providerName];
+
+  const redirectUri = buildOAuth2CallbackUri(
+    hostname,
+    oAuth2CallbackBasePath,
+    providerAlias ? providerAlias : providerName,
+    port,
+    useSsl,
+  );
+
+  if (!(providerName in SocialLoginButtonImpl.OAUTH2_GATEWAYS)) {
+    console.error(`Unrecognized social auth provider ${providerName}.`);
+  }
+
+  const oAuth2Gateway = SocialLoginButtonImpl.OAUTH2_GATEWAYS[providerName];
+  let oAuth2Uri = `${oAuth2Gateway}?client_id=${clientId}&redirect_uri=${redirectUri}`;
+  const additionalParameters = SocialLoginButtonImpl.OAUTH2_ADDITIONAL_PARAMETERS[providerName];
+
+  if (additionalParameters) {
+    for (const key in additionalParameters) {
+      if (additionalParameters.hasOwnProperty(key)) {
+        oAuth2Uri += `&${key}=${additionalParameters[key]}`;
+      }
+    }
+  }
+
+  return {
+    oAuth2Uri,
+  };
+}
+
+export const SocialLoginButton = connect(mapStateToProps)(SocialLoginButtonImpl);

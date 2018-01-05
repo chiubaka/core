@@ -1,14 +1,8 @@
 import * as classnames from "classnames";
 import * as React from "react";
+import { connect } from "react-redux";
 import { Link, NavLink } from "react-router-dom";
-
-export interface INavbarProps {
-  brandLink?: string;
-  links: INavbarEntry[];
-  logo?: string;
-  logoSize?: number;
-  productName: string;
-}
+import { IProductState } from "../../../app/model/index";
 
 export interface INavbarEntry {
   text: string;
@@ -16,7 +10,20 @@ export interface INavbarEntry {
   current?: boolean;
 }
 
-export class Navbar extends React.Component<INavbarProps> {
+export interface INavbarOwnProps {
+  brandLink?: string;
+  links: INavbarEntry[];
+  logoSize?: number;
+}
+
+export interface INavbarStateProps {
+  logoPath?: string;
+  productName: string;
+}
+
+export interface INavbarProps extends INavbarOwnProps, INavbarStateProps {}
+
+class NavbarImpl extends React.Component<INavbarProps> {
   public static defaultProps: Partial<INavbarProps> = {
     brandLink: "/",
     logoSize: 30,
@@ -38,12 +45,12 @@ export class Navbar extends React.Component<INavbarProps> {
   }
 
   public render(): JSX.Element {
-    const { logo, productName } = this.props;
+    const { logoPath, productName } = this.props;
 
-    const logoElement = logo ?
+    const logoElement = logoPath ?
       (
         <img
-          src={logo}
+          src={logoPath}
           width={this.props.logoSize}
           height={this.props.logoSize}
           alt={productName}
@@ -79,3 +86,12 @@ export class Navbar extends React.Component<INavbarProps> {
     );
   }
 }
+
+function mapStateToProps(state: IProductState): INavbarStateProps {
+  return {
+    logoPath: state.product.logoPath,
+    productName: state.product.productName,
+  };
+}
+
+export const Navbar = connect(mapStateToProps)(NavbarImpl);

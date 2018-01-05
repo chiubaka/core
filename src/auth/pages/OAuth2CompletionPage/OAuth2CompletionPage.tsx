@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { Dispatch } from "redux";
 import { ProgressBar } from "../../../app/components/ProgressBar";
-import { IOAuth2Props } from "../../../types/index";
+import { IServiceInnerState, IServiceState } from "../../../app/model/index";
 import { clearRedirect, login } from "../../actions/index";
 import { IAuthState, LoginState } from "../../model/AuthenticationState";
 import { buildOAuth2CallbackUri } from "../../utils/uri";
@@ -13,8 +13,9 @@ export interface IOAuth2CompletionPageParams {
   provider: string;
 }
 
-export interface IOAuth2CompletionPageStateProps {
+export interface IOAuth2CompletionPageStateProps extends IServiceInnerState {
   loggedIn: boolean;
+  oAuth2CallbackBasePath: string;
   redirectPath: string;
 }
 
@@ -23,7 +24,7 @@ export interface IOAuth2CompletionPageDispatchProps {
   onOAuth2Completion: (provider: string, code: string, redirectUri: string) => void;
 }
 
-export interface IOAuth2CompletionPageProps extends RouteComponentProps<IOAuth2CompletionPageParams>, IOAuth2Props,
+export interface IOAuth2CompletionPageProps extends RouteComponentProps<IOAuth2CompletionPageParams>,
   IOAuth2CompletionPageStateProps, IOAuth2CompletionPageDispatchProps {}
 
 class OAuth2CompletionPage extends React.Component<IOAuth2CompletionPageProps> {
@@ -65,9 +66,13 @@ class OAuth2CompletionPage extends React.Component<IOAuth2CompletionPageProps> {
   }
 }
 
-function mapStateToProps(state: IAuthState): IOAuth2CompletionPageStateProps {
+function mapStateToProps(state: IAuthState & IServiceState): IOAuth2CompletionPageStateProps {
   return {
+    hostname: state.service.hostname,
     loggedIn: state.auth.loginState === LoginState.LoggedIn,
+    oAuth2CallbackBasePath: state.auth.oAuth2CallbackBasePath,
+    port: state.service.port,
+    useSsl: state.service.useSsl,
     redirectPath: state.auth.redirectPath,
   };
 }

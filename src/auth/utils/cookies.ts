@@ -1,5 +1,5 @@
 import * as JsCookies from "js-cookie";
-import { IUser } from "../../types/index";
+import { IUser } from "../../app/types/index";
 
 export const USER_KEY = "user";
 export const REDIRECT_PATH_KEY = "redirectPath";
