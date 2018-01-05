@@ -1,6 +1,7 @@
 import * as JsCookies from "js-cookie";
 import { IUser } from "../../app/types/index";
 
+export const TOKEN_KEY = "token";
 export const USER_KEY = "user";
 export const REDIRECT_PATH_KEY = "redirectPath";
 
@@ -16,6 +17,18 @@ export function getUser(): IUser {
 
 export function removeUser() {
   JsCookies.remove(USER_KEY);
+}
+
+export function setToken(token: string, expires: number = 1) {
+  JsCookies.set(TOKEN_KEY, token, { expires });
+}
+
+export function getToken(): string {
+  return JsCookies.get(TOKEN_KEY);
+}
+
+export function removeToken() {
+  JsCookies.remove(TOKEN_KEY);
 }
 
 export function setRedirectPath(redirectPath: string) {

@@ -1,12 +1,12 @@
+import { Button, Classes, ControlGroup, InputGroup } from "@blueprintjs/core";
+import * as classnames from "classnames";
 import * as React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { Dispatch } from "redux";
-import * as classnames from "classnames";
-import { Button, Classes, ControlGroup, InputGroup } from "@blueprintjs/core";
 import { IProductState, IServiceState } from "../../../app/model/index";
 import { ISocialLoginProvider } from "../../../app/types/index";
-import { setRedirect } from "../../actions/index";
+import { login, setRedirect } from "../../actions/index";
 import { SocialLoginButton } from "../../components/SocialLoginButton";
 import { IAuthState, LoginState } from "../../model/AuthenticationState";
 
@@ -19,17 +19,20 @@ export interface ILoginPageStateProps {
 }
 
 export interface ILoginPageDispatchProps {
+  onSubmitLogin: (username: string, password: string) => void;
   setRedirect: (redirectPath: string) => void;
 }
 
-export interface ILoginPageOwnProps {
+export interface ILoginPageOwnProps extends RouteComponentProps<any> {
   defaultRedirectPath?: string;
 }
 
-export interface ILoginPageProps extends RouteComponentProps<any>, ILoginPageStateProps, ILoginPageDispatchProps,
+export interface ILoginPageProps extends ILoginPageStateProps, ILoginPageDispatchProps,
   ILoginPageOwnProps {}
 
 export interface ILoginPageState {
+  username: string;
+  password: string;
   showSocialLogin: boolean;
 }
 
@@ -44,9 +47,14 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
     super(props);
 
     this.state = {
+      username: "",
+      password: "",
       showSocialLogin: true,
     };
 
+    this.editUsername = this.editUsername.bind(this);
+    this.editPassword = this.editPassword.bind(this);
+    this.submitLogin = this.submitLogin.bind(this);
     this.toggleLoginType = this.toggleLoginType.bind(this);
   }
 
@@ -93,15 +101,30 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
   }
 
   private renderLoginForm(): JSX.Element {
-    if (!this.props.enableUsernameLogin || (this.props.providers.length > 0 && this.state.showSocialLogin)) {
+    const { username, password, showSocialLogin } = this.state;
+
+    if (!this.props.enableUsernameLogin || (this.props.providers.length > 0 && showSocialLogin)) {
       return null;
     }
 
     return (
       <ControlGroup className="login-form" vertical={true}>
-        <InputGroup className={Classes.LARGE} leftIconName="person" placeholder="Username"/>
-        <InputGroup className={Classes.LARGE} type="password" leftIconName="lock" placeholder="Password" />
-        <Button className={classnames(Classes.INTENT_PRIMARY, Classes.LARGE)} text="Login"/>
+        <InputGroup
+          onChange={this.editUsername}
+          className={Classes.LARGE}
+          leftIconName="person"
+          placeholder="Username"
+          value={username}
+        />
+        <InputGroup
+          onChange={this.editPassword}
+          className={Classes.LARGE}
+          type="password"
+          leftIconName="lock"
+          placeholder="Password"
+          value={password}
+        />
+        <Button onClick={this.submitLogin} className={classnames(Classes.INTENT_PRIMARY, Classes.LARGE)} text="Login"/>
       </ControlGroup>
     );
   }
@@ -138,14 +161,30 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
           Or login with your <a onClick={this.toggleLoginType}>username and password</a>.
         </span>
       );
-    }
-    else {
+    } else {
       return (
         <span className="login-type-helper">
           Or login with your <a onClick={this.toggleLoginType}>favorite social network</a>.
         </span>
-      )
+      );
     }
+  }
+
+  private editUsername(event: React.FormEvent<any>) {
+    const target = event.target as HTMLInputElement;
+    const value = target.value;
+    this.setState({...this.state, username: value});
+  }
+
+  private editPassword(event: React.FormEvent<any>) {
+    const target = event.target as HTMLInputElement;
+    const value = target.value;
+    this.setState({...this.state, password: value});
+  }
+
+  private submitLogin() {
+    const { username, password } = this.state;
+    this.props.onSubmitLogin(username, password);
   }
 
   private toggleLoginType() {
@@ -183,10 +222,16 @@ function mapStateToProps(state: IAuthState & IProductState & IServiceState): ILo
 
 function mapDispatchToProps(dispatch: Dispatch<IAuthState>): ILoginPageDispatchProps {
   return {
+    onSubmitLogin: (username: string, password: string) => {
+      dispatch(login(username, password));
+    },
     setRedirect: (redirectPath: string) => {
       dispatch(setRedirect(redirectPath));
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter<ILoginPageProps>(LoginPage));
+export default connect<ILoginPageStateProps, ILoginPageDispatchProps, ILoginPageOwnProps>(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withRouter<ILoginPageProps>(LoginPage));

@@ -13,6 +13,7 @@ export interface IAuthState {
 }
 
 export interface IAuthInnerState {
+  token?: string;
   user?: IUser;
   loginState: LoginState;
   oAuth2CallbackBasePath: string;
@@ -29,13 +30,15 @@ export const DEFAULT_AUTH_STATE: IAuthInnerState = {
 };
 
 export function getExistingAuthState(overrideState: Partial<IAuthInnerState>) {
+  const token = Cookies.getToken();
   const user = Cookies.getUser();
   const redirectPath = Cookies.getRedirectPath();
 
   return {
     ...DEFAULT_AUTH_STATE,
+    token,
     user,
-    loginState: user && user.token ? LoginState.LoggedIn : LoginState.NotLoggedIn,
+    loginState: token ? LoginState.LoggedIn : LoginState.NotLoggedIn,
     redirectPath,
     ...overrideState,
   };

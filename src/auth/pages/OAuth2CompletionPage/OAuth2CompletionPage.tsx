@@ -5,7 +5,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { Dispatch } from "redux";
 import { ProgressBar } from "../../../app/components/ProgressBar";
 import { IServiceInnerState, IServiceState } from "../../../app/model/index";
-import { clearRedirect, login } from "../../actions/index";
+import { clearRedirect, socialLogin } from "../../actions/index";
 import { IAuthState, LoginState } from "../../model/AuthenticationState";
 import { buildOAuth2CallbackUri } from "../../utils/uri";
 
@@ -83,7 +83,7 @@ function mapDispatchToProps(dispatch: Dispatch<IAuthState>): IOAuth2CompletionPa
       dispatch(clearRedirect());
     },
     onOAuth2Completion: (provider: string, code: string, oAuth2CallbackUri: string) => {
-      dispatch(login(provider, code, oAuth2CallbackUri));
+      dispatch(socialLogin(provider, code, oAuth2CallbackUri));
     },
   };
 }
