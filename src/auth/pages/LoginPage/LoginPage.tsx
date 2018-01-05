@@ -89,7 +89,6 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
     if (logoPath) {
       return (
         <img
-          width="250"
           height="250"
           className="logo mx-auto d-block"
           src={this.props.logoPath}
