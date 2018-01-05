@@ -14,7 +14,7 @@ export function setUser(user: IUser, expires: number = 1) {
 }
 
 export function getUser(): IUser {
-  return getJSON(USER_KEY) as IUser;
+  return get(USER_KEY) as IUser;
 }
 
 export function removeUser() {
@@ -60,25 +60,7 @@ function set(key: string, data: any, expires?: number) {
   localStorage.setItem(key, JSON.stringify(container));
 }
 
-function get(key: string): string {
-  const data = hydrateAndCheckExpiration(key);
-  if (isNullOrUndefined(data)) {
-    return null;
-  }
-
-  return data;
-}
-
-function getJSON(key: string): any {
-  const data = hydrateAndCheckExpiration(key);
-  if (isNullOrUndefined(data)) {
-    return null;
-  }
-
-  return JSON.parse(data);
-}
-
-function hydrateAndCheckExpiration(key: string): any {
+function get(key: string): any {
   const item = localStorage.getItem(key);
 
   if (isNullOrUndefined(item)) {
@@ -88,7 +70,7 @@ function hydrateAndCheckExpiration(key: string): any {
   const container: IStorageContainer = JSON.parse(item);
   // If expired, return null
   const { createdAt, expires, data } = container;
-  if (!expires || moment(createdAt).add(expires, "days").isBefore(moment())) {
+  if (!expires || moment().isBefore(moment(createdAt).add(expires, "days"))) {
     return data;
   } else {
     localStorage.removeItem(key);
