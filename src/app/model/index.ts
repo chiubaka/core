@@ -3,7 +3,7 @@ export interface IProductState {
 }
 
 export interface IProductInnerState {
-  logoPath: string;
+  logoPath?: string;
   productName: string;
   testMarketingMode: boolean;
 }
@@ -14,6 +14,7 @@ export interface IServiceState {
 
 export interface IServiceInnerState {
   hostname: string;
-  port: number;
+  port?: number;
+  // TODO: This could eventually be optional. Should default to true.
   useSsl: boolean;
 }

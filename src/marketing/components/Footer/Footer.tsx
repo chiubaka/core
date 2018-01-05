@@ -1,7 +1,7 @@
 import * as React from "react";
-import { IPrivacyPolicyModalProps, PrivacyPolicyModal } from "../PrivacyPolicyModal/PrivacyPolicyModal";
+import { PrivacyPolicyModal } from "../PrivacyPolicyModal/PrivacyPolicyModal";
 
-export interface IFooterProps extends IPrivacyPolicyModalProps {
+export interface IFooterProps {
   disclaimer?: string;
 }
 
@@ -19,7 +19,7 @@ export class Footer extends React.Component<IFooterProps> {
             <a href="#" data-toggle="modal" data-target="#privacy-policy" title="Privacy Policy">Privacy Policy</a>
           </div>
         </div>
-        <PrivacyPolicyModal {...this.props}/>
+        <PrivacyPolicyModal/>
       </div>
     );
   }

@@ -2,22 +2,25 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { Dispatch } from "redux";
-import { IOAuth2Props, IProductProps, ISocialLoginProvider } from "../../../types/index";
+import { IProductState, IServiceState } from "../../../app/model/index";
+import { ISocialLoginProvider } from "../../../app/types/index";
 import { setRedirect } from "../../actions/index";
 import { SocialLoginButton } from "../../components/SocialLoginButton";
 import { IAuthState, LoginState } from "../../model/AuthenticationState";
 
 export interface ILoginPageStateProps {
   loggedIn: boolean;
+  logoPath?: string;
+  productName: string;
+  providers: ISocialLoginProvider[];
 }
 
 export interface ILoginPageDispatchProps {
   setRedirect: (redirectPath: string) => void;
 }
 
-export interface ILoginPageOwnProps extends IProductProps, IOAuth2Props {
+export interface ILoginPageOwnProps {
   defaultRedirectPath?: string;
-  providers?: ISocialLoginProvider[];
 }
 
 export interface ILoginPageProps extends RouteComponentProps<any>, ILoginPageStateProps, ILoginPageDispatchProps,
@@ -65,12 +68,7 @@ class LoginPage extends React.Component<ILoginPageProps, React.ComponentState> {
     return (
       <div className="login-page container d-table">
         <div className="content d-table-cell align-middle">
-          <img
-            width="250"
-            height="250"
-            className="logo mx-auto d-block"
-            src={this.props.logo}
-          />
+          {this.renderLogo()}
           <span className="product-name">
             {this.props.productName}
           </span>
@@ -78,6 +76,22 @@ class LoginPage extends React.Component<ILoginPageProps, React.ComponentState> {
         </div>
       </div>
     );
+  }
+
+  private renderLogo() {
+    const logoPath = this.props.logoPath;
+    if (logoPath) {
+      return (
+        <img
+          width="250"
+          height="250"
+          className="logo mx-auto d-block"
+          src={this.props.logoPath}
+        />
+      );
+    }
+
+    return null;
   }
 
   private checkAuthentication(props: ILoginPageProps) {
@@ -99,9 +113,12 @@ class LoginPage extends React.Component<ILoginPageProps, React.ComponentState> {
   }
 }
 
-function mapStateToProps(state: IAuthState): ILoginPageStateProps {
+function mapStateToProps(state: IAuthState & IProductState & IServiceState): ILoginPageStateProps {
   return {
     loggedIn: state.auth.loginState === LoginState.LoggedIn,
+    logoPath: state.product.logoPath,
+    productName: state.product.productName,
+    providers: state.auth.providers,
   };
 }
 

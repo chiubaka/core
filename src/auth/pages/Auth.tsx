@@ -1,18 +1,19 @@
 import * as React from "react";
 import { Route, RouteComponentProps, Switch } from "react-router-dom";
 
-import LoginPage, { ILoginPageOwnProps } from "./LoginPage/LoginPage";
+import { connect } from "react-redux";
+import { IServiceState } from "../../app/model/index";
+import { IAuthState } from "../model/AuthenticationState";
+import LoginPage from "./LoginPage/LoginPage";
 import LogoutPage from "./LogoutPage";
 import OAuth2CompletionPage from "./OAuth2CompletionPage/OAuth2CompletionPage";
 
-export class Auth extends React.Component<ILoginPageOwnProps> {
-  public static defaultProps: Partial<ILoginPageOwnProps> = {
-    // TODO: Figure out how to use SSL in local development, and remove this as an option--always use SSL
-    useSsl: false,
-    oAuth2CallbackBasePath: "/auth/login/oauth2/complete/",
-  };
+export interface IAuthStateProps {
+  oAuth2CallbackBasePath: string;
+}
 
-  constructor(props: ILoginPageOwnProps) {
+export class AuthImpl extends React.Component<IAuthStateProps> {
+  constructor(props: IAuthStateProps) {
     super(props);
 
     this.renderOAuth2CompletionPage = this.renderOAuth2CompletionPage.bind(this);
@@ -40,13 +41,21 @@ export class Auth extends React.Component<ILoginPageOwnProps> {
 
   private renderOAuth2CompletionPage(props: RouteComponentProps<any>): JSX.Element {
     return (
-      <OAuth2CompletionPage {...props} {...this.props}/>
+      <OAuth2CompletionPage {...props}/>
     );
   }
 
   private renderLoginPage(props: RouteComponentProps<any>): JSX.Element {
     return (
-      <LoginPage {...props} {...this.props}/>
+      <LoginPage {...props}/>
     );
   }
 }
+
+function mapStateToProps(state: IAuthState & IServiceState) {
+  return {
+    oAuth2CallbackBasePath: state.auth.oAuth2CallbackBasePath,
+  };
+}
+
+export const Auth = connect(mapStateToProps)(AuthImpl);

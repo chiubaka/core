@@ -1,7 +1,7 @@
 import { Action, Dispatch } from "redux";
 // This import will remap the typing for Dispatch so it's more tolerant of passing functions
 import "redux-thunk";
-import { IUser, IUserResponse } from "../../types/index";
+import { IUser, IUserResponse } from "../../app/types/index";
 import { IAuthState } from "./../model/AuthenticationState";
 
 const typeCache: { [label: string]: boolean } = {};
