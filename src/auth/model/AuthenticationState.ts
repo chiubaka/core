@@ -17,25 +17,26 @@ export interface IAuthInnerState {
   loginState: LoginState;
   oAuth2CallbackBasePath: string;
   providers: ISocialLoginProvider[];
+  enableUsernameLogin: boolean;
   redirectPath?: string;
 }
 
 export const DEFAULT_AUTH_STATE: IAuthInnerState = {
+  enableUsernameLogin: false,
   loginState: LoginState.NotLoggedIn,
   providers: [],
   oAuth2CallbackBasePath: "/auth/login/oauth2/complete/",
 };
 
-export function getExistingAuthState(providers: ISocialLoginProvider[] = DEFAULT_AUTH_STATE.providers,
-                                     oAuth2CallbackBasePath: string = DEFAULT_AUTH_STATE.oAuth2CallbackBasePath) {
+export function getExistingAuthState(overrideState: Partial<IAuthInnerState>) {
   const user = Cookies.getUser();
   const redirectPath = Cookies.getRedirectPath();
 
   return {
+    ...DEFAULT_AUTH_STATE,
     user,
     loginState: user && user.token ? LoginState.LoggedIn : LoginState.NotLoggedIn,
-    oAuth2CallbackBasePath,
-    providers,
     redirectPath,
+    ...overrideState,
   };
 }
