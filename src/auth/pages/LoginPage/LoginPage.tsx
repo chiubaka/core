@@ -54,6 +54,7 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
 
     this.editUsername = this.editUsername.bind(this);
     this.editPassword = this.editPassword.bind(this);
+    this.handlePasswordKeyPress = this.handlePasswordKeyPress.bind(this);
     this.submitLogin = this.submitLogin.bind(this);
     this.toggleLoginType = this.toggleLoginType.bind(this);
   }
@@ -117,6 +118,7 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
         />
         <InputGroup
           onChange={this.editPassword}
+          onKeyUp={this.handlePasswordKeyPress}
           className={Classes.LARGE}
           type="password"
           leftIconName="lock"
@@ -179,6 +181,12 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
     const target = event.target as HTMLInputElement;
     const value = target.value;
     this.setState({...this.state, password: value});
+  }
+
+  private handlePasswordKeyPress(event: React.KeyboardEvent<any>) {
+    if (event.key === "Enter") {
+      this.submitLogin();
+    }
   }
 
   private submitLogin() {
