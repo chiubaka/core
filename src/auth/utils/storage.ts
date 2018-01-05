@@ -91,6 +91,7 @@ function hydrateAndCheckExpiration(key: string): any {
   if (!expires || moment(createdAt).add(expires, "days").isBefore(moment())) {
     return data;
   } else {
+    localStorage.removeItem(key);
     return null;
   }
 }
