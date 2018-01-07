@@ -1,7 +1,7 @@
 import { Action, Dispatch } from "redux";
 // This import will remap the typing for Dispatch so it's more tolerant of passing functions
 import "redux-thunk";
-import { IJwtResponse, IJwtUserResponse, IUser, IUserResponse } from "../../app/types/index";
+import { IJwtResponse, IJwtUserResponse, IUser } from "../../app/types/index";
 import { IAuthState } from "./../model/AuthenticationState";
 
 const typeCache: { [label: string]: boolean } = {};
@@ -90,7 +90,7 @@ export function clearRedirect(): Action {
   };
 }
 
-function userFromUserResponse(response: IUserResponse): IUser {
+function userFromJwtUserResponse(response: IJwtUserResponse): IUser {
   return {
     id: response.id,
     username: response.username,
@@ -100,18 +100,18 @@ function userFromUserResponse(response: IUserResponse): IUser {
   };
 }
 
-export function login(username: string, password: string) {
+export function login(username: string, password: string, email: boolean = false) {
   return (dispatch: Dispatch<IAuthState>) => {
     dispatch(startLogin());
+
+    const payload = email ? { email: username, password } : { username, password };
+
     return fetch("/api/login/username/jwt/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
+      body: JSON.stringify(payload),
     })
       .then((response) => response.json())
       .then((response: IJwtResponse) => {
@@ -125,9 +125,8 @@ export function login(username: string, password: string) {
         });
       })
       .then((response) => response.json())
-      .then((response: IUserResponse) => {
-        const user = userFromUserResponse(response);
-        dispatch(successfulGetUserDetails(user));
+      .then((response: IUser) => {
+        dispatch(successfulGetUserDetails(response));
       })
       .catch((error) => {
         return dispatch(failLogin(error));
@@ -151,7 +150,7 @@ export function socialLogin(provider: string, code: string, redirectUri: string)
     })
       .then((response) => response.json())
       .then((response: IJwtUserResponse) => {
-        const user = userFromUserResponse(response);
+        const user = userFromJwtUserResponse(response);
         dispatch(completeLogin(response.token));
         dispatch(successfulGetUserDetails(user));
       })

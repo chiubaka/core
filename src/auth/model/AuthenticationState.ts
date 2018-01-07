@@ -17,15 +17,17 @@ export interface IAuthInnerState {
   user?: IUser;
   loginState: LoginState;
   oAuth2CallbackBasePath: string;
-  providers: ISocialLoginProvider[];
-  enableUsernameLogin: boolean;
+  socialProviders: ISocialLoginProvider[];
+  enableNonSocialLogin: boolean;
+  useEmailAsUsername: boolean;
   redirectPath?: string;
 }
 
 export const DEFAULT_AUTH_STATE: IAuthInnerState = {
-  enableUsernameLogin: false,
+  enableNonSocialLogin: false,
+  useEmailAsUsername: false,
   loginState: LoginState.NotLoggedIn,
-  providers: [],
+  socialProviders: [],
   oAuth2CallbackBasePath: "/auth/login/oauth2/complete/",
 };
 
