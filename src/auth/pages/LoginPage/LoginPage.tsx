@@ -6,7 +6,8 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { Dispatch } from "redux";
 import { IProductState, IServiceState } from "../../../app/model/index";
 import { ISocialLoginProvider } from "../../../app/types/index";
-import { login, setRedirect } from "../../actions/index";
+import { AuthApi } from "../../actions/AuthApi";
+import { setRedirect } from "../../actions/index";
 import { SocialLoginButton } from "../../components/SocialLoginButton";
 import { IAuthState, LoginState } from "../../model/AuthenticationState";
 
@@ -14,8 +15,9 @@ export interface ILoginPageStateProps {
   loggedIn: boolean;
   logoPath?: string;
   productName: string;
-  providers: ISocialLoginProvider[];
-  enableUsernameLogin?: boolean;
+  socialProviders: ISocialLoginProvider[];
+  enableNonSocialLogin: boolean;
+  useEmailAsUsername: boolean;
 }
 
 export interface ILoginPageDispatchProps {
@@ -40,7 +42,7 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
   public static defaultProps: Partial<ILoginPageProps> = {
     loggedIn: false,
     defaultRedirectPath: "/",
-    providers: [],
+    socialProviders: [],
   };
 
   constructor(props?: ILoginPageProps) {
@@ -102,8 +104,9 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
 
   private renderLoginForm(): JSX.Element {
     const { username, password, showSocialLogin } = this.state;
+    const { enableNonSocialLogin, socialProviders, useEmailAsUsername } = this.props;
 
-    if (!this.props.enableUsernameLogin || (this.props.providers.length > 0 && showSocialLogin)) {
+    if (!enableNonSocialLogin || (socialProviders.length > 0 && showSocialLogin)) {
       return null;
     }
 
@@ -112,8 +115,8 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
         <InputGroup
           onChange={this.editUsername}
           className={Classes.LARGE}
-          leftIconName="person"
-          placeholder="Username"
+          leftIconName={useEmailAsUsername ? "envelope" : "person"}
+          placeholder={useEmailAsUsername ? "Email" : "Username"}
           value={username}
         />
         <InputGroup
@@ -125,17 +128,22 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
           placeholder="Password"
           value={password}
         />
-        <Button onClick={this.submitLogin} className={classnames(Classes.INTENT_PRIMARY, Classes.LARGE)} text="Login"/>
+        <Button
+          disabled={!(username && password)}
+          onClick={this.submitLogin}
+          className={classnames(Classes.INTENT_PRIMARY, Classes.LARGE)}
+          text="Login"
+        />
       </ControlGroup>
     );
   }
 
   private renderSocialLoginButtons(): JSX.Element[] {
-    if (this.props.enableUsernameLogin && !this.state.showSocialLogin) {
+    if (this.props.enableNonSocialLogin && !this.state.showSocialLogin) {
       return null;
     }
 
-    const providers = this.props.providers;
+    const providers = this.props.socialProviders;
 
     return providers.map((provider) => {
       const {clientId, providerName} = provider;
@@ -152,7 +160,9 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
   }
 
   private renderLoginTypeSwitch(): JSX.Element {
-    if (this.props.providers.length === 0 || !this.props.enableUsernameLogin) {
+    const { socialProviders, enableNonSocialLogin } = this.props;
+
+    if (socialProviders.length === 0 || !enableNonSocialLogin) {
       return null;
     }
 
@@ -222,15 +232,16 @@ function mapStateToProps(state: IAuthState & IProductState & IServiceState): ILo
     loggedIn: state.auth.loginState === LoginState.LoggedIn,
     logoPath: state.product.logoPath,
     productName: state.product.productName,
-    providers: state.auth.providers,
-    enableUsernameLogin: state.auth.enableUsernameLogin,
+    socialProviders: state.auth.socialProviders,
+    enableNonSocialLogin: state.auth.enableNonSocialLogin,
+    useEmailAsUsername: state.auth.useEmailAsUsername,
   };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<IAuthState>): ILoginPageDispatchProps {
   return {
     onSubmitLogin: (username: string, password: string) => {
-      dispatch(login(username, password));
+      dispatch(AuthApi.getInstance().login(username, password));
     },
     setRedirect: (redirectPath: string) => {
       dispatch(setRedirect(redirectPath));

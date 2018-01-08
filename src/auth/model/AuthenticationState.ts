@@ -1,3 +1,4 @@
+import { isNullOrUndefined } from "util";
 import { ISocialLoginProvider, IUser } from "../../app/types/index";
 import * as Cookies from "../utils/storage";
 
@@ -17,15 +18,17 @@ export interface IAuthInnerState {
   user?: IUser;
   loginState: LoginState;
   oAuth2CallbackBasePath: string;
-  providers: ISocialLoginProvider[];
-  enableUsernameLogin: boolean;
+  socialProviders: ISocialLoginProvider[];
+  enableNonSocialLogin: boolean;
+  useEmailAsUsername: boolean;
   redirectPath?: string;
 }
 
 export const DEFAULT_AUTH_STATE: IAuthInnerState = {
-  enableUsernameLogin: false,
+  enableNonSocialLogin: false,
+  useEmailAsUsername: false,
   loginState: LoginState.NotLoggedIn,
-  providers: [],
+  socialProviders: [],
   oAuth2CallbackBasePath: "/auth/login/oauth2/complete/",
 };
 
@@ -38,7 +41,7 @@ export function getExistingAuthState(overrideState: Partial<IAuthInnerState>) {
     ...DEFAULT_AUTH_STATE,
     token,
     user,
-    loginState: token ? LoginState.LoggedIn : LoginState.NotLoggedIn,
+    loginState: !isNullOrUndefined(token) ? LoginState.LoggedIn : LoginState.NotLoggedIn,
     redirectPath,
     ...overrideState,
   };
