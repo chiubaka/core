@@ -1,4 +1,5 @@
 import { Action } from "redux";
+import { isNullOrUndefined } from "util";
 import { ActionTypes, ICompleteLogin, ISetRedirect, ISuccessfulGetUserDetails } from "../actions/index";
 import { DEFAULT_AUTH_STATE, IAuthInnerState, LoginState } from "../model/AuthenticationState";
 import * as Cookies from "../utils/storage";
@@ -10,7 +11,7 @@ export function auth(state: IAuthInnerState = DEFAULT_AUTH_STATE, action: Action
     case ActionTypes.COMPLETE_LOGIN:
       const token = (action as ICompleteLogin).token;
       Cookies.setToken(token);
-      return {...state, loginState: LoginState.LoggedIn, token};
+      return {...state, loginState: !isNullOrUndefined(token) ? LoginState.LoggedIn : LoginState.NotLoggedIn, token};
     case ActionTypes.SUCCESSFUL_GET_USER_DETAILS:
       const user = (action as ISuccessfulGetUserDetails).user;
       Cookies.setUser(user);

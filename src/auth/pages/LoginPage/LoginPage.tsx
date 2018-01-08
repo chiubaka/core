@@ -6,7 +6,8 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { Dispatch } from "redux";
 import { IProductState, IServiceState } from "../../../app/model/index";
 import { ISocialLoginProvider } from "../../../app/types/index";
-import { login, setRedirect } from "../../actions/index";
+import { AuthApi } from "../../actions/AuthApi";
+import { setRedirect } from "../../actions/index";
 import { SocialLoginButton } from "../../components/SocialLoginButton";
 import { IAuthState, LoginState } from "../../model/AuthenticationState";
 
@@ -20,7 +21,7 @@ export interface ILoginPageStateProps {
 }
 
 export interface ILoginPageDispatchProps {
-  onSubmitLogin: (username: string, password: string, email: boolean) => void;
+  onSubmitLogin: (username: string, password: string) => void;
   setRedirect: (redirectPath: string) => void;
 }
 
@@ -127,7 +128,12 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
           placeholder="Password"
           value={password}
         />
-        <Button onClick={this.submitLogin} className={classnames(Classes.INTENT_PRIMARY, Classes.LARGE)} text="Login"/>
+        <Button
+          disabled={!(username && password)}
+          onClick={this.submitLogin}
+          className={classnames(Classes.INTENT_PRIMARY, Classes.LARGE)}
+          text="Login"
+        />
       </ControlGroup>
     );
   }
@@ -195,7 +201,7 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
 
   private submitLogin() {
     const { username, password } = this.state;
-    this.props.onSubmitLogin(username, password, this.props.useEmailAsUsername);
+    this.props.onSubmitLogin(username, password);
   }
 
   private toggleLoginType() {
@@ -234,8 +240,8 @@ function mapStateToProps(state: IAuthState & IProductState & IServiceState): ILo
 
 function mapDispatchToProps(dispatch: Dispatch<IAuthState>): ILoginPageDispatchProps {
   return {
-    onSubmitLogin: (username: string, password: string, email: boolean = false) => {
-      dispatch(login(username, password, email));
+    onSubmitLogin: (username: string, password: string) => {
+      dispatch(AuthApi.getInstance().login(username, password));
     },
     setRedirect: (redirectPath: string) => {
       dispatch(setRedirect(redirectPath));

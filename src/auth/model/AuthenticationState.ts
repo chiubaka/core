@@ -1,3 +1,4 @@
+import { isNullOrUndefined } from "util";
 import { ISocialLoginProvider, IUser } from "../../app/types/index";
 import * as Cookies from "../utils/storage";
 
@@ -40,7 +41,7 @@ export function getExistingAuthState(overrideState: Partial<IAuthInnerState>) {
     ...DEFAULT_AUTH_STATE,
     token,
     user,
-    loginState: token ? LoginState.LoggedIn : LoginState.NotLoggedIn,
+    loginState: !isNullOrUndefined(token) ? LoginState.LoggedIn : LoginState.NotLoggedIn,
     redirectPath,
     ...overrideState,
   };
