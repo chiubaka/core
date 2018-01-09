@@ -6,7 +6,8 @@ import { completeLogout } from "../../auth/actions";
 import { IAuthState } from "../../auth/model/AuthenticationState";
 
 export declare type ApiSuccessCallback<T> = (dispatch: Dispatch<IAuthState>, response: T) => void;
-export declare type ApiAction = ThunkAction<Promise<void>, IAuthState, null>;
+export declare type ApiAction<T> = ThunkAction<Promise<T>, IAuthState, null>;
+export interface IApiError {[field: string]: string[]; }
 
 export class Api {
   public static UNSUCCESSFUL_API_REQUEST_TYPE = "UNSUCCESSFUL_API_REQUEST";
@@ -25,19 +26,20 @@ export class Api {
     return headers;
   }
 
-  protected errorTransformer(_url: string, _error: any) {
-    return "An unexpected error has occurred. Please try again later.";
+  protected errorTransformer(_url: string, _error: IApiError): Promise<string> {
+    return Promise.reject("An unexpected error has occurred. Please try again later.");
   }
 
   protected handleUnsuccessfulRequest(reason: string, dispatch: Dispatch<IAuthState>) {
     dispatch(Api.unsuccessfulRequest(reason));
   }
 
-  protected getActionCreator<T>(pathname: string, onSuccess: ApiSuccessCallback<T>): ApiAction {
+  protected getActionCreator<T>(pathname: string, onSuccess: ApiSuccessCallback<T>): ApiAction<T> {
     return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
       return this.getRequest(pathname, dispatch, getState().auth.token)
         .then((response: T) => {
           onSuccess(dispatch, response);
+          return response;
         });
     };
   }
@@ -46,11 +48,12 @@ export class Api {
     return this.request(pathname, dispatch, token);
   }
 
-  protected postActionCreator<T>(pathname: string, payload: T, onSuccess: ApiSuccessCallback<T>): ApiAction {
+  protected postActionCreator<T>(pathname: string, payload: T, onSuccess: ApiSuccessCallback<T>): ApiAction<T> {
     return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
       return this.postRequest(pathname, payload, dispatch, getState().auth.token)
         .then((response: T) => {
           onSuccess(dispatch, response);
+          return response;
         });
     };
   }
@@ -59,11 +62,12 @@ export class Api {
     return this.requestWithPayload(pathname, payload, "POST", dispatch, token);
   }
 
-  protected putActionCreator<T>(pathname: string, payload: T, onSuccess: ApiSuccessCallback<T>): ApiAction {
+  protected putActionCreator<T>(pathname: string, payload: T, onSuccess: ApiSuccessCallback<T>): ApiAction<T> {
     return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
       return this.putRequest(pathname, payload, dispatch, getState().auth.token)
         .then((response: T) => {
           onSuccess(dispatch, response);
+          return response;
         });
     };
   }
@@ -98,7 +102,7 @@ export class Api {
     switch (response.status) {
       case HttpStatus.OK:
       case HttpStatus.CREATED:
-        return Promise.resolve(response.json());
+        return response.json();
       case HttpStatus.UNAUTHORIZED:
         dispatch(completeLogout());
         dispatch(push("/auth/login", {
@@ -106,8 +110,7 @@ export class Api {
         }));
         return Promise.reject("You are not logged in.");
       case HttpStatus.BAD_REQUEST:
-        const reason = this.errorTransformer(response.url, response.json());
-        return Promise.reject(reason);
+        return response.json().then(this.errorTransformer.bind(this, response.url));
       case HttpStatus.INTERNAL_SERVER_ERROR:
       case HttpStatus.GATEWAY_TIMEOUT:
         return Promise.reject("An unexpected error has occurred. Please try again later.");

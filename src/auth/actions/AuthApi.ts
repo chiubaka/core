@@ -1,6 +1,7 @@
 import { Dispatch } from "redux";
 import { Api } from "../../api/actions";
 import { IJwtResponse, IJwtUserResponse, IUser } from "../../app/types";
+import { IApiError } from "../../index";
 import { IAuthState } from "../model/AuthenticationState";
 import { completeLogin, failLogin, startLogin, successfulGetUserDetails } from "./index";
 
@@ -34,11 +35,13 @@ export class AuthApi extends Api {
         const token = getState().auth.token;
         return this.postRequest("/api/login/username/jwt/", payload, dispatch, token)
           .then((response: IJwtResponse) => {
-            dispatch(completeLogin(response.token));
-            return this.getRequest("/api/users/me/", dispatch, token);
-          })
-          .then((response: IUser) => {
-            dispatch(successfulGetUserDetails(response));
+            if (response) {
+              dispatch(completeLogin(response.token));
+              return this.getRequest("/api/users/me/", dispatch, response.token)
+                .then((userDetailsResponse: IUser) => {
+                dispatch(successfulGetUserDetails(userDetailsResponse));
+                });
+            }
           });
       };
     }
@@ -60,8 +63,8 @@ export class AuthApi extends Api {
       };
     }
 
-    protected errorTransformer(_url: string, _error: any) {
-      return "Invalid credentials.";
+    protected errorTransformer(_url: string, _error: IApiError): Promise<string> {
+      return Promise.reject("Invalid credentials.");
     }
 
     protected handleUnsuccessfulRequest(reason: string, dispatch: Dispatch<IAuthState>) {

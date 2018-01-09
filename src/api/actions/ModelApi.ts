@@ -3,7 +3,7 @@ import { Dispatch } from "redux";
 import { IAuthState } from "../../auth/model/AuthenticationState";
 /* tslint:enable:no-unused-variable */
 
-import { Api } from "./Api";
+import { Api, ApiAction } from "./Api";
 import { IModel } from "./index";
 
 export class ModelApi<T extends IModel> extends Api {
@@ -25,25 +25,25 @@ export class ModelApi<T extends IModel> extends Api {
       this.endpoint = `${ModelApi.API_PATH}/${modelName.toLowerCase()}s/`;
     }
 
-    public getAll() {
+    public getAll(): ApiAction<T[]> {
       return this.getActionCreator(this.endpoint, (dispatch, response: T[]) => {
         dispatch(this.successfulGetAllAction(response));
       });
     }
 
-    public get(id: number) {
+    public get(id: number): ApiAction<T> {
       return this.getActionCreator(`${this.endpoint}${id}/`, (dispatch, response: T) => {
         dispatch(this.successfulGetAction(response));
       });
     }
 
-    public create(payload: T) {
+    public create(payload: Partial<T>): ApiAction<T> {
       return this.postActionCreator(this.endpoint, payload, (dispatch, response: T) => {
         dispatch(this.successfulCreateAction(response));
-      });
+      }) as ApiAction<T>;
     }
 
-    public update(original: T, updated: T) {
+    public update(original: T, updated: T): ApiAction<T> {
       return this.putActionCreator(`${this.endpoint}${updated.id}/`, updated, (dispatch, response: T) => {
         dispatch(this.successfulUpdateAction(original, response));
       });
