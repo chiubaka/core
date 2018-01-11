@@ -49,6 +49,14 @@ export class ModelApi<T extends IModel> extends Api {
       });
     }
 
+    public createOrUpdate(original: Partial<T>, updated: Partial<T>): ApiAction<T> {
+      if (original.id) {
+        return this.update(original as T, updated as T);
+      } else {
+        return this.create(updated);
+      }
+    }
+
     public successfulGetAllAction(payload: T[]) {
       return {
         type: this.SUCCESSFUL_GET_ALL_TYPE,

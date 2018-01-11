@@ -95,6 +95,7 @@ export class Api {
     })
     .catch((reason) => {
       this.handleUnsuccessfulRequest(reason, dispatch);
+      return Promise.reject(reason);
     });
   }
 
