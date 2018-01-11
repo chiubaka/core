@@ -19,8 +19,9 @@ export function modelApiById<T extends IModel>(Api: ModelApi<T>) {
         newState[object.id] = object;
         return newState;
       }
+      case Api.SUCCESSFUL_GET_TYPE:
       case Api.SUCCESSFUL_UPDATE_TYPE: {
-        const object = (action as IApiUpdateResponse<T>).updated;
+        const object = (action as IApiUpdateResponse<T>).payload;
         const newState = {...state};
         newState[object.id] = object;
         return newState;
@@ -43,8 +44,9 @@ export function modelApiAsArray<T extends IModel>(Api: ModelApi<T>) {
         const object = (action as IApiResponse<T>).payload;
         return [...state, object];
       }
+      case Api.SUCCESSFUL_GET_TYPE:
       case Api.SUCCESSFUL_UPDATE_TYPE: {
-        const updated = (action as IApiUpdateResponse<T>).updated;
+        const updated = (action as IApiUpdateResponse<T>).payload;
         const index = state.findIndex((object) => {
           return object.id === updated.id;
         });

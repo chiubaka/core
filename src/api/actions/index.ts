@@ -7,9 +7,8 @@ export interface IApiResponse<T> extends Action {
   payload: T;
 }
 
-export interface IApiUpdateResponse<T> extends Action {
+export interface IApiUpdateResponse<T> extends IApiResponse<T> {
   original: T;
-  updated: T;
 }
 
 export interface IApiErrorResponse extends Action {
