@@ -78,11 +78,11 @@ export class ModelApi<T extends IModel> extends Api {
       };
     }
 
-    public successfulUpdateAction(original: T, updated: T) {
+    public successfulUpdateAction(original: T, payload: T) {
       return {
         type: this.SUCCESSFUL_UPDATE_TYPE,
         original,
-        updated,
+        payload,
       };
     }
   }
