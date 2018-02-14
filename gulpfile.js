@@ -7,7 +7,7 @@ const merge = require('merge2');
 const tsProject = ts.createProject('./tsconfig.json');
 
 gulp.task('default', () => {
-  const tsResult =  gulp.src('src/**/*.ts')
+  const tsResult =  gulp.src(['src/**/*.ts', 'src/**/*.tsx'])
     .pipe(sourcemaps.init())
     .pipe(tsProject())
 
