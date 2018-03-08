@@ -26,8 +26,16 @@ export class Api {
     return headers;
   }
 
-  protected errorTransformer(_url: string, _error: IApiError): Promise<string> {
-    return Promise.reject("An unexpected error has occurred. Please try again later.");
+  protected errorTransformer(_url: string, error: IApiError): Promise<string> {
+    let errorMessage = "";
+    for (const field in error) {
+      if (error.hasOwnProperty(field)) {
+        error[field].forEach((message) => {
+          errorMessage += message + " ";
+        });
+      }
+    }
+    return Promise.reject(errorMessage.trim());
   }
 
   protected handleUnsuccessfulRequest(reason: string, dispatch: Dispatch<IAuthState>) {
