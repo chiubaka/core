@@ -3,8 +3,6 @@ import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 import { IAnalyticsInnerState, IAnalyticsState } from "./model/AnalyticsState";
 
-declare type PageProps<MatchParams> = IAnalyticsInnerState & RouteComponentProps<MatchParams>;
-
 declare global {
   // tslint:disable-next-line:interface-name
   interface Window {
@@ -13,9 +11,10 @@ declare global {
   }
 }
 
-export function withPageAnalytics<WrappedComponentProps>(
-  WrappedComponent: React.ComponentClass<RouteComponentProps<any>>) {
-  class Page<MatchParams> extends React.Component<PageProps<MatchParams> & WrappedComponentProps> {
+export function withPageAnalytics<TOriginalProps extends RouteComponentProps<any>>(
+  WrappedComponent: (React.ComponentClass<TOriginalProps> | React.StatelessComponent<TOriginalProps>),
+): React.ComponentClass<TOriginalProps> {
+  class Page extends React.Component<TOriginalProps & IAnalyticsInnerState> {
     public componentDidMount(): void {
       const path = this.props.location.pathname;
       if (this.props.enableFacebookAnalytics) {
@@ -37,5 +36,32 @@ export function withPageAnalytics<WrappedComponentProps>(
     return state.analytics;
   }
 
-  return connect(mapStateToProps)(Page);
+  return connect<IAnalyticsInnerState, null, TOriginalProps>(mapStateToProps)(Page);
 }
+
+// export function withPageAnalytics<WrappedComponentProps, MatchParams>(
+//   WrappedComponent: React.ComponentType<RouteComponentProps<MatchParams>>) {
+//   class Page extends React.Component<PageProps<MatchParams> & WrappedComponentProps> {
+//     public componentDidMount(): void {
+//       const path = this.props.location.pathname;
+//       if (this.props.enableFacebookAnalytics) {
+//         window.fbq("track", "ViewContent", {content_name: path});
+//       }
+//       if (this.props.googleAnalyticsId) {
+//         window.gtag("config", this.props.googleAnalyticsId, {page_path: path});
+//       }
+//     }
+
+//     public render(): JSX.Element {
+//       return (
+//         <WrappedComponent {...this.props}/>
+//       );
+//     }
+//   }
+
+//   function mapStateToProps(state: IAnalyticsState): IAnalyticsInnerState {
+//     return state.analytics;
+//   }
+
+//   return connect(mapStateToProps)(Page);
+// }
