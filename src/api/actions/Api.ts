@@ -21,7 +21,9 @@ export class Api {
 
   public static apiHeaders(accessToken: string) {
     const headers = new Headers();
-    headers.append("Authorization", `JWT ${accessToken}`);
+    if (accessToken) {
+      headers.append("Authorization", `JWT ${accessToken}`);
+    }
     headers.append("Content-Type", "application/json");
     return headers;
   }
