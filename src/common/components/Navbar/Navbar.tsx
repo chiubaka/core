@@ -14,6 +14,7 @@ export interface INavbarOwnProps {
   brandLink?: string;
   links: INavbarEntry[];
   logoSize?: number;
+  light?: boolean;
 }
 
 export interface INavbarStateProps {
@@ -45,7 +46,7 @@ class NavbarImpl extends React.Component<INavbarProps> {
   }
 
   public render(): JSX.Element {
-    const { logoPath, productName } = this.props;
+    const { light, logoPath, productName } = this.props;
 
     const logoElement = logoPath ?
       (
@@ -60,7 +61,7 @@ class NavbarImpl extends React.Component<INavbarProps> {
       : null;
 
     return (
-      <nav className="navbar navbar-expand-sm navbar-light">
+      <nav className={classnames("navbar navbar-expand-sm", light ? "navbar-light" : "navbar-dark")}>
         <Link className="navbar-brand" to={this.props.brandLink}>
           {logoElement}
           <span className="product-name">{productName}</span>

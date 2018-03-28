@@ -30,12 +30,12 @@ class PrivacyPolicyModalImpl extends React.Component<IPrivacyPolicyModalProps> {
             </div>
             <div className="modal-body">
               <p>
-                This Privacy Policy was last modified on October 13, 2017.
+                This Privacy Policy was last modified on March 26, 2018.
               </p>
               <p>
-                Chiubaka Technologies (“us”, “we”, “our”) operates https://{hostname} (the “Site”). This page informs
-                you of our policies regarding the collection, use, and disclosure of Personal Information we receive
-                from users of the Site.
+                Chiubaka Technologies, LLC (“us”, “we”, “our”) operates https://{hostname} (the “Site”). This page
+                informs you of our policies regarding the collection, use, and disclosure of Personal Information we
+                receive from users of the Site.
               </p>
               <p>
                 We use your Personal Information only for providing and improving the Site. By using the Site, you agree

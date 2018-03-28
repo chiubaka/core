@@ -1,8 +1,16 @@
 .jumbotron-fluid {
   height: 97vh;
-  //background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+
+  @if variable-exists(jumbotron-background-image) {
+    background: url($jumbotron-background-image);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+  @if variable-exists(jumbotron-background-color) {
+    background-color: $jumbotron-background-color;
+  }
 
   .jumbotron-overlay {
     position: absolute;

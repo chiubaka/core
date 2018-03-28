@@ -38,30 +38,3 @@ export function withPageAnalytics<TOriginalProps extends RouteComponentProps<any
 
   return connect<IAnalyticsInnerState, null, TOriginalProps>(mapStateToProps)(Page);
 }
-
-// export function withPageAnalytics<WrappedComponentProps, MatchParams>(
-//   WrappedComponent: React.ComponentType<RouteComponentProps<MatchParams>>) {
-//   class Page extends React.Component<PageProps<MatchParams> & WrappedComponentProps> {
-//     public componentDidMount(): void {
-//       const path = this.props.location.pathname;
-//       if (this.props.enableFacebookAnalytics) {
-//         window.fbq("track", "ViewContent", {content_name: path});
-//       }
-//       if (this.props.googleAnalyticsId) {
-//         window.gtag("config", this.props.googleAnalyticsId, {page_path: path});
-//       }
-//     }
-
-//     public render(): JSX.Element {
-//       return (
-//         <WrappedComponent {...this.props}/>
-//       );
-//     }
-//   }
-
-//   function mapStateToProps(state: IAnalyticsState): IAnalyticsInnerState {
-//     return state.analytics;
-//   }
-
-//   return connect(mapStateToProps)(Page);
-// }
