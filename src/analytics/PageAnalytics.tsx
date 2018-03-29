@@ -17,11 +17,12 @@ export function withPageAnalytics<TOriginalProps extends RouteComponentProps<any
   class Page extends React.Component<TOriginalProps & IAnalyticsInnerState> {
     public componentDidMount(): void {
       const path = this.props.location.pathname;
+      const params = this.props.location.search;
       if (this.props.enableFacebookAnalytics) {
-        window.fbq("track", "ViewContent", {content_name: path});
+        window.fbq("track", "ViewContent", {content_name: `${path}${params}`});
       }
       if (this.props.googleAnalyticsId) {
-        window.gtag("config", this.props.googleAnalyticsId, {page_path: path});
+        window.gtag("config", this.props.googleAnalyticsId, {page_path: `${path}${params}`});
       }
     }
 
