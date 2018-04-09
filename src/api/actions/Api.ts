@@ -7,6 +7,9 @@ import { IAuthState } from "../../auth/model/AuthenticationState";
 
 export declare type ApiSuccessCallback<T> = (dispatch: Dispatch<IAuthState>, response: T) => void;
 export declare type ApiAction<T> = ThunkAction<Promise<T>, IAuthState, null>;
+export declare type ResponseTransformer<BackendType, FrontendType> = (response: BackendType) => FrontendType;
+export declare type PayloadTransformer<BackendType, FrontendType> = (payload: FrontendType) => BackendType;
+
 export interface IApiError {[field: string]: string[]; }
 
 export class Api {
@@ -44,12 +47,17 @@ export class Api {
     dispatch(Api.unsuccessfulRequest(reason));
   }
 
-  protected getActionCreator<T>(pathname: string, onSuccess: ApiSuccessCallback<T>): ApiAction<T> {
+  protected getActionCreator<BackendT, FrontendT = BackendT>(pathname: string,
+                                                             onSuccess: ApiSuccessCallback<FrontendT>,
+                                                             // tslint:disable-next-line:max-line-length
+                                                             responseTransformer?: ResponseTransformer<BackendT, FrontendT>):
+                                                             ApiAction<FrontendT> {
     return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
       return this.getRequest(pathname, dispatch, getState().auth.token)
-        .then((response: T) => {
-          onSuccess(dispatch, response);
-          return response;
+        .then((response: BackendT) => {
+          const transformedResponse = responseTransformer ? responseTransformer(response) : response as any;
+          onSuccess(dispatch, transformedResponse);
+          return transformedResponse;
         });
     };
   }
@@ -58,12 +66,20 @@ export class Api {
     return this.request(pathname, dispatch, token);
   }
 
-  protected postActionCreator<T>(pathname: string, payload: T, onSuccess: ApiSuccessCallback<T>): ApiAction<T> {
+  protected postActionCreator<BackendT, FrontendT = BackendT>(pathname: string, payload: FrontendT,
+                                                              onSuccess: ApiSuccessCallback<FrontendT>,
+                                                              /* tslint:disable:max-line-length */
+                                                              payloadTransformer?: PayloadTransformer<BackendT, FrontendT>,
+                                                              responseTransformer?: ResponseTransformer<BackendT, FrontendT>):
+                                                              /* tslint:emnable:max-line-length */
+                                                              ApiAction<FrontendT> {
     return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
-      return this.postRequest(pathname, payload, dispatch, getState().auth.token)
-        .then((response: T) => {
-          onSuccess(dispatch, response);
-          return response;
+      const transformedPayload = payloadTransformer ? payloadTransformer(payload) : payload as any;
+      return this.postRequest(pathname, transformedPayload, dispatch, getState().auth.token)
+        .then((response: BackendT) => {
+          const transformedResponse = responseTransformer ? responseTransformer(response) : response as any;
+          onSuccess(dispatch, transformedResponse);
+          return transformedResponse;
         });
     };
   }
@@ -72,12 +88,20 @@ export class Api {
     return this.requestWithPayload(pathname, payload, "POST", dispatch, token);
   }
 
-  protected putActionCreator<T>(pathname: string, payload: T, onSuccess: ApiSuccessCallback<T>): ApiAction<T> {
+  protected putActionCreator<BackendT, FrontendT = BackendT>(pathname: string, payload: FrontendT,
+                                                             onSuccess: ApiSuccessCallback<FrontendT>,
+                                                             /* tslint:disable:max-line-length */
+                                                             payloadTransformer?: PayloadTransformer<BackendT, FrontendT>,
+                                                             responseTransformer?: ResponseTransformer<BackendT, FrontendT>):
+                                                             /* tslint:emnable:max-line-length */
+                                                             ApiAction<FrontendT> {
     return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
-      return this.putRequest(pathname, payload, dispatch, getState().auth.token)
-        .then((response: T) => {
-          onSuccess(dispatch, response);
-          return response;
+      const transformedPayload = payloadTransformer ? payloadTransformer(payload) : payload as any;
+      return this.putRequest(pathname, transformedPayload, dispatch, getState().auth.token)
+        .then((response: BackendT) => {
+          const transformedResponse = responseTransformer ? responseTransformer(response) : response as any;
+          onSuccess(dispatch, transformedResponse);
+          return transformedResponse;
         });
     };
   }
