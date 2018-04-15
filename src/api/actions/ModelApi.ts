@@ -9,7 +9,7 @@ import { Api, ApiAction } from "./Api";
 import { IModel } from "./index";
 
 interface IModelUpdateDependency<T> {
-  idMapper: (payload: T) => number;
+  idMapper: (modelObject: T) => number;
   modelApiAction: (id: number) => ApiAction<any>;
 }
 
