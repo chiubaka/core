@@ -22,6 +22,7 @@ export interface IModelFormControllerState<T> {
 
 export interface IModelFormControllerComponentProps<T>  extends IModelFormProps<T> {
   onSubmit: () => Promise<T>;
+  onFormReset: () => void;
 }
 
 export function withModelFormController<TProps, TModel extends {id?: number}, TOwnProps = TProps>(
@@ -39,7 +40,8 @@ export function withModelFormController<TProps, TModel extends {id?: number}, TO
       };
 
       this.updateModelState = this.updateModelState.bind(this);
-      this.onSubmit = this.onSubmit.bind(this);
+      this.submitForm = this.submitForm.bind(this);
+      this.resetForm = this.resetForm.bind(this);
     }
 
     public render(): JSX.Element {
@@ -48,12 +50,13 @@ export function withModelFormController<TProps, TModel extends {id?: number}, TO
           {...this.props}
           {...this.state}
           onModelDetailsUpdate={this.updateModelState}
-          onSubmit={this.onSubmit}
+          onSubmit={this.submitForm}
+          onFormReset={this.resetForm}
         />
       );
     }
 
-    public updateModelState(model: Partial<TModel>) {
+    private updateModelState(model: Partial<TModel>) {
       this.setState({
         ...this.state,
         model: {
@@ -63,10 +66,14 @@ export function withModelFormController<TProps, TModel extends {id?: number}, TO
       });
     }
 
-    public onSubmit() {
+    private submitForm() {
       return this.props.onSubmit(this.props.model, this.state.model).then((model) => {
         return model;
       });
+    }
+
+    private resetForm() {
+      this.setState({model: defaultModelState});
     }
   }
 
