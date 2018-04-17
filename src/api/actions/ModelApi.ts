@@ -125,7 +125,9 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
 
       if (!isNullOrUndefined(dependencyIds)) {
         dependencyIds.forEach((dependencyId) => {
-          dispatch(dependency.modelApiAction(dependencyId));
+          if (!isNullOrUndefined(dependencyId)) {
+            dispatch(dependency.modelApiAction(dependencyId));
+          }
         });
       }
     });
