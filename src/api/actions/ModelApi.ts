@@ -9,7 +9,7 @@ import { Api, ApiAction } from "./Api";
 import { IModel } from "./index";
 
 interface IModelUpdateDependency<T> {
-  idMapper: (modelObject: T) => number;
+  idMapper: (modelObject: T) => number[];
   modelApiAction: (id: number) => ApiAction<any>;
 }
 
@@ -101,8 +101,8 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
     };
   }
 
-  public addModelUpdateDependency(idMapper: (data: FrontendType) => number,
-                                  dependentApiAction: (id: number) => ApiAction<any>,
+  public addModelUpdateDependency(idMapper: (data: FrontendType) => number[],
+                                  dependentApiAction: (ids: number) => ApiAction<any>,
                                   apiThisArg: Api) {
     this.modelUpdateDependencies.push({idMapper, modelApiAction: dependentApiAction.bind(apiThisArg)});
   }
@@ -121,10 +121,12 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
 
   private processModelUpdateDependencies(dispatch: Dispatch<any>, modelObject: FrontendType) {
     this.modelUpdateDependencies.forEach((dependency) => {
-      const dependencyId = dependency.idMapper(modelObject);
+      const dependencyIds = dependency.idMapper(modelObject);
 
-      if (!isNullOrUndefined(dependencyId)) {
-        dispatch(dependency.modelApiAction(dependencyId));
+      if (!isNullOrUndefined(dependencyIds)) {
+        dependencyIds.forEach((dependencyId) => {
+          dispatch(dependency.modelApiAction(dependencyId));
+        });
       }
     });
   }
