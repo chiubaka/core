@@ -38,26 +38,34 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
   }
 
   public getAll(): ApiAction<FrontendType[]> {
-    return this.getActionCreator(this.endpoint, (dispatch, response: FrontendType[]) => {
+    return this.getActionCreator(this.getListEndpoint(), (dispatch, response: FrontendType[]) => {
       dispatch(this.successfulGetAllAction(response));
     }, this.bulkTransformForFrontend);
   }
 
   public get(id: number): ApiAction<FrontendType> {
-    return this.getActionCreator(`${this.endpoint}${id}/`, (dispatch, response: FrontendType) => {
+    return this.getActionCreator(this.getItemEndpoint(id), (dispatch, response: FrontendType) => {
       dispatch(this.successfulGetAction(response));
     }, this.transformForFrontend);
   }
 
+  public getListEndpoint() {
+    return this.endpoint;
+  }
+
+  public getItemEndpoint(id: number) {
+    return `${this.endpoint}${id}/`;
+  }
+
   public create(payload: Partial<FrontendType>): ApiAction<FrontendType> {
-    return this.postActionCreator(this.endpoint, payload, (dispatch, response: FrontendType) => {
+    return this.postActionCreator(this.getListEndpoint(), payload, (dispatch, response: FrontendType) => {
       dispatch(this.successfulCreateAction(response));
       this.processModelUpdateDependencies(dispatch, response);
     }, this.transformForBackend, this.transformForFrontend) as ApiAction<FrontendType>;
   }
 
   public update(original: FrontendType, updated: FrontendType): ApiAction<FrontendType> {
-    return this.putActionCreator(`${this.endpoint}${updated.id}/`, updated, (dispatch, response: FrontendType) => {
+    return this.putActionCreator(this.getItemEndpoint(updated.id), updated, (dispatch, response: FrontendType) => {
       dispatch(this.successfulUpdateAction(original, response));
       this.processModelUpdateDependencies(dispatch, original);
       this.processModelUpdateDependencies(dispatch, response);
