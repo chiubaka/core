@@ -114,7 +114,6 @@ export class Api {
     switch (response.status) {
       case HttpStatus.OK:
       case HttpStatus.CREATED:
-        console.log("Successful response");
         return response.json();
       case HttpStatus.UNAUTHORIZED:
         dispatch(completeLogout());

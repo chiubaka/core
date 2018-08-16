@@ -2,7 +2,7 @@ import * as HttpStatus from "http-status-codes";
 import { Dispatch } from "redux";
 
 import { Api } from "../../api/actions";
-import { IJwtResponse, IJwtUserResponse, IUser } from "../../app/types";
+import { IJwtUserResponse, IUser } from "../../app/types";
 import { IApiError } from "../../index";
 import { IAuthState } from "../model/AuthenticationState";
 import { completeLogin, failLogin, startLogin, successfulGetUserDetails } from "./index";
