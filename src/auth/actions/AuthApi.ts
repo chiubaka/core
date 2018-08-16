@@ -1,6 +1,8 @@
+import * as HttpStatus from "http-status-codes";
 import { Dispatch } from "redux";
+
 import { Api } from "../../api/actions";
-import { IJwtResponse, IJwtUserResponse, IUser } from "../../app/types";
+import { IJwtUserResponse, IUser } from "../../app/types";
 import { IApiError } from "../../index";
 import { IAuthState } from "../model/AuthenticationState";
 import { completeLogin, failLogin, startLogin, successfulGetUserDetails } from "./index";
@@ -29,18 +31,40 @@ export class AuthApi extends Api {
     public login(username: string, password: string) {
       return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
         dispatch(startLogin());
-        const payload = getState().auth.useEmailAsUsername
+        const authState = getState().auth;
+        const innerPayload = authState.useEmailAsUsername
           ? { email: username, password }
           : { username, password };
-        const token = getState().auth.token;
-        return this.postRequest("/api/login/username/jwt/", payload, dispatch, token)
-          .then((response: IJwtResponse) => {
+
+        // Some auth systems expect parameters in the form:
+        // {
+        //   user: {
+        //     email: test@test.com
+        //     password: testtest
+        //   }
+        // }
+        const payload = getState().auth.wrapParameters
+          ? { user: innerPayload }
+          : innerPayload;
+        return this.postRequest("/api/login/username/jwt/", payload, dispatch, null)
+          .then((response: IJwtUserResponse) => {
             if (response) {
-              dispatch(completeLogin(response.token));
-              return this.getRequest("/api/users/me/", dispatch, response.token)
+              if (response.token) {
+                dispatch(completeLogin(response.token));
+              }
+              if (response.email) {
+                const user = AuthApi.userFromJwtUserResponse(response);
+                dispatch(successfulGetUserDetails(user));
+              } else {
+                // TODO: Should really fix the Django server so that it returns the user details
+                // with the tokens--that would allow elimination of this branching code path.
+                // Have to grab new state because we've just updated through dispatch, in theory
+                const token = getState().auth.token;
+                return this.getRequest("/api/users/me/", dispatch, token)
                 .then((userDetailsResponse: IUser) => {
-                dispatch(successfulGetUserDetails(userDetailsResponse));
+                  dispatch(successfulGetUserDetails(userDetailsResponse));
                 });
+              }
             }
           });
       };
@@ -70,5 +94,18 @@ export class AuthApi extends Api {
     protected handleUnsuccessfulRequest(reason: string, dispatch: Dispatch<IAuthState>) {
       super.handleUnsuccessfulRequest(reason, dispatch);
       dispatch(failLogin(reason));
+    }
+
+    protected handleApiResponse<T>(dispatch: Dispatch<IAuthState>, response: Response): Promise<T | string> {
+      if (response.status === HttpStatus.OK || response.status === HttpStatus.CREATED) {
+        // Handle pulling the JWT token out of the headers if it appears there.
+        const authorizationHeader = response.headers.get("Authorization");
+        if (authorizationHeader !== null) {
+          const token = authorizationHeader.split(" ")[1];
+          dispatch(completeLogin(token));
+        }
+      }
+
+      return super.handleApiResponse(dispatch, response);
     }
   }
