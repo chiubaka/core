@@ -1,4 +1,4 @@
-import { Intent, Toaster } from "@blueprintjs/core";
+import { Intent, IToaster, Toaster } from "@blueprintjs/core";
 import { Action } from "redux";
 import { Api } from "../../api/actions";
 import { IApiErrorResponse } from "../../index";
@@ -10,7 +10,10 @@ export function identityReducer<T>(defaultState: T) {
   };
 }
 
-const ErrorToaster = Toaster.create();
+let ErrorToaster: IToaster = null;
+document.addEventListener("DOMContentLoaded", () => {
+  ErrorToaster = Toaster.create();
+});
 
 export function product(defaultState: IProductInnerState) {
   return (state: IProductInnerState = defaultState, action: Action) => {

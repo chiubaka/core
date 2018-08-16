@@ -115,7 +115,7 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
         <InputGroup
           onChange={this.editUsername}
           className={Classes.LARGE}
-          leftIconName={useEmailAsUsername ? "envelope" : "person"}
+          leftIcon={useEmailAsUsername ? "envelope" : "person"}
           placeholder={useEmailAsUsername ? "Email" : "Username"}
           value={username}
         />
@@ -124,7 +124,7 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
           onKeyUp={this.handlePasswordKeyPress}
           className={Classes.LARGE}
           type="password"
-          leftIconName="lock"
+          leftIcon="lock"
           placeholder="Password"
           value={password}
         />

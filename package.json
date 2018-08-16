@@ -1,6 +1,6 @@
 {
   "name": "@chiubaka/core",
-  "version": "0.16.2",
+  "version": "0.17.0",
   "description": "Core common code for Chiubaka Technologies projects.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,7 +13,7 @@
   "author": "Daniel Chiu <daniel@chiubaka.com>",
   "license": "ISC",
   "peerDependencies": {
-    "@blueprintjs/core": "^1.35.0",
+    "@blueprintjs/core": "^3.3.0",
     "@types/query-string": "^5.0.1",
     "bootstrap": "4.0.0-beta.3",
     "bootstrap-social": "ladjs/bootstrap-social#gh-pages",
@@ -33,7 +33,7 @@
     "redux-thunk": "^2.2.0"
   },
   "devDependencies": {
-    "@blueprintjs/core": "^1.35.0",
+    "@blueprintjs/core": "^3.3.0",
     "@types/classnames": "^2.2.3",
     "@types/query-string": "^5.0.1",
     "@types/react": "^16.0.34",
