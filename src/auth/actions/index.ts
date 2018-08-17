@@ -1,7 +1,10 @@
-import { Action } from "redux";
+import { push } from "react-router-redux";
+import { Action, Dispatch } from "redux";
 // This import will remap the typing for Dispatch so it's more tolerant of passing functions
 import "redux-thunk";
+
 import { IUser } from "../../app/types/index";
+import { IAuthState } from "../model/AuthenticationState";
 
 const typeCache: { [label: string]: boolean } = {};
 
@@ -34,6 +37,19 @@ export function startLogin() {
 
 export interface ICompleteLogin extends Action {
   token: string;
+}
+
+// Performs the deletion of the JWT token before redirecting the user back out to the login page.
+// NOTE: In almost all cases you want AuthApi.getInstance().logout() instead. That method also
+// handles hitting the API backend to revoke the JWT token as an extra precaution.
+export function completeLogoutAndRedirect() {
+  return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
+    dispatch(completeLogout());
+    dispatch(push("/auth/login", {
+      // TODO: This path should be configurable.
+      redirectPath: "/app",
+    }));
+  };
 }
 
 // TODO: rest-social-auth documentation doesn't reference a token expiration parameter, but I should find and set one

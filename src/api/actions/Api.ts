@@ -1,8 +1,7 @@
 import * as HttpStatus from "http-status-codes";
-import { push } from "react-router-redux";
 import { Dispatch } from "redux";
 import { ThunkAction } from "redux-thunk";
-import { completeLogout } from "../../auth/actions";
+import { completeLogoutAndRedirect } from "../../auth/actions/index";
 import { IAuthState } from "../../auth/model/AuthenticationState";
 
 export declare type ApiSuccessCallback<T> = (dispatch: Dispatch<IAuthState>, response: T) => void;
@@ -110,17 +109,19 @@ export class Api {
     return this.requestWithPayload(pathname, payload, "PUT", dispatch, token);
   }
 
+  protected deleteRequest(pathname: string, dispatch: Dispatch<IAuthState>, token: string): Promise<any> {
+    return this.request(pathname, dispatch, token, {
+      method: "DELETE",
+    });
+  }
+
   protected handleApiResponse<T>(dispatch: Dispatch<IAuthState>, response: Response): Promise<T | string> {
     switch (response.status) {
       case HttpStatus.OK:
       case HttpStatus.CREATED:
         return response.json();
       case HttpStatus.UNAUTHORIZED:
-        dispatch(completeLogout());
-        dispatch(push("/auth/login", {
-          // TODO: This path should be configurable and not constant.
-          redirectPath: "/app",
-        }));
+        dispatch(completeLogoutAndRedirect());
         return Promise.reject("You are not logged in.");
       case HttpStatus.BAD_REQUEST:
         return response.json().then(this.errorTransformer.bind(this, response.url));
