@@ -2,7 +2,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
-import { ModelApi } from "../../api";
+import { IModel, ModelApi } from "../../api";
 import { IModelFormProps } from "../types";
 
 export interface IModelFormControllerDispatchProps<T> {
@@ -25,7 +25,7 @@ export interface IModelFormControllerComponentProps<T>  extends IModelFormProps<
   onFormReset: () => void;
 }
 
-export function withModelFormController<TProps, TModel extends {id?: number}, TOwnProps = TProps>(
+export function withModelFormController<TProps, TModel extends IModel, TOwnProps = TProps>(
   WrappedComponent: React.ComponentType<TProps & IModelFormControllerComponentProps<TModel>>,
   Api: ModelApi<TModel>,
   defaultModelState: Partial<TModel> = {},

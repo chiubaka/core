@@ -1,6 +1,6 @@
 import { Action } from "redux";
-import { IApiResponse, IApiUpdateResponse, IModel, ModelApi } from "../actions/index";
-import { IModelById } from "../model/index";
+import { IApiResponse, IApiUpdateResponse, ModelApi } from "../actions";
+import { IModel, IModelById } from "../model";
 
 export declare type ModelFilterFunction<T> = (model: T) => boolean;
 export declare type ModelEqualityFunction<T> = (model1: T, model2: T) => boolean;
