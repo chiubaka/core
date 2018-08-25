@@ -5,12 +5,12 @@ import { IAuthState } from "../../auth/model/AuthenticationState";
 
 import { isNullOrUndefined } from "util";
 
+import { IModel } from "../model/";
 import { Api, ApiAction } from "./Api";
-import { IModel } from "./index";
 
 interface IModelUpdateDependency<T> {
-  idMapper: (modelObject: T) => number[];
-  modelApiAction: (id: number) => ApiAction<any>;
+  idMapper: (modelObject: T) => string[];
+  modelApiAction: (id: string) => ApiAction<any>;
 }
 
 export class ModelApi<BackendType extends IModel, FrontendType extends IModel = BackendType> extends Api {
@@ -43,7 +43,7 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
     }, this.bulkTransformForFrontend);
   }
 
-  public get(id: number): ApiAction<FrontendType> {
+  public get(id: string): ApiAction<FrontendType> {
     return this.getActionCreator(this.getItemEndpoint(id), (dispatch, response: FrontendType) => {
       dispatch(this.successfulGetAction(response));
     }, this.transformForFrontend);
@@ -53,7 +53,7 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
     return this.endpoint;
   }
 
-  public getItemEndpoint(id: number) {
+  public getItemEndpoint(id: string) {
     return `${this.endpoint}${id}/`;
   }
 
@@ -109,8 +109,8 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
     };
   }
 
-  public addModelUpdateDependency(idMapper: (data: FrontendType) => number[],
-                                  dependentApiAction: (ids: number) => ApiAction<any>,
+  public addModelUpdateDependency(idMapper: (data: FrontendType) => string[],
+                                  dependentApiAction: (id: string) => ApiAction<any>,
                                   apiThisArg: Api) {
     this.modelUpdateDependencies.push({idMapper, modelApiAction: dependentApiAction.bind(apiThisArg)});
   }

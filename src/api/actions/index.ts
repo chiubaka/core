@@ -14,7 +14,3 @@ export interface IApiUpdateResponse<T> extends IApiResponse<T> {
 export interface IApiErrorResponse extends Action {
   reason: string;
 }
-
-export interface IModel {
-  id?: number;
-}

@@ -1,3 +1,7 @@
 export interface IModelById<T> {
-  [id: number]: T;
+  [id: string]: T;
+}
+
+export interface IModel {
+  id?: string;
 }

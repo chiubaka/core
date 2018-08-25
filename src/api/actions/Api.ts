@@ -21,10 +21,11 @@ export class Api {
     };
   }
 
-  public static apiHeaders(accessToken: string) {
+  // TODO: authPrefix should be customizable based on app configs somehow
+  public static apiHeaders(accessToken: string, authPrefix: string = "Bearer") {
     const headers = new Headers();
     if (accessToken) {
-      headers.append("Authorization", `JWT ${accessToken}`);
+      headers.append("Authorization", `${authPrefix} ${accessToken}`);
     }
     headers.append("Content-Type", "application/json");
     return headers;
