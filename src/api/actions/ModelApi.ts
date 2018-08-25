@@ -3,6 +3,7 @@ import { Dispatch } from "redux";
 import { IAuthState } from "../../auth/model/AuthenticationState";
 /* tslint:enable:no-unused-variable */
 
+import * as pluralize from "pluralize";
 import { isNullOrUndefined } from "util";
 
 import { IModel } from "../model/";
@@ -26,11 +27,11 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
 
   constructor(modelName: string) {
     super();
-    this.SUCCESSFUL_GET_ALL_TYPE = `SUCCESSFUL_GET_ALL_${modelName.toUpperCase()}S`;
+    this.SUCCESSFUL_GET_ALL_TYPE = `SUCCESSFUL_GET_ALL_${pluralize(modelName.toUpperCase())}`;
     this.SUCCESSFUL_GET_TYPE = `SUCCESSFUL_GET_${modelName.toUpperCase()}`;
     this.SUCCESSFUL_CREATE_TYPE = `SUCCESSFUL_CREATE_${modelName.toUpperCase()}`;
     this.SUCCESSFUL_UPDATE_TYPE = `SUCCESSFUL_UPDATE_${modelName.toUpperCase()}`;
-    this.endpoint = `${ModelApi.API_PATH}/${modelName.toLowerCase()}s/`;
+    this.endpoint = `${ModelApi.API_PATH}/${pluralize(modelName.toLowerCase())}/`;
     this.modelUpdateDependencies = [];
 
     this.bulkTransformForFrontend = this.bulkTransformForFrontend.bind(this);

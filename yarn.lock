@@ -80,6 +80,10 @@
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.0.tgz#acaa89247afddc7967e9902fd11761dadea1a555"
 
+"@types/pluralize@^0.0.29":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@types/pluralize/-/pluralize-0.0.29.tgz#6ffa33ed1fc8813c469b859681d09707eb40d03c"
+
 "@types/query-string@^5.0.1":
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/@types/query-string/-/query-string-5.1.0.tgz#7f40cdea49ddafa0ea4f3db35fb6c24d3bfd4dcc"
@@ -2241,6 +2245,10 @@ plugin-error@^1.0.1:
     arr-diff "^4.0.0"
     arr-union "^3.1.0"
     extend-shallow "^3.0.2"
+
+pluralize@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-7.0.0.tgz#298b89df8b93b0221dbf421ad2b1b1ea23fc6777"
 
 popper.js@^1.14.1:
   version "1.14.4"
