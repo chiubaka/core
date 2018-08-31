@@ -1,10 +1,11 @@
+import { IModel } from "../../api";
+
 export interface ISocialLoginProvider {
   providerName: string;
   clientId: string;
 }
 
-export interface IUserBase {
-  id: number;
+export interface IUserBase extends IModel {
   username: string;
   email: string;
 }
@@ -20,7 +21,4 @@ export interface IJwtResponse {
 
 // TODO: This response object only exists because the Python server returns names in snake case.
 // Ideally, remove this and get server to respond in camel case.
-export interface IJwtUserResponse extends IUserBase, IJwtResponse {
-  first_name: string;
-  last_name: string;
-}
+export interface IJwtUserResponse extends IUser, IJwtResponse {}

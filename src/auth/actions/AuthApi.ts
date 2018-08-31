@@ -23,8 +23,8 @@ export class AuthApi extends Api {
       id: response.id,
       username: response.username,
       email: response.email,
-      firstName: response.first_name,
-      lastName: response.last_name,
+      firstName: response.firstName,
+      lastName: response.lastName,
     };
   }
 
