@@ -1,19 +1,31 @@
 import { Action } from "redux";
 import { IApiResponse, IApiUpdateResponse, ModelApi } from "../actions";
-import { IModel, IModelById } from "../model";
+import { IModel, IModelById, IModelIndex } from "../model";
 
 export declare type ModelFilterFunction<T> = (model: T) => boolean;
 export declare type ModelEqualityFunction<T> = (model1: T, model2: T) => boolean;
 export declare type GetObjectsReducer<StateType, ModelType> = (objects: ModelType[]) => StateType;
 export declare type MergeObjectReducer<StateType, ModelType> = (state: StateType, object: ModelType) => StateType;
 
-export function modelApiReducer<StateT, ModelT extends IModel>(Apis: Array<ModelApi<ModelT>>,
-                                                               initialState: StateT,
-                                                               modelFilter: ModelFilterFunction<ModelT>,
-                                                               onBulkObjectAdd: GetObjectsReducer<StateT, ModelT>,
-                                                               onObjectAdd: MergeObjectReducer<StateT, ModelT>,
-                                                               onObjectRemove: MergeObjectReducer<StateT, ModelT>,
-                                                               modelEquality?: ModelEqualityFunction<ModelT>) {
+// By default, filter nothing out.
+function defaultModelFilterFunction<T>(_object: T) {
+  return true;
+}
+
+// By default, consider nothing equal and always update. This is usually more
+// work than we need to do.
+function defaultModelEqualityFunction<T>(_object1: T, _object2: T) {
+  return false;
+}
+
+export function modelApiReducer<StateT, ModelT extends IModel>(
+  Apis: Array<ModelApi<ModelT>>,
+  initialState: StateT,
+  modelFilter: ModelFilterFunction<ModelT>,
+  onBulkObjectAdd: GetObjectsReducer<StateT, ModelT>,
+  onObjectAdd: MergeObjectReducer<StateT, ModelT>,
+  onObjectRemove: MergeObjectReducer<StateT, ModelT>,
+  modelEquality: ModelEqualityFunction<ModelT> = defaultModelEqualityFunction) {
   const getAllTypes = new Set(Apis.map((Api) => Api.SUCCESSFUL_GET_ALL_TYPE));
   const createTypes = new Set(Apis.map((Api) => Api.SUCCESSFUL_CREATE_TYPE));
   const updateTypes = new Set(Apis.map((Api) => Api.SUCCESSFUL_UPDATE_TYPE));
@@ -43,35 +55,99 @@ export function modelApiReducer<StateT, ModelT extends IModel>(Apis: Array<Model
   };
 }
 
-// TODO: Can probably be refactored to make use of modelApiReducer
 export function modelApiById<T extends IModel>(Api: ModelApi<T>) {
-  return (state: IModelById<T> = {}, action: Action): IModelById<T> => {
-    switch (action.type) {
-      case Api.SUCCESSFUL_GET_ALL_TYPE: {
-        const objects = (action as IApiResponse<T[]>).payload;
-        const newState = {...state};
-        objects.forEach((object) => {
-          newState[object.id] = object;
-        });
-        return newState;
-      }
-      case Api.SUCCESSFUL_CREATE_TYPE: {
-        const object = (action as IApiResponse<T>).payload;
-        const newState = {...state};
-        newState[object.id] = object;
-        return newState;
-      }
-      case Api.SUCCESSFUL_GET_TYPE:
-      case Api.SUCCESSFUL_UPDATE_TYPE: {
-        const payload = (action as IApiUpdateResponse<T>).payload;
-        const newState = {...state};
-        newState[payload.id] = payload;
-        return newState;
-      }
-      default:
-        return state;
+  return modelApiByUniqueProperty(Api, "id");
+}
+
+export function modelApiByUniqueProperty<T extends IModel>(Api: ModelApi<T>,
+                                                           propertyName: keyof T) {
+  return modelApiReducer(
+    [Api],
+    {},
+    // Nothing should be filtered out!
+    defaultModelFilterFunction,
+    (objects: T[]) => {
+      const newState: IModelById<T> = {};
+      objects.forEach((object) => {
+        const property = object[propertyName];
+        newState[property] = object;
+      });
+      return newState;
+    },
+    (state: IModelById<T>, object: T) => {
+      const newState = {...state};
+      const property = object[propertyName];
+      newState[property] = object;
+      return newState;
+    },
+    (state: IModelById<T>, object: T) => {
+      const property = object[propertyName];
+      const newState = {...state};
+      delete newState[property];
+      return newState;
+    },
+    (object1: T, object2: T) => {
+      const property1 = object1[propertyName];
+      const property2 = object2[propertyName];
+
+      return property1 === property2;
+    },
+  );
+}
+
+export function modelApiByProperty<T extends IModel>(Api: ModelApi<T>,
+                                                     propertyName: keyof T,
+                                                     modelEquality?: ModelEqualityFunction<T>) {
+  function addToIndex(index: IModelIndex<T>, object: T) {
+    const property: any = object[propertyName];
+    if (!index.hasOwnProperty(property)) {
+      index[property] = [];
     }
-  };
+
+    index[property].push(object);
+  }
+
+  function removeFromIndex(index: IModelIndex<T>, object: T) {
+    const property: any = object[propertyName];
+    if (!index.hasOwnProperty(property)) {
+      return;
+    }
+
+    const newList = index[property].filter((existingObject) => {
+      return existingObject.id !== object.id;
+    });
+
+    if (newList.length === 0) {
+      delete index[property];
+    } else {
+      index[property] = newList;
+    }
+  }
+
+  return modelApiReducer(
+    [Api],
+    {},
+    (_model: T) => true,
+    (objects: T[]) => {
+      const newState: IModelIndex<T> = {};
+      objects.forEach((object) => {
+        addToIndex(newState, object);
+      });
+
+      return newState;
+    },
+    (state: IModelIndex<T>, object: T) => {
+      const newState = {...state};
+      addToIndex(newState, object);
+      return newState;
+    },
+    (state: IModelIndex<T>, object: T) => {
+      const newState = {...state};
+      removeFromIndex(newState, object);
+      return newState;
+    },
+    modelEquality,
+  );
 }
 
 // TODO: Can probably be refactored to make use of modelApiReducer
