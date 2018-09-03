@@ -88,5 +88,9 @@ export function withModelFormController<TProps, TModel extends IModel, TOwnProps
     };
   }
 
-  return connect(null, mapDispatchToProps)(ModelFormController);
+  return connect<
+    null,
+    IModelFormControllerDispatchProps<TModel>,
+    IModelFormControllerOwnProps<TModel> & TOwnProps
+  >(null, mapDispatchToProps)(ModelFormController);
 }
