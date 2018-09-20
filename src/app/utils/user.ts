@@ -17,4 +17,20 @@ export class UserUtil {
 
     return displayValue;
   }
+
+  public static initials(user: IUser) {
+    if (!user) {
+      return null;
+    }
+
+    if (user.firstName && user.lastName) {
+      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
+    } else if (user.firstName) {
+      return user.firstName.charAt(0);
+    } else if (user.lastName) {
+      return user.lastName.charAt(0);
+    }
+
+    return null;
+  }
 }
