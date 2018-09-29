@@ -60,7 +60,7 @@ export class AuthApi extends Api {
               // with the tokens--that would allow elimination of this branching code path.
               // Have to grab new state because we've just updated through dispatch, in theory
               const token = getState().auth.token;
-              return this.getRequest("/api/users/me/", dispatch, token)
+              return this.getRequest("/api/users/me/", null, dispatch, token)
               .then((userDetailsResponse: IUser) => {
                 dispatch(successfulGetUserDetails(userDetailsResponse));
               });

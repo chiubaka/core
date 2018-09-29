@@ -1,9 +1,12 @@
 import * as HttpStatus from "http-status-codes";
 import { Dispatch } from "redux";
 import { ThunkAction } from "redux-thunk";
+import { isNullOrUndefined } from "util";
+
 import { completeLogoutAndRedirect } from "../../auth/actions/index";
 import { IAuthState } from "../../auth/model/AuthenticationState";
 
+export declare type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 export declare type ApiSuccessCallback<T> = (dispatch: Dispatch<IAuthState>, response: T) => void;
 export declare type ApiAction<T> = ThunkAction<Promise<T>, IAuthState, null>;
 export declare type ResponseTransformer<BackendType, FrontendType> = (response: BackendType) => FrontendType;
@@ -31,6 +34,12 @@ export class Api {
     return headers;
   }
 
+  public static encodeUrlParams(payload: any) {
+    return Object.keys(payload).map((key) => {
+      return encodeURIComponent(key) + "=" + encodeURIComponent(payload[key]);
+    }).join("&");
+  }
+
   protected errorTransformer(_url: string, error: IApiError): Promise<string> {
     let errorMessage = "";
     for (const field in error) {
@@ -47,63 +56,35 @@ export class Api {
     dispatch(Api.unsuccessfulRequest(reason));
   }
 
-  protected getActionCreator<BackendT, FrontendT = BackendT>(pathname: string,
-                                                             onSuccess: ApiSuccessCallback<FrontendT>,
-                                                             // tslint:disable-next-line:max-line-length
-                                                             responseTransformer?: ResponseTransformer<BackendT, FrontendT>):
-                                                             ApiAction<FrontendT> {
-    return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
-      return this.getRequest(pathname, dispatch, getState().auth.token)
-        .then((response: BackendT) => {
-          const transformedResponse = responseTransformer ? responseTransformer(response) : response as any;
-          onSuccess(dispatch, transformedResponse);
-          return transformedResponse;
-        });
-    };
-  }
-
-  protected getRequest(pathname: string, dispatch: Dispatch<IAuthState>, token: string): Promise<any> {
-    return this.request(pathname, dispatch, token);
-  }
-
-  protected postActionCreator<BackendT, FrontendT = BackendT>(pathname: string, payload: FrontendT,
-                                                              onSuccess: ApiSuccessCallback<FrontendT>,
-                                                              /* tslint:disable:max-line-length */
-                                                              payloadTransformer?: PayloadTransformer<BackendT, FrontendT>,
-                                                              responseTransformer?: ResponseTransformer<BackendT, FrontendT>):
-                                                              /* tslint:emnable:max-line-length */
-                                                              ApiAction<FrontendT> {
+  protected actionCreator<
+      FrontendPayloadT,
+      BackendPayloadT = FrontendPayloadT,
+      BackendResponseT = BackendPayloadT,
+      FrontendResponseT = BackendResponseT
+    >(
+      pathname: string, payload: FrontendPayloadT,
+      method: HttpMethod,
+      onSuccess: ApiSuccessCallback<FrontendResponseT>,
+      payloadTransformer?: PayloadTransformer<BackendPayloadT, FrontendPayloadT>,
+      responseTransformer?: ResponseTransformer<BackendResponseT, FrontendResponseT>,
+    ): ApiAction<FrontendResponseT> {
     return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
       const transformedPayload = payloadTransformer ? payloadTransformer(payload) : payload as any;
-      return this.postRequest(pathname, transformedPayload, dispatch, getState().auth.token)
-        .then((response: BackendT) => {
+      return this.requestWithPayload(pathname, transformedPayload, method, dispatch, getState().auth.token)
+        .then((response: BackendResponseT) => {
           const transformedResponse = responseTransformer ? responseTransformer(response) : response as any;
           onSuccess(dispatch, transformedResponse);
           return transformedResponse;
         });
     };
+  }
+
+  protected getRequest<T>(pathname: string, payload: T, dispatch: Dispatch<IAuthState>, token: string): Promise<any> {
+    return this.requestWithPayload(pathname, payload, "GET", dispatch, token);
   }
 
   protected postRequest<T>(pathname: string, payload: T, dispatch: Dispatch<IAuthState>, token: string): Promise<any> {
     return this.requestWithPayload(pathname, payload, "POST", dispatch, token);
-  }
-
-  protected putActionCreator<BackendT, FrontendT = BackendT>(pathname: string, payload: FrontendT,
-                                                             onSuccess: ApiSuccessCallback<FrontendT>,
-                                                             /* tslint:disable:max-line-length */
-                                                             payloadTransformer?: PayloadTransformer<BackendT, FrontendT>,
-                                                             responseTransformer?: ResponseTransformer<BackendT, FrontendT>):
-                                                             /* tslint:emnable:max-line-length */
-                                                             ApiAction<FrontendT> {
-    return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
-      const transformedPayload = payloadTransformer ? payloadTransformer(payload) : payload as any;
-      return this.putRequest(pathname, transformedPayload, dispatch, getState().auth.token)
-        .then((response: BackendT) => {
-          const transformedResponse = responseTransformer ? responseTransformer(response) : response as any;
-          onSuccess(dispatch, transformedResponse);
-          return transformedResponse;
-        });
-    };
   }
 
   protected putRequest<T>(pathname: string, payload: T, dispatch: Dispatch<IAuthState>, token: string): Promise<any> {
@@ -134,11 +115,14 @@ export class Api {
     }
   }
 
-  private requestWithPayload<T>(pathname: string, payload: T, method: "POST" | "PUT",
+  private requestWithPayload<T>(pathname: string, payload: T, method: HttpMethod,
                                 dispatch: Dispatch<IAuthState>, token: string) {
+    pathname = method === "GET" && !isNullOrUndefined(payload)
+      ?  `${pathname}?${Api.encodeUrlParams(payload)}`
+      : pathname;
     return this.request(pathname, dispatch, token, {
       method,
-      body: JSON.stringify(payload),
+      body: isNullOrUndefined(payload) || method === "GET" ? undefined : JSON.stringify(payload),
     });
   }
 

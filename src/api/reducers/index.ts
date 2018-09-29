@@ -1,5 +1,5 @@
 import { Action } from "redux";
-import { IApiResponse, IApiUpdateResponse, ModelApi } from "../actions";
+import { IApiResponse, IApiUpdateResponse, ModelApi, SearchableModelApi } from "../actions";
 import { IModel, IModelById, IModelIndex } from "../model";
 
 export declare type ModelFilterFunction<T> = (model: T) => boolean;
@@ -16,6 +16,17 @@ function defaultModelFilterFunction<T>(_object: T) {
 // work than we need to do.
 function defaultModelEqualityFunction<T>(_object1: T, _object2: T) {
   return false;
+}
+
+export function searchableModelApiAsArray<ModelT extends IModel>(
+  Api: SearchableModelApi<ModelT>,
+) {
+  return (state: ModelT[] = [], action: Action): ModelT[] => {
+    if (action.type === Api.SUCCESSFUL_SEARCH_TYPE) {
+      return (action as IApiResponse<ModelT[]>).payload;
+    }
+    return state;
+  };
 }
 
 export function modelApiReducer<StateT, ModelT extends IModel>(
