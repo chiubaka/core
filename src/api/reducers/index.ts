@@ -67,11 +67,12 @@ export function modelApiReducer<StateT, ModelT extends IModel>(
 }
 
 export function modelApiById<T extends IModel>(Api: ModelApi<T>) {
-  return modelApiByUniqueProperty(Api, "id");
+  return modelApiByUniqueProperty(Api, "id", defaultModelEqualityFunction);
 }
 
 export function modelApiByUniqueProperty<T extends IModel>(Api: ModelApi<T>,
-                                                           propertyName: keyof T) {
+                                                           propertyName: keyof T,
+                                                           modelEquality: ModelEqualityFunction<T>) {
   return modelApiReducer(
     [Api],
     {},
@@ -97,12 +98,7 @@ export function modelApiByUniqueProperty<T extends IModel>(Api: ModelApi<T>,
       delete newState[property];
       return newState;
     },
-    (object1: T, object2: T) => {
-      const property1 = object1[propertyName];
-      const property2 = object2[propertyName];
-
-      return property1 === property2;
-    },
+    modelEquality,
   );
 }
 
