@@ -102,6 +102,8 @@ export class Api {
       case HttpStatus.OK:
       case HttpStatus.CREATED:
         return response.json();
+      case HttpStatus.NO_CONTENT:
+        return null;
       case HttpStatus.UNAUTHORIZED:
         dispatch(completeLogoutAndRedirect());
         return Promise.reject("You are not logged in.");

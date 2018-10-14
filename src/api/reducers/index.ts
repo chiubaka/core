@@ -1,5 +1,5 @@
 import { Action } from "redux";
-import { IApiResponse, IApiUpdateResponse, ModelApi, SearchableModelApi } from "../actions";
+import { IApiDeleteResponse, IApiResponse, IApiUpdateResponse, ModelApi, SearchableModelApi } from "../actions";
 import { IModel, IModelById, IModelIndex } from "../model";
 
 export declare type ModelFilterFunction<T> = (model: T) => boolean;
@@ -40,6 +40,7 @@ export function modelApiReducer<StateT, ModelT extends IModel>(
   const getAllTypes = new Set(Apis.map((Api) => Api.SUCCESSFUL_GET_ALL_TYPE));
   const createTypes = new Set(Apis.map((Api) => Api.SUCCESSFUL_CREATE_TYPE));
   const updateTypes = new Set(Apis.map((Api) => Api.SUCCESSFUL_UPDATE_TYPE));
+  const deleteTypes = new Set(Apis.map((Api) => Api.SUCCESSFUL_DELETE_TYPE));
 
   return (state: StateT = initialState, action: Action): StateT => {
     if (getAllTypes.has(action.type)) {
@@ -61,6 +62,9 @@ export function modelApiReducer<StateT, ModelT extends IModel>(
           return onObjectAdd(onObjectRemove(state, original), payload);
         }
       }
+    } else if (deleteTypes.has(action.type)) {
+      const deleted = (action as IApiDeleteResponse<ModelT>).deleted;
+      return onObjectRemove(state, deleted);
     }
     return state;
   };
@@ -184,6 +188,21 @@ export function modelApiAsArray<T extends IModel>(Api: ModelApi<T>) {
 
         const newState = [...state];
         newState.splice(index, 1, updated);
+        return newState;
+      }
+      case Api.SUCCESSFUL_DELETE_TYPE: {
+        const deleted = (action as IApiDeleteResponse<T>).deleted;
+        const index = state.findIndex((object) => {
+          return object.id === deleted.id;
+        });
+
+        if (index === -1) {
+          console.warn("API attempt to delete an object which does not exist on client.");
+          return state;
+        }
+
+        const newState = [...state];
+        newState.splice(index, 1);
         return newState;
       }
       default:

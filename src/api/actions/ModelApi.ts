@@ -21,16 +21,19 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
   public SUCCESSFUL_GET_TYPE: string;
   public SUCCESSFUL_CREATE_TYPE: string;
   public SUCCESSFUL_UPDATE_TYPE: string;
+  public SUCCESSFUL_DELETE_TYPE: string;
 
   protected endpoint: string;
   private modelUpdateDependencies: Array<IModelUpdateDependency<FrontendType>>;
 
   constructor(modelName: string) {
     super();
-    this.SUCCESSFUL_GET_ALL_TYPE = `SUCCESSFUL_GET_ALL_${pluralize(modelName.toUpperCase())}`;
-    this.SUCCESSFUL_GET_TYPE = `SUCCESSFUL_GET_${modelName.toUpperCase()}`;
-    this.SUCCESSFUL_CREATE_TYPE = `SUCCESSFUL_CREATE_${modelName.toUpperCase()}`;
-    this.SUCCESSFUL_UPDATE_TYPE = `SUCCESSFUL_UPDATE_${modelName.toUpperCase()}`;
+    const modelNameUpper = modelName.toUpperCase();
+    this.SUCCESSFUL_GET_ALL_TYPE = `SUCCESSFUL_GET_ALL_${pluralize(modelNameUpper)}`;
+    this.SUCCESSFUL_GET_TYPE = `SUCCESSFUL_GET_${modelNameUpper}`;
+    this.SUCCESSFUL_CREATE_TYPE = `SUCCESSFUL_CREATE_${modelNameUpper}`;
+    this.SUCCESSFUL_UPDATE_TYPE = `SUCCESSFUL_UPDATE_${modelNameUpper}`;
+    this.SUCCESSFUL_DELETE_TYPE = `SUCCESSFUL_DELETE_${modelNameUpper}`;
     this.endpoint = `${ModelApi.API_PATH}/${pluralize(modelName.toLowerCase())}/`;
     this.modelUpdateDependencies = [];
 
@@ -81,6 +84,12 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
     }
   }
 
+  public delete(deleted: FrontendType) {
+    return this.actionCreator(this.getItemEndpoint(deleted.id), null, "DELETE", (dispatch, _response) => {
+      dispatch(this.successfulDeleteAction(deleted));
+    });
+  }
+
   public successfulGetAllAction(payload: FrontendType[]) {
     return {
       type: this.SUCCESSFUL_GET_ALL_TYPE,
@@ -107,6 +116,13 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
       type: this.SUCCESSFUL_UPDATE_TYPE,
       original,
       payload,
+    };
+  }
+
+  public successfulDeleteAction(deleted: FrontendType) {
+    return {
+      type: this.SUCCESSFUL_DELETE_TYPE,
+      deleted,
     };
   }
 
