@@ -24,6 +24,15 @@ export function searchableModelApiAsArray<ModelT extends IModel>(
   return (state: ModelT[] = [], action: Action): ModelT[] => {
     if (action.type === Api.SUCCESSFUL_SEARCH_TYPE) {
       return (action as IApiResponse<ModelT[]>).payload;
+    } else if (action.type === Api.SUCCESSFUL_UPDATE_TYPE) {
+      const updated = (action as IApiUpdateResponse<ModelT>).payload;
+      const newState = [...state];
+      const index = newState.findIndex((model: ModelT) => model.id === updated.id);
+      if (index !== -1) {
+        newState[index] = updated;
+      }
+
+      return newState;
     }
     return state;
   };
