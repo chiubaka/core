@@ -29,7 +29,7 @@ export class SearchableModelApi<BackendType extends IModel, FrontendType extends
   }
 
   public getSearchEndpoint() {
-    return `${this.endpoint}/search/`;
+    return `${this.endpoint}search/`;
   }
 
   public successfulSearchAction(payload: FrontendType[]) {
