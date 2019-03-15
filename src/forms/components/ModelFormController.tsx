@@ -92,5 +92,5 @@ export function withModelFormController<TProps, TModel extends IModel, TOwnProps
     null,
     IModelFormControllerDispatchProps<TModel>,
     IModelFormControllerOwnProps<TModel> & TOwnProps
-  >(null, mapDispatchToProps)(ModelFormController);
+  >(null, mapDispatchToProps)(ModelFormController as any);
 }

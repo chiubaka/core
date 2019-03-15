@@ -249,7 +249,7 @@ function mapDispatchToProps(dispatch: Dispatch<IAuthState>): ILoginPageDispatchP
   };
 }
 
-export default connect<ILoginPageStateProps, ILoginPageDispatchProps, ILoginPageOwnProps>(
+export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withRouter<ILoginPageProps>(LoginPage));
+)(withRouter(LoginPage) as any);

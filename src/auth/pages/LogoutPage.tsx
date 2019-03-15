@@ -35,4 +35,4 @@ function mapDispatchToProps(dispatch: Dispatch<IAuthState>, ownProps: ILogoutPag
   };
 }
 
-export default connect(null, mapDispatchToProps)(withRouter<ILogoutPageProps>(LogoutPage));
+export default withRouter(connect(null, mapDispatchToProps)(LogoutPage));
