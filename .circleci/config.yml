@@ -1,0 +1,61 @@
+version: 2
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: circleci/node:latest
+jobs:
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - node-modules-{{ arch }}-{{ checksum "yarn.lock" }}
+            - node-modules-{{ arch }}-
+      - run:
+          name: Install dependencies
+          command: yarn install
+      - save_cache:
+          paths:
+            - ./node_modules
+          key: node-modules-{{ arch }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Lint code
+          command: yarn lint
+      - run:
+          name: Build code
+          command: yarn build
+      - run:
+          name: Run tests
+          command: yarn test
+      - store_test_results:
+          path: ./coverage
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+  publish:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Authenticate with NPM registry
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
+      - run:
+          name: Publish package
+          command: npm publish
+workflows:
+  version: 2
+  test-publish:
+    jobs:
+      - test:
+          filters: # required since `deploy-prod` has tag filters AND requires build
+            tags:
+              only: /.*/
+      - publish:
+          requires:
+            - test
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+(-.+)?/
