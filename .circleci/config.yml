@@ -37,6 +37,17 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - node-modules-{{ arch }}-{{ checksum "yarn.lock" }}
+            - node-modules-{{ arch }}-
+      - run:
+          name: Install dependencies
+          command: yarn install
+      - save_cache:
+          paths:
+            - ./node_modules
+          key: node-modules-{{ arch }}-{{ checksum "yarn.lock" }}
       - run:
           name: Build distribution
           command: yarn build
