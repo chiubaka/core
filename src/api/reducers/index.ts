@@ -1,4 +1,6 @@
 import { Action } from "redux";
+import { isNullOrUndefined } from "util";
+
 import { IApiDeleteResponse, IApiResponse, IApiUpdateResponse, ModelApi, SearchableModelApi } from "../actions";
 import { IModel, IModelById, IModelIndex } from "../model";
 
@@ -19,8 +21,12 @@ function defaultModelFilterFunction<T>(_object: T) {
 
 // By default, consider nothing equal and always update. This is usually more
 // work than we need to do.
-function defaultModelEqualityFunction<T>(_object1: T, _object2: T) {
+function defaultModelEqualityFunction<T extends IModel>(_object1: T, _object2: T) {
   return false;
+}
+
+function modelIdEquality<T extends IModel>(object1: T, object2: T) {
+  return object1.id === object2.id;
 }
 
 function propertyExistsInState(propertyName: string, state: any, object: any) {
@@ -103,8 +109,8 @@ export function modelApiReducer<StateT, ModelT extends IModel>(options: IModelAp
     } else if (getTypes.has(action.type)) {
       const object = (action as IApiResponse<ModelT>).payload;
       if (modelFilter(object)) {
-        const locator = (objectLocator && objectLocator(state, object)) || null;
-        if (!locator) {
+        const locator = objectLocator ? objectLocator(state, object) : null;
+        if (isNullOrUndefined(locator)) {
           return onObjectAdd(state, object);
         } else {
           return onObjectAdd(onObjectRemove(state, object, locator), object, locator);
@@ -250,8 +256,9 @@ export function modelApiAsArray<T extends IModel>(options: IModelApiReducerSimpl
   const {
     Api,
     modelFilter,
-    modelEquality,
   } = options;
+
+  const modelEquality = options.modelEquality || modelIdEquality;
 
   return modelApiReducer({
     Apis: [Api],
@@ -260,7 +267,7 @@ export function modelApiAsArray<T extends IModel>(options: IModelApiReducerSimpl
       return objects;
     },
     onObjectAdd: (state: T[], object: T, locator: number) => {
-      if (locator) {
+      if (!isNullOrUndefined(locator) && locator >= 0) {
         const newState = [...state];
         newState.splice(locator, 0, object);
         return newState;
@@ -269,10 +276,7 @@ export function modelApiAsArray<T extends IModel>(options: IModelApiReducerSimpl
       return [...state, object];
     },
     onObjectRemove: (state: T[], object: T, locator: number) => {
-      // TODO: The equality function here could probably just be a modelEquality function
-      const index = locator || state.findIndex((o) => {
-        return object.id === o.id;
-      });
+      const index = isNullOrUndefined(locator) ? state.findIndex(modelEquality.bind(this, object)) : locator;
 
       if (index === -1) {
         console.warn("API attempt to remove an object which does not exist on client.");
@@ -284,7 +288,7 @@ export function modelApiAsArray<T extends IModel>(options: IModelApiReducerSimpl
       return newState;
     },
     objectLocator: (state: T[], object: T) => {
-      const index = state.indexOf(object);
+      const index = state.findIndex(modelEquality.bind(this, object));
       return index === -1 ? null : index;
     },
     modelFilter,

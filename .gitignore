@@ -15,3 +15,6 @@ yarn-error.log
 
 # Vim temporary files
 *.swp
+
+# Jest coverage output
+coverage/
