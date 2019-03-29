@@ -2,7 +2,7 @@ import {
   IModel,
   ModelApi,
   modelApiAsArray,
-} from "../../../api";
+} from "../../../src/api";
 
 interface ITask extends IModel {
   id: string;
