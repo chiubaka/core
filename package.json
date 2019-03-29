@@ -1,6 +1,6 @@
 {
   "name": "@chiubaka/core",
-  "version": "0.17.14",
+  "version": "0.17.15",
   "description": "Core common code for Chiubaka Technologies projects.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
