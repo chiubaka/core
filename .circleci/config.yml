@@ -38,6 +38,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Build distribution
+          command: yarn build
+      - run:
           name: Authenticate with NPM registry
           command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
       - run:
