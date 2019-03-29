@@ -134,7 +134,7 @@ export function modelApiReducer<StateT, ModelT extends IModel>(options: IModelAp
         // one. However, don't bother doing this if we detect that the objects are
         // actually the same.
         if (modelEquality && !modelEquality(original, payload)) {
-          const locator = (objectLocator && objectLocator(state, original)) || null;
+          const locator = objectLocator ? objectLocator(state, original) : null;
           return onObjectAdd(onObjectRemove(state, original, locator), payload, locator);
         }
       }
@@ -256,9 +256,8 @@ export function modelApiAsArray<T extends IModel>(options: IModelApiReducerSimpl
   const {
     Api,
     modelFilter,
+    modelEquality,
   } = options;
-
-  const modelEquality = options.modelEquality || modelIdEquality;
 
   return modelApiReducer({
     Apis: [Api],
@@ -276,7 +275,7 @@ export function modelApiAsArray<T extends IModel>(options: IModelApiReducerSimpl
       return [...state, object];
     },
     onObjectRemove: (state: T[], object: T, locator: number) => {
-      const index = isNullOrUndefined(locator) ? state.findIndex(modelEquality.bind(this, object)) : locator;
+      const index = isNullOrUndefined(locator) ? state.findIndex(modelIdEquality.bind(this, object)) : locator;
 
       if (index === -1) {
         console.warn("API attempt to remove an object which does not exist on client.");
@@ -288,7 +287,7 @@ export function modelApiAsArray<T extends IModel>(options: IModelApiReducerSimpl
       return newState;
     },
     objectLocator: (state: T[], object: T) => {
-      const index = state.findIndex(modelEquality.bind(this, object));
+      const index = state.findIndex(modelIdEquality.bind(this, object));
       return index === -1 ? null : index;
     },
     modelFilter,
