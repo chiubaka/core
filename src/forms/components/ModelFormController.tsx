@@ -26,7 +26,7 @@ export interface IModelFormControllerComponentProps<T>  extends IModelFormProps<
 }
 
 export function withModelFormController<TProps, TModel extends IModel, TOwnProps = TProps>(
-  WrappedComponent: React.ComponentType<TProps & IModelFormControllerComponentProps<TModel>>,
+  WrappedComponent: React.ComponentType<IModelFormControllerComponentProps<TModel>>,
   Api: ModelApi<TModel>,
   defaultModelState: Partial<TModel> = {},
 ) {
