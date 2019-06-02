@@ -37,8 +37,6 @@ export function completeLogout(): Action {
   };
 }
 
-
-
 export function setRedirect(redirectPath: string): ISetRedirect {
   return {
     type: ActionTypes.SET_REDIRECT,

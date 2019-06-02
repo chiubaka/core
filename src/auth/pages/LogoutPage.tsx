@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 
 import { AuthApi, AuthDispatch as Dispatch } from "../actions";
-import { IAuthState } from "../model/AuthenticationState";
 
 export interface ILogoutPageDispatchProps {
   onLogout: () => void;
