@@ -1,10 +1,10 @@
 import * as HttpStatus from "http-status-codes";
 
-import { Api } from "../../api/actions/Api";
+import { Api, IApiError } from "../../api/actions/Api";
 import { IJwtUserResponse, IUser } from "../../app/types";
-import { completeLogoutAndRedirect, IApiError } from "../../index";
 import { IAuthState } from "../model/AuthenticationState";
-import { completeLogin, failLogin, startLogin, successfulGetUserDetails } from "./index";
+import { completeLogin, failLogin, startLogin, successfulGetUserDetails } from "./creators";
+import { completeLogoutAndRedirect } from "./thunks";
 import { AuthDispatch as Dispatch } from "./types";
 
 export class AuthApi extends Api {
