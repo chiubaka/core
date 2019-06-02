@@ -1,8 +1,8 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
-import { Dispatch } from "redux";
-import { AuthApi } from "../actions/AuthApi";
+
+import { AuthApi, AuthDispatch as Dispatch } from "../actions";
 import { IAuthState } from "../model/AuthenticationState";
 
 export interface ILogoutPageDispatchProps {
@@ -25,7 +25,7 @@ class LogoutPage extends React.Component<ILogoutPageProps, {}> {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch<IAuthState>, ownProps: ILogoutPageOwnProps): ILogoutPageDispatchProps {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: ILogoutPageOwnProps): ILogoutPageDispatchProps {
   return {
     onLogout: () => {
       dispatch(AuthApi.getInstance().logout());

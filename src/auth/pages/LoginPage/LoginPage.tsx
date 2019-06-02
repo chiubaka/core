@@ -3,11 +3,10 @@ import * as classnames from "classnames";
 import * as React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
-import { Dispatch } from "redux";
-import { IProductState, IServiceState } from "../../../app/model/index";
-import { ISocialLoginProvider } from "../../../app/types/index";
-import { AuthApi } from "../../actions/AuthApi";
-import { setRedirect } from "../../actions/index";
+
+import { IProductState, IServiceState } from "../../../app/model";
+import { ISocialLoginProvider } from "../../../app/types";
+import { AuthApi, AuthDispatch as Dispatch, setRedirect } from "../../actions";
 import { SocialLoginButton } from "../../components/SocialLoginButton";
 import { IAuthState, LoginState } from "../../model/AuthenticationState";
 
@@ -238,7 +237,7 @@ function mapStateToProps(state: IAuthState & IProductState & IServiceState): ILo
   };
 }
 
-function mapDispatchToProps(dispatch: Dispatch<IAuthState>): ILoginPageDispatchProps {
+function mapDispatchToProps(dispatch: Dispatch): ILoginPageDispatchProps {
   return {
     onSubmitLogin: (username: string, password: string) => {
       dispatch(AuthApi.getInstance().login(username, password));

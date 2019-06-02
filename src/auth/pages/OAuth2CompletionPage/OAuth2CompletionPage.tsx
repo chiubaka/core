@@ -2,11 +2,10 @@ import { parse } from "query-string";
 import * as React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
-import { Dispatch } from "redux";
+
 import { ProgressBar } from "../../../app/components/ProgressBar";
-import { IServiceInnerState, IServiceState } from "../../../app/model/index";
-import { AuthApi } from "../../actions/AuthApi";
-import { clearRedirect } from "../../actions/index";
+import { IServiceInnerState, IServiceState } from "../../../app/model";
+import { AuthApi, AuthDispatch as Dispatch, clearRedirect } from "../../actions";
 import { IAuthState, LoginState } from "../../model/AuthenticationState";
 import { buildOAuth2CallbackUri } from "../../utils/uri";
 
@@ -78,7 +77,7 @@ function mapStateToProps(state: IAuthState & IServiceState): IOAuth2CompletionPa
   };
 }
 
-function mapDispatchToProps(dispatch: Dispatch<IAuthState>): IOAuth2CompletionPageDispatchProps {
+function mapDispatchToProps(dispatch: Dispatch): IOAuth2CompletionPageDispatchProps {
   return {
     clearRedirect: () => {
       dispatch(clearRedirect());

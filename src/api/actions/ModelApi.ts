@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-variable */
-import { Dispatch } from "redux";
+import { ThunkDispatch } from "redux-thunk";
 import { IAuthState } from "../../auth/model/AuthenticationState";
 /* tslint:enable:no-unused-variable */
 
@@ -8,6 +8,8 @@ import { isNullOrUndefined } from "util";
 
 import { IModel } from "../model/";
 import { Api, ApiAction } from "./Api";
+
+export declare type Dispatch = ThunkDispatch<any, void, any>;
 
 interface IModelUpdateDependency<T> {
   idMapper: (modelObject: T) => string[];
@@ -144,7 +146,7 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
     return objects.map(this.transformForFrontend);
   }
 
-  private processModelUpdateDependencies(dispatch: Dispatch<any>, modelObject: FrontendType) {
+  private processModelUpdateDependencies(dispatch: Dispatch, modelObject: FrontendType) {
     this.modelUpdateDependencies.forEach((dependency) => {
       const dependencyIds = dependency.idMapper(modelObject);
 

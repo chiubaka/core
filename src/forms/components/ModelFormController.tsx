@@ -1,9 +1,11 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { ThunkDispatch } from "redux-thunk";
 
 import { IModel, ModelApi } from "../../api";
 import { IModelFormProps } from "../types";
+
+declare type Dispatch = ThunkDispatch<any, void, any>;
 
 export interface IModelFormControllerDispatchProps<T> {
   onSubmit: (original: Partial<T>, updated: Partial<T>) => Promise<T>;
@@ -77,12 +79,10 @@ export function withModelFormController<TProps, TModel extends IModel, TOwnProps
     }
   }
 
-  function mapDispatchToProps(dispatch: Dispatch<any>): IModelFormControllerDispatchProps<TModel> {
+  function mapDispatchToProps(dispatch: Dispatch): IModelFormControllerDispatchProps<TModel> {
     return {
       onSubmit: (original: Partial<TModel>, updated: Partial<TModel>) => {
-        const promise =  dispatch(Api.createOrUpdate(original, updated)).then((model) => {
-          return model;
-        });
+        const promise: Promise<TModel> = dispatch(Api.createOrUpdate(original, updated)) as any;
         return promise;
       },
     };

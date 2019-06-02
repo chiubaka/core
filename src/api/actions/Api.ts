@@ -1,14 +1,14 @@
 import * as HttpStatus from "http-status-codes";
-import { Dispatch } from "redux";
 import { ThunkAction } from "redux-thunk";
 import { isNullOrUndefined } from "util";
 
-import { completeLogoutAndRedirect } from "../../auth/actions/index";
+import { completeLogoutAndRedirect } from "../../auth/actions/thunks";
+import { AuthDispatch as Dispatch } from "../../auth/actions/types";
 import { IAuthState } from "../../auth/model/AuthenticationState";
 
 export declare type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
-export declare type ApiSuccessCallback<T> = (dispatch: Dispatch<IAuthState>, response: T) => void;
-export declare type ApiAction<T> = ThunkAction<Promise<T>, IAuthState, null>;
+export declare type ApiSuccessCallback<T> = (dispatch: Dispatch, response: T) => void;
+export declare type ApiAction<T> = ThunkAction<Promise<T>, IAuthState, void, any>;
 export declare type ResponseTransformer<BackendType, FrontendType> = (response: BackendType) => FrontendType;
 export declare type PayloadTransformer<BackendType, FrontendType> = (payload: FrontendType) => BackendType;
 
@@ -52,7 +52,7 @@ export class Api {
     return Promise.reject(errorMessage.trim());
   }
 
-  protected handleUnsuccessfulRequest(reason: string, dispatch: Dispatch<IAuthState>) {
+  protected handleUnsuccessfulRequest(reason: string, dispatch: Dispatch) {
     dispatch(Api.unsuccessfulRequest(reason));
   }
 
@@ -68,7 +68,7 @@ export class Api {
       payloadTransformer?: PayloadTransformer<BackendPayloadT, FrontendPayloadT>,
       responseTransformer?: ResponseTransformer<BackendResponseT, FrontendResponseT>,
     ): ApiAction<FrontendResponseT> {
-    return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
+    return (dispatch: Dispatch, getState: () => IAuthState) => {
       const transformedPayload = payloadTransformer ? payloadTransformer(payload) : payload as any;
       return this.requestWithPayload(pathname, transformedPayload, method, dispatch, getState().auth.token)
         .then((response: BackendResponseT) => {
@@ -79,25 +79,25 @@ export class Api {
     };
   }
 
-  protected getRequest<T>(pathname: string, payload: T, dispatch: Dispatch<IAuthState>, token: string): Promise<any> {
+  protected getRequest<T>(pathname: string, payload: T, dispatch: Dispatch, token: string): Promise<any> {
     return this.requestWithPayload(pathname, payload, "GET", dispatch, token);
   }
 
-  protected postRequest<T>(pathname: string, payload: T, dispatch: Dispatch<IAuthState>, token: string): Promise<any> {
+  protected postRequest<T>(pathname: string, payload: T, dispatch: Dispatch, token: string): Promise<any> {
     return this.requestWithPayload(pathname, payload, "POST", dispatch, token);
   }
 
-  protected putRequest<T>(pathname: string, payload: T, dispatch: Dispatch<IAuthState>, token: string): Promise<any> {
+  protected putRequest<T>(pathname: string, payload: T, dispatch: Dispatch, token: string): Promise<any> {
     return this.requestWithPayload(pathname, payload, "PUT", dispatch, token);
   }
 
-  protected deleteRequest(pathname: string, dispatch: Dispatch<IAuthState>, token: string): Promise<any> {
+  protected deleteRequest(pathname: string, dispatch: Dispatch, token: string): Promise<any> {
     return this.request(pathname, dispatch, token, {
       method: "DELETE",
     });
   }
 
-  protected handleApiResponse<T>(dispatch: Dispatch<IAuthState>, response: Response): Promise<T | string> {
+  protected handleApiResponse<T>(dispatch: Dispatch, response: Response): Promise<T | string> {
     switch (response.status) {
       case HttpStatus.OK:
       case HttpStatus.CREATED:
@@ -107,6 +107,8 @@ export class Api {
       case HttpStatus.UNAUTHORIZED:
         dispatch(completeLogoutAndRedirect());
         return Promise.reject("You are not logged in.");
+      case HttpStatus.FORBIDDEN:
+        return Promise.reject("You have insufficient permissions to perform this action.");
       case HttpStatus.BAD_REQUEST:
         return response.json().then(this.errorTransformer.bind(this, response.url));
       case HttpStatus.INTERNAL_SERVER_ERROR:
@@ -118,7 +120,7 @@ export class Api {
   }
 
   private requestWithPayload<T>(pathname: string, payload: T, method: HttpMethod,
-                                dispatch: Dispatch<IAuthState>, token: string) {
+                                dispatch: Dispatch, token: string) {
     pathname = method === "GET" && !isNullOrUndefined(payload)
       ?  `${pathname}?${Api.encodeUrlParams(payload)}`
       : pathname;
@@ -128,7 +130,7 @@ export class Api {
     });
   }
 
-  private request(pathname: string, dispatch: Dispatch<IAuthState>, token: string,
+  private request(pathname: string, dispatch: Dispatch, token: string,
                   requestOptions: RequestInit = {}): Promise<any> {
     return fetch(pathname, {
       headers: Api.apiHeaders(token),

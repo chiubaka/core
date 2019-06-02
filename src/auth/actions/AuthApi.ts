@@ -1,11 +1,11 @@
 import * as HttpStatus from "http-status-codes";
-import { Dispatch } from "redux";
 
-import { Api } from "../../api/actions";
+import { Api } from "../../api/actions/Api";
 import { IJwtUserResponse, IUser } from "../../app/types";
 import { completeLogoutAndRedirect, IApiError } from "../../index";
 import { IAuthState } from "../model/AuthenticationState";
 import { completeLogin, failLogin, startLogin, successfulGetUserDetails } from "./index";
+import { AuthDispatch as Dispatch } from "./types";
 
 export class AuthApi extends Api {
   public static getInstance(): AuthApi {
@@ -29,7 +29,7 @@ export class AuthApi extends Api {
   }
 
   public login(username: string, password: string) {
-    return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
+    return (dispatch: Dispatch, getState: () => IAuthState) => {
       dispatch(startLogin());
       const authState = getState().auth;
       const innerPayload = authState.useEmailAsUsername
@@ -71,7 +71,7 @@ export class AuthApi extends Api {
   }
 
   public socialLogin(provider: string, code: string, redirectUri: string) {
-    return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
+    return (dispatch: Dispatch, getState: () => IAuthState) => {
       dispatch(startLogin());
       const payload = {
         provider,
@@ -88,7 +88,7 @@ export class AuthApi extends Api {
   }
 
   public logout() {
-    return (dispatch: Dispatch<IAuthState>, getState: () => IAuthState) => {
+    return (dispatch: Dispatch, getState: () => IAuthState) => {
       const token = getState().auth.token;
       return this.deleteRequest("/api/logout/jwt/", dispatch, token)
       .then(() => {
@@ -101,12 +101,12 @@ export class AuthApi extends Api {
     return Promise.reject("Invalid credentials.");
   }
 
-  protected handleUnsuccessfulRequest(reason: string, dispatch: Dispatch<IAuthState>) {
+  protected handleUnsuccessfulRequest(reason: string, dispatch: Dispatch) {
     super.handleUnsuccessfulRequest(reason, dispatch);
     dispatch(failLogin(reason));
   }
 
-  protected handleApiResponse<T>(dispatch: Dispatch<IAuthState>, response: Response): Promise<T | string> {
+  protected handleApiResponse<T>(dispatch: Dispatch, response: Response): Promise<T | string> {
     switch (response.status) {
       case HttpStatus.OK:
       case HttpStatus.CREATED:
