@@ -1,9 +1,19 @@
-import { ISocialLoginProvider, IUser } from "../../app/types/index";
+import { IUser } from "../../app/types/index";
 export declare enum LoginState {
     NotLoggedIn = 0,
     LoggingIn = 1,
     LoggedIn = 2,
     LoggingOut = 3
+}
+export declare enum OAuth2ResponseType {
+    Code = "code",
+    Token = "token"
+}
+export interface ISocialLoginProvider {
+    providerName: string;
+    clientId: string;
+    responseType: OAuth2ResponseType;
+    scope?: string[];
 }
 export interface IAuthState {
     auth: IAuthInnerState;

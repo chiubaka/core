@@ -1,4 +1,4 @@
-import { parse } from "query-string";
+import { parse, ParsedQuery } from "query-string";
 import * as React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
@@ -6,7 +6,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { ProgressBar } from "../../../app/components/ProgressBar";
 import { IServiceInnerState, IServiceState } from "../../../app/model";
 import { AuthApi, AuthDispatch as Dispatch, clearRedirect } from "../../actions";
-import { IAuthState, LoginState } from "../../model/AuthenticationState";
+import { IAuthState, LoginState, OAuth2ResponseType, ISocialLoginProvider } from "../../model/AuthenticationState";
 import { buildOAuth2CallbackUri } from "../../utils/uri";
 
 export interface IOAuth2CompletionPageParams {
@@ -17,15 +17,26 @@ export interface IOAuth2CompletionPageStateProps extends IServiceInnerState {
   loggedIn: boolean;
   oAuth2CallbackBasePath: string;
   redirectPath: string;
+  providers: ISocialLoginProvider[];
 }
 
 export interface IOAuth2CompletionPageDispatchProps {
   clearRedirect: () => void;
-  onOAuth2Completion: (provider: string, code: string, redirectUri: string) => void;
+  socialLogin: (provider: string, code: string, redirectUri: string) => void;
+  socialLoginAccessToken: (provider: string, token: string) => void;
 }
 
-export interface IOAuth2CompletionPageProps extends RouteComponentProps<IOAuth2CompletionPageParams>,
-  IOAuth2CompletionPageStateProps, IOAuth2CompletionPageDispatchProps {}
+export interface IOAuth2CompletionPageMergeProps {
+  onOAuth2Completion: (provider: string, queryParams: ParsedQuery) => void;
+}
+
+export interface IOAuth2CompletionPageProps extends 
+  RouteComponentProps<IOAuth2CompletionPageParams>,
+  IOAuth2CompletionPageMergeProps {
+    loggedIn: boolean;
+    redirectPath: string;
+    clearRedirect: () => void;
+  }
 
 export function buildOAuth2CompletionPage(api: AuthApi) {
   class OAuth2CompletionPage extends React.Component<IOAuth2CompletionPageProps> {
@@ -49,16 +60,12 @@ export function buildOAuth2CompletionPage(api: AuthApi) {
 
     private handleOAuth2AndRedirect(props: IOAuth2CompletionPageProps) {
       const queryParams = parse(props.location.search);
-      const code = queryParams.code;
   
       if (!props.loggedIn) {
         // TODO: Need to handle case where user is not logged in but login failed.
         const provider = props.match.params.provider;
-  
-        const { hostname, oAuth2CallbackBasePath, port, useSsl } = props;
-        const oAuth2CallbackUri = buildOAuth2CallbackUri(hostname, oAuth2CallbackBasePath, provider, port, useSsl);
-  
-        props.onOAuth2Completion(provider, code as string, oAuth2CallbackUri);
+    
+        props.onOAuth2Completion(provider, queryParams);
       } else {
         props.clearRedirect();
         // TODO: Should not be "/" here, should be a parameterized default path
@@ -75,6 +82,7 @@ export function buildOAuth2CompletionPage(api: AuthApi) {
       port: state.service.port,
       useSsl: state.service.useSsl,
       redirectPath: state.auth.redirectPath,
+      providers: state.auth.socialProviders,
     };
   }
 
@@ -83,14 +91,39 @@ export function buildOAuth2CompletionPage(api: AuthApi) {
       clearRedirect: () => {
         dispatch(clearRedirect());
       },
-      onOAuth2Completion: (provider: string, code: string, oAuth2CallbackUri: string) => {
+      socialLogin: (provider: string, code: string, oAuth2CallbackUri: string) => {
         dispatch(api.socialLogin(provider, code, oAuth2CallbackUri));
       },
+      socialLoginAccessToken: (provider: string, token: string) => {
+        dispatch(api.socialLoginAccessToken(provider, token));
+      }
     };
+  }
+
+  function mergeProps(stateProps: IOAuth2CompletionPageStateProps, dispatchProps: IOAuth2CompletionPageDispatchProps) {
+    return {
+      onOAuth2Completion: (providerName: string, queryParams: ParsedQuery) => {
+        const provider = stateProps.providers.find((p) => p.providerName === providerName);
+
+        switch (provider.responseType) {
+          case (OAuth2ResponseType.Token): {
+            return dispatchProps.socialLoginAccessToken(providerName, queryParams.token as string);
+          }
+          case (OAuth2ResponseType.Code):
+          default: {
+            const { hostname, oAuth2CallbackBasePath, port, useSsl } = stateProps;
+            const oAuth2CallbackUri = buildOAuth2CallbackUri(hostname, oAuth2CallbackBasePath, providerName, port, useSsl);
+
+            return dispatchProps.socialLogin(providerName, queryParams.code as string, oAuth2CallbackUri);
+          }
+        }
+      }
+    }
   }
 
   return connect(
     mapStateToProps,
     mapDispatchToProps,
-  )(withRouter<IOAuth2CompletionPageProps>(OAuth2CompletionPage));
+    mergeProps,
+  )(withRouter<IOAuth2CompletionPageProps>(OAuth2CompletionPage) as any);
 }

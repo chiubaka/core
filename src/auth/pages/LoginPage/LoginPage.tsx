@@ -5,10 +5,9 @@ import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 
 import { IProductState, IServiceState } from "../../../app/model";
-import { ISocialLoginProvider } from "../../../app/types";
 import { AuthApi, AuthDispatch as Dispatch, setRedirect } from "../../actions";
 import { SocialLoginButton } from "../../components/SocialLoginButton";
-import { IAuthState, LoginState } from "../../model/AuthenticationState";
+import { IAuthState, ISocialLoginProvider, LoginState } from "../../model/AuthenticationState";
 
 export interface ILoginPageStateProps {
   loggedIn: boolean;
@@ -146,13 +145,10 @@ export function buildLoginPage(api: AuthApi) {
       const providers = this.props.socialProviders;
 
       return providers.map((provider) => {
-        const {clientId, providerName} = provider;
-
         return (
           <SocialLoginButton
-            key={providerName}
-            clientId={clientId}
-            providerName={providerName}
+            key={provider.providerName}
+            provider={provider}
             {...this.props}
           />
         );

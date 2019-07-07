@@ -2,6 +2,7 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "sourceMap": true,
+    "lib": ["esnext.asynciterable", "es6", "dom", "dom.iterable", "scripthost"],
     "noImplicitAny": true,
     "module": "commonjs",
     "target": "es6",

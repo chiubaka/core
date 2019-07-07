@@ -1,10 +1,10 @@
-import { RestClient } from "../../../api/clients/RestClient";
-import { IJwtUserResponse, IUser } from "../../../app/types";
-import { AuthRestClient } from "../../clients/AuthRestClient";
-import { IAuthInnerState } from "../../model";
-import { completeLogin, successfulGetUserDetails } from "../creators";
-import { completeLogoutAndRedirect } from "../thunks";
-import { AuthDispatch, IAuthApiAdapter } from "../types";
+import { RestClient } from "../../../../api/clients/RestClient";
+import { IJwtUserResponse, IUser } from "../../../../app/types";
+import { AuthRestClient } from "../../../clients/AuthRestClient";
+import { IAuthInnerState } from "../../../model";
+import { completeLogin, successfulGetUserDetails } from "../../creators";
+import { completeLogoutAndRedirect } from "../../thunks";
+import { AuthDispatch, IAuthApiAdapter } from "../../types";
 
 export class RestApiAdapter implements IAuthApiAdapter {
   public static getInstance(): RestApiAdapter {

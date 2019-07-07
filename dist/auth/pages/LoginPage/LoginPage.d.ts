@@ -1,6 +1,6 @@
 import { RouteComponentProps } from "react-router-dom";
-import { ISocialLoginProvider } from "../../../app/types";
 import { AuthApi } from "../../actions";
+import { ISocialLoginProvider } from "../../model/AuthenticationState";
 export interface ILoginPageStateProps {
     loggedIn: boolean;
     logoPath?: string;

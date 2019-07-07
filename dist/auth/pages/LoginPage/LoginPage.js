@@ -64,8 +64,7 @@ function buildLoginPage(api) {
             }
             const providers = this.props.socialProviders;
             return providers.map((provider) => {
-                const { clientId, providerName } = provider;
-                return (React.createElement(SocialLoginButton_1.SocialLoginButton, Object.assign({ key: providerName, clientId: clientId, providerName: providerName }, this.props)));
+                return (React.createElement(SocialLoginButton_1.SocialLoginButton, Object.assign({ key: provider.providerName, provider: provider }, this.props)));
             });
         }
         renderLoginTypeSwitch() {

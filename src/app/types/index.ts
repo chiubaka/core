@@ -1,10 +1,5 @@
 import { IModel } from "../../api";
 
-export interface ISocialLoginProvider {
-  providerName: string;
-  clientId: string;
-}
-
 export interface IUserBase extends IModel {
   username: string;
   email: string;

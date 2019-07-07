@@ -27,7 +27,8 @@ export interface ISetRedirect extends Action {
 export declare type AuthAction = Action | ICompleteLogin | ISuccessfulGetUserDetails | IFailLogin | ISetRedirect;
 export declare type AuthDispatch = ThunkDispatch<IAuthState, void, AuthAction>;
 export interface IAuthApiAdapter {
-    login: (username: string, password: string, dispatch: AuthDispatch, authState: IAuthInnerState) => Promise<any>;
-    socialLogin: (provider: string, code: string, redirectUri: string, dispatch: AuthDispatch, authState: IAuthInnerState) => Promise<any>;
+    login?: (username: string, password: string, dispatch: AuthDispatch, authState: IAuthInnerState) => Promise<any>;
+    socialLogin?: (provider: string, code: string, redirectUri: string, dispatch: AuthDispatch, authState: IAuthInnerState) => Promise<any>;
+    socialLoginAccessToken?: (provider: string, accessToken: string, dispatch: AuthDispatch, authState: IAuthInnerState) => Promise<any>;
     logout: (dispatch: AuthDispatch, authState: IAuthInnerState) => Promise<any>;
 }

@@ -1,7 +1,7 @@
 import * as React from "react";
+import { ISocialLoginProvider } from "../model/AuthenticationState";
 export interface ISocialLoginButtonOwnProps {
-    clientId: string;
-    providerName: string;
+    provider: ISocialLoginProvider;
 }
 export interface ISocialLoginButtonStateProps {
     oAuth2Uri: string;
@@ -15,12 +15,7 @@ declare class SocialLoginButtonImpl extends React.Component<ISocialLoginButtonPr
     static OAUTH2_PROVIDER_ALIAS: {
         [provider: string]: string;
     };
-    static OAUTH2_ADDITIONAL_PARAMETERS: {
-        [provider: string]: {
-            [parameter: string]: string;
-        };
-    };
     render(): JSX.Element;
 }
-export declare const SocialLoginButton: import("react-redux").ConnectedComponentClass<typeof SocialLoginButtonImpl, Pick<ISocialLoginButtonProps, "clientId" | "providerName"> & ISocialLoginButtonOwnProps>;
+export declare const SocialLoginButton: import("react-redux").ConnectedComponentClass<typeof SocialLoginButtonImpl, Pick<ISocialLoginButtonProps, "provider"> & ISocialLoginButtonOwnProps>;
 export {};

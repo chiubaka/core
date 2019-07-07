@@ -9,6 +9,11 @@ var LoginState;
     LoginState[LoginState["LoggedIn"] = 2] = "LoggedIn";
     LoginState[LoginState["LoggingOut"] = 3] = "LoggingOut";
 })(LoginState = exports.LoginState || (exports.LoginState = {}));
+var OAuth2ResponseType;
+(function (OAuth2ResponseType) {
+    OAuth2ResponseType["Code"] = "code";
+    OAuth2ResponseType["Token"] = "token";
+})(OAuth2ResponseType = exports.OAuth2ResponseType || (exports.OAuth2ResponseType = {}));
 exports.DEFAULT_AUTH_STATE = {
     enableNonSocialLogin: false,
     useEmailAsUsername: false,

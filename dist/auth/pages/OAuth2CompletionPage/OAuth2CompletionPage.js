@@ -23,13 +23,10 @@ function buildOAuth2CompletionPage(api) {
         }
         handleOAuth2AndRedirect(props) {
             const queryParams = query_string_1.parse(props.location.search);
-            const code = queryParams.code;
             if (!props.loggedIn) {
                 // TODO: Need to handle case where user is not logged in but login failed.
                 const provider = props.match.params.provider;
-                const { hostname, oAuth2CallbackBasePath, port, useSsl } = props;
-                const oAuth2CallbackUri = uri_1.buildOAuth2CallbackUri(hostname, oAuth2CallbackBasePath, provider, port, useSsl);
-                props.onOAuth2Completion(provider, code, oAuth2CallbackUri);
+                props.onOAuth2Completion(provider, queryParams);
             }
             else {
                 props.clearRedirect();
@@ -46,6 +43,7 @@ function buildOAuth2CompletionPage(api) {
             port: state.service.port,
             useSsl: state.service.useSsl,
             redirectPath: state.auth.redirectPath,
+            providers: state.auth.socialProviders,
         };
     }
     function mapDispatchToProps(dispatch) {
@@ -53,12 +51,33 @@ function buildOAuth2CompletionPage(api) {
             clearRedirect: () => {
                 dispatch(actions_1.clearRedirect());
             },
-            onOAuth2Completion: (provider, code, oAuth2CallbackUri) => {
+            socialLogin: (provider, code, oAuth2CallbackUri) => {
                 dispatch(api.socialLogin(provider, code, oAuth2CallbackUri));
             },
+            socialLoginAccessToken: (provider, token) => {
+                dispatch(api.socialLoginAccessToken(provider, token));
+            }
         };
     }
-    return react_redux_1.connect(mapStateToProps, mapDispatchToProps)(react_router_dom_1.withRouter(OAuth2CompletionPage));
+    function mergeProps(stateProps, dispatchProps) {
+        return {
+            onOAuth2Completion: (providerName, queryParams) => {
+                const provider = stateProps.providers.find((p) => p.providerName === providerName);
+                switch (provider.responseType) {
+                    case (AuthenticationState_1.OAuth2ResponseType.Token): {
+                        return dispatchProps.socialLoginAccessToken(providerName, queryParams.token);
+                    }
+                    case (AuthenticationState_1.OAuth2ResponseType.Code):
+                    default: {
+                        const { hostname, oAuth2CallbackBasePath, port, useSsl } = stateProps;
+                        const oAuth2CallbackUri = uri_1.buildOAuth2CallbackUri(hostname, oAuth2CallbackBasePath, providerName, port, useSsl);
+                        return dispatchProps.socialLogin(providerName, queryParams.code, oAuth2CallbackUri);
+                    }
+                }
+            }
+        };
+    }
+    return react_redux_1.connect(mapStateToProps, mapDispatchToProps, mergeProps)(react_router_dom_1.withRouter(OAuth2CompletionPage));
 }
 exports.buildOAuth2CompletionPage = buildOAuth2CompletionPage;
 
