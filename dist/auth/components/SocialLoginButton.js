@@ -13,7 +13,7 @@ class SocialLoginButtonImpl extends React.Component {
     }
 }
 SocialLoginButtonImpl.OAUTH2_GATEWAYS = {
-    facebook: "https://www.facebook.com/v2.10/dialog/oauth",
+    facebook: "https://www.facebook.com/v3.3/dialog/oauth",
     google: "https://accounts.google.com/o/oauth2/v2/auth",
 };
 // Provides provider providerName aliases as shims since social-app-django differentiates between Google and
@@ -23,7 +23,7 @@ SocialLoginButtonImpl.OAUTH2_PROVIDER_ALIAS = {
 };
 SocialLoginButtonImpl.OAUTH2_ADDITIONAL_PARAMETERS = {
     facebook: {
-        response_type: "code",
+        response_type: "token",
     },
     google: {
         response_type: "code",

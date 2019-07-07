@@ -5,6 +5,6 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./Api"));
 __export(require("./ModelApi"));
-__export(require("./SearchableModelApi"));
+__export(require("./SearchableApi"));
 
 //# sourceMappingURL=../../dist/api/actions/index.js.map

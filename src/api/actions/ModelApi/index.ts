@@ -17,7 +17,7 @@ interface IModelUpdateDependency<T> {
 
 export class ModelApi<
   BackendType extends IModel,
-  FrontendType extends IModel = BackendType
+  FrontendType extends IModel = BackendType,
 > extends Api<IModelApiAdapter<BackendType, FrontendType>> {
 
   public SUCCESSFUL_GET_ALL_TYPE: string;

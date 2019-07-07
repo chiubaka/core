@@ -1,5 +1,6 @@
 import { RouteComponentProps } from "react-router-dom";
 import { ISocialLoginProvider } from "../../../app/types";
+import { AuthApi } from "../../actions";
 export interface ILoginPageStateProps {
     loggedIn: boolean;
     logoPath?: string;
@@ -22,5 +23,4 @@ export interface ILoginPageState {
     password: string;
     showSocialLogin: boolean;
 }
-declare const _default: import("react-redux").ConnectedComponentClass<any, Pick<unknown, never>>;
-export default _default;
+export declare function buildLoginPage(api: AuthApi): import("react-redux").ConnectedComponentClass<any, Pick<unknown, never>>;

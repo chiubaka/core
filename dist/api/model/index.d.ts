@@ -8,3 +8,6 @@ export interface IModelById<T extends IModel> {
 export interface IModelIndex<T extends IModel> {
     [key: string]: T[];
 }
+export interface IApiAdapter {
+    name: string;
+}

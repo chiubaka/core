@@ -1,7 +1,7 @@
 import { Action } from "redux";
 import { ThunkDispatch } from "redux-thunk";
 import { IUser } from "../../app/types";
-import { IAuthState } from "../model";
+import { IAuthState, IAuthInnerState } from "../model";
 export declare const ActionTypes: {
     START_LOGIN: "START_LOGIN";
     COMPLETE_LOGIN: "COMPLETE_LOGIN";
@@ -26,3 +26,8 @@ export interface ISetRedirect extends Action {
 }
 export declare type AuthAction = Action | ICompleteLogin | ISuccessfulGetUserDetails | IFailLogin | ISetRedirect;
 export declare type AuthDispatch = ThunkDispatch<IAuthState, void, AuthAction>;
+export interface IAuthApiAdapter {
+    login: (username: string, password: string, dispatch: AuthDispatch, authState: IAuthInnerState) => Promise<any>;
+    socialLogin: (provider: string, code: string, redirectUri: string, dispatch: AuthDispatch, authState: IAuthInnerState) => Promise<any>;
+    logout: (dispatch: AuthDispatch, authState: IAuthInnerState) => Promise<any>;
+}

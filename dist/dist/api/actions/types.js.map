@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/api/actions/types.ts"],"names":[],"mappings":"","file":"../../../api/actions/types.js","sourcesContent":["import { ThunkAction } from \"redux-thunk\";\n\nimport { IAuthState } from \"../../auth/model\";\n\nexport declare type ApiAction<T> = ThunkAction<Promise<T>, IAuthState, void, any>;\n"]}

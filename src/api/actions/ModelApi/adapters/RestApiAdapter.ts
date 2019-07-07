@@ -1,10 +1,10 @@
 import * as pluralize from "pluralize";
 import { ThunkDispatch } from "redux-thunk";
 
+import { ModelApi } from "../";
 import { RestClient } from "../../../clients/RestClient";
 import { IModel } from "../../../model";
 import { ApiAction } from "../../types";
-import { ModelApi } from "../ModelApi";
 import { IModelApiAdapter } from "./types";
 
 // Clients will have all kinds of States and all kinds of Actions, so must use any here.
@@ -19,7 +19,7 @@ export class RestApiAdapter<
   protected endpoint: string;
   protected api: ModelApi<BackendType, FrontendType>;
 
-  private client: RestClient;
+  protected client: RestClient;
 
   constructor(modelName: string, client: RestClient = RestClient.getInstance()) {
     this.client = client;
@@ -28,14 +28,6 @@ export class RestApiAdapter<
 
   public setApi(api: ModelApi<BackendType, FrontendType>) {
     this.api = api;
-  }
-
-  public getListEndpoint() {
-    return this.endpoint;
-  }
-
-  public getItemEndpoint(id: string) {
-    return `${this.endpoint}${id}/`;
   }
 
   public getAll = () => {
@@ -100,5 +92,13 @@ export class RestApiAdapter<
         dispatch(this.api.successfulDeleteAction(deleted));
       },
     );
+  }
+
+  private getListEndpoint() {
+    return this.endpoint;
+  }
+
+  private getItemEndpoint(id: string) {
+    return `${this.endpoint}${id}/`;
   }
 }
