@@ -1,20 +1,28 @@
 import * as HttpStatus from "http-status-codes";
-import { ThunkAction } from "redux-thunk";
 import { isNullOrUndefined } from "util";
 
 import { IAuthState } from "../../auth/model/AuthenticationState";
 import { AuthDispatch as Dispatch, completeLogoutAndRedirect } from "../../auth/actions";
-import { Api } from "../actions";
+import { Api, ApiAction } from "../actions";
 
 export declare type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 export declare type RestApiSuccessCallback<T> = (dispatch: Dispatch, response: T) => void;
 export declare type ResponseTransformer<BackendType, FrontendType> = (response: BackendType) => FrontendType;
 export declare type PayloadTransformer<BackendType, FrontendType> = (payload: FrontendType) => BackendType;
-export declare type RestApiAction<T> = ThunkAction<Promise<T>, IAuthState, void, any>;
 
 export interface IRestApiError {[field: string]: string[]; }
 
 export class RestClient {
+  public static getInstance() {
+    if (!RestClient.singleton) {
+      RestClient.singleton = new RestClient();
+    }
+
+    return RestClient.singleton;
+  }
+
+  private static singleton: RestClient;
+
   // TODO: authPrefix should be customizable based on app configs somehow
   public static apiHeaders(accessToken: string, authPrefix: string = "Bearer") {
     const headers = new Headers();
@@ -47,7 +55,7 @@ export class RestClient {
     dispatch(Api.unsuccessfulRequest(reason));
   }
 
-  protected actionCreator<
+  public actionCreator<
       FrontendPayloadT,
       BackendPayloadT = FrontendPayloadT,
       BackendResponseT = BackendPayloadT,
@@ -58,7 +66,7 @@ export class RestClient {
       onSuccess: RestApiSuccessCallback<FrontendResponseT>,
       payloadTransformer?: PayloadTransformer<BackendPayloadT, FrontendPayloadT>,
       responseTransformer?: ResponseTransformer<BackendResponseT, FrontendResponseT>,
-    ): RestApiAction<FrontendResponseT> {
+    ): ApiAction<FrontendResponseT> {
     return (dispatch: Dispatch, getState: () => IAuthState) => {
       const transformedPayload = payloadTransformer ? payloadTransformer(payload) : payload as any;
       return this.requestWithPayload(pathname, transformedPayload, method, dispatch, getState().auth.token)

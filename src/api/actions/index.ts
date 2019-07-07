@@ -1,8 +1,9 @@
 import { Action } from "redux";
 
 export * from "./Api";
-export * from "./ModelApi";
+export * from "./ModelApi/ModelApi";
 export * from "./SearchableModelApi";
+export * from "./types";
 
 export interface IApiResponse<T> extends Action {
   payload: T;

@@ -29,8 +29,8 @@ export class RestApiAdapter implements IAuthApiAdapter {
 
   private client: RestClient;
 
-  constructor() {
-    this.client = new AuthRestClient();
+  constructor(client: RestClient = new AuthRestClient()) {
+    this.client = client;
   }
 
   public login = (username: string, password: string, dispatch: AuthDispatch, authState: IAuthInnerState) => {

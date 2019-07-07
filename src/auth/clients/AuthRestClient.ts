@@ -5,6 +5,20 @@ import { completeLogin, failLogin } from "../actions/creators";
 import { AuthDispatch as Dispatch } from "../actions/types";
 
 export class AuthRestClient extends RestClient {
+  // TODO: Some code smell here around having to rename the singleton private var
+  // Had to do this because apparently otherwise the type conflicts with the
+  // super class... and then I was concerned that I'd accidentally get one instance
+  // between this class and the super.
+  public static getInstance() {
+    if (!AuthRestClient.authSingleton) {
+      AuthRestClient.authSingleton = new AuthRestClient();
+    }
+
+    return AuthRestClient.authSingleton;
+  }
+
+  private static authSingleton: AuthRestClient;
+
   protected errorTransformer(_url: string, _error: IRestApiError): Promise<string> {
     return Promise.reject("Invalid credentials.");
   }
