@@ -9,18 +9,18 @@ import { buildLoginPage } from "./LoginPage/LoginPage";
 import { buildLogoutPage } from "./LogoutPage";
 import { buildOAuth2CompletionPage } from "./OAuth2CompletionPage/OAuth2CompletionPage";
 
-export interface IAuthStateProps {
+interface IAuthStateProps {
   oAuth2CallbackBasePath: string;
 }
 
-function buildAuth(adapter?: IAuthApiAdapter) {
+export function buildAuth(adapter?: IAuthApiAdapter): React.ComponentClass {
   const api = new AuthApi(adapter);
 
   const LoginPage = buildLoginPage(api);
   const LogoutPage = buildLogoutPage(api);
   const OAuth2CompletionPage = buildOAuth2CompletionPage(api);
 
-  class Auth extends React.Component<IAuthStateProps> {
+  class AuthImpl extends React.Component<IAuthStateProps> {
     constructor(props: IAuthStateProps) {
       super(props);
 
@@ -66,5 +66,7 @@ function buildAuth(adapter?: IAuthApiAdapter) {
     };
   }
 
-  return connect(mapStateToProps)(Auth);
+  return connect(mapStateToProps)(AuthImpl);
 }
+
+export const Auth = buildAuth();

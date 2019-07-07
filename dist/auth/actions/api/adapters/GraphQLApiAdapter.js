@@ -25,6 +25,12 @@ class GraphQLApiAdapter {
         };
         this.client = client;
     }
+    static getInstance() {
+        if (!GraphQLApiAdapter.singleton) {
+            GraphQLApiAdapter.singleton = new GraphQLApiAdapter();
+        }
+        return GraphQLApiAdapter.singleton;
+    }
 }
 exports.GraphQLApiAdapter = GraphQLApiAdapter;
 

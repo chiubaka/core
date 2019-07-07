@@ -12,7 +12,7 @@ function buildAuth(adapter) {
     const LoginPage = LoginPage_1.buildLoginPage(api);
     const LogoutPage = LogoutPage_1.buildLogoutPage(api);
     const OAuth2CompletionPage = OAuth2CompletionPage_1.buildOAuth2CompletionPage(api);
-    class Auth extends React.Component {
+    class AuthImpl extends React.Component {
         constructor(props) {
             super(props);
             this.renderOAuth2CompletionPage = this.renderOAuth2CompletionPage.bind(this);
@@ -38,7 +38,9 @@ function buildAuth(adapter) {
             oAuth2CallbackBasePath: state.auth.oAuth2CallbackBasePath,
         };
     }
-    return react_redux_1.connect(mapStateToProps)(Auth);
+    return react_redux_1.connect(mapStateToProps)(AuthImpl);
 }
+exports.buildAuth = buildAuth;
+exports.Auth = buildAuth();
 
 //# sourceMappingURL=../../dist/auth/pages/Auth.js.map

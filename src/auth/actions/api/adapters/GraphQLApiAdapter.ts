@@ -4,6 +4,16 @@ import { IAuthInnerState } from "../../../model";
 import { AuthDispatch, IAuthApiAdapter } from "../../types";
 
 export class GraphQLApiAdapter implements IAuthApiAdapter {
+  public static getInstance(): GraphQLApiAdapter {
+    if (!GraphQLApiAdapter.singleton) {
+      GraphQLApiAdapter.singleton = new GraphQLApiAdapter();
+    }
+
+    return GraphQLApiAdapter.singleton;
+  }
+
+  private static singleton: GraphQLApiAdapter;
+
   private client: ApolloClient<any>;
 
   constructor(client: ApolloClient<any> = new ApolloClient()) {
