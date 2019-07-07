@@ -17,7 +17,7 @@ export interface ISocialLoginButtonProps extends ISocialLoginButtonOwnProps, ISo
 
 class SocialLoginButtonImpl extends React.Component<ISocialLoginButtonProps> {
   public static OAUTH2_GATEWAYS: {[provider: string]: string} = {
-    facebook: "https://www.facebook.com/v2.10/dialog/oauth",
+    facebook: "https://www.facebook.com/v3.3/dialog/oauth",
     google: "https://accounts.google.com/o/oauth2/v2/auth",
   };
 
@@ -29,7 +29,7 @@ class SocialLoginButtonImpl extends React.Component<ISocialLoginButtonProps> {
 
   public static OAUTH2_ADDITIONAL_PARAMETERS: {[provider: string]: {[parameter: string]: string}} = {
     facebook: {
-      response_type: "code",
+      response_type: "token",
     },
     google: {
       response_type: "code",
