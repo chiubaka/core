@@ -1,5 +1,5 @@
-import { AuthDispatch as Dispatch } from "../../auth/actions";
-import { ApiAction } from "../actions";
+import { AuthDispatch as Dispatch } from "../../auth/actions/types";
+import { ApiAction } from "../actions/types";
 export declare type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 export declare type RestApiSuccessCallback<T> = (dispatch: Dispatch, response: T) => void;
 export declare type ResponseTransformer<BackendType, FrontendType> = (response: BackendType) => FrontendType;

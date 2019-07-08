@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const HttpStatus = require("http-status-codes");
 const util_1 = require("util");
-const actions_1 = require("../../auth/actions");
-const actions_2 = require("../actions");
+const thunks_1 = require("../../auth/actions/thunks");
+const Api_1 = require("../actions/Api");
 class RestClient {
     static getInstance() {
         if (!RestClient.singleton) {
@@ -37,7 +37,7 @@ class RestClient {
         return Promise.reject(errorMessage.trim());
     }
     handleUnsuccessfulRequest(reason, dispatch) {
-        dispatch(actions_2.Api.unsuccessfulRequest(reason));
+        dispatch(Api_1.Api.unsuccessfulRequest(reason));
     }
     actionCreator(pathname, payload, method, onSuccess, payloadTransformer, responseTransformer) {
         return (dispatch, getState) => {
@@ -72,7 +72,7 @@ class RestClient {
             case HttpStatus.NO_CONTENT:
                 return null;
             case HttpStatus.UNAUTHORIZED:
-                dispatch(actions_1.completeLogoutAndRedirect());
+                dispatch(thunks_1.completeLogoutAndRedirect());
                 return Promise.reject("You are not logged in.");
             case HttpStatus.FORBIDDEN:
                 return Promise.reject("You have insufficient permissions to perform this action.");

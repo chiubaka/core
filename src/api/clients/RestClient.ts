@@ -2,8 +2,10 @@ import * as HttpStatus from "http-status-codes";
 import { isNullOrUndefined } from "util";
 
 import { IAuthState } from "../../auth/model/AuthenticationState";
-import { AuthDispatch as Dispatch, completeLogoutAndRedirect } from "../../auth/actions";
-import { Api, ApiAction } from "../actions";
+import { AuthDispatch as Dispatch } from "../../auth/actions/types";
+import { completeLogoutAndRedirect } from "../../auth/actions/thunks";
+import { Api } from "../actions/Api";
+import { ApiAction } from "../actions/types";
 
 export declare type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 export declare type RestApiSuccessCallback<T> = (dispatch: Dispatch, response: T) => void;
