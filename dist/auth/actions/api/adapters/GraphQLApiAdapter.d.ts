@@ -26,6 +26,6 @@ export declare class GraphQLApiAdapter implements IAuthApiAdapter {
     private client;
     constructor(client?: ApolloClient<any>);
     socialLoginAccessToken: (provider: string, accessToken: string, dispatch: import("redux-thunk").ThunkDispatch<import("../../../model").IAuthState, void, import("../../types").AuthAction>, _authState: IAuthInnerState) => Promise<never>;
-    logout: () => Promise<void>;
+    logout: (dispatch: import("redux-thunk").ThunkDispatch<import("../../../model").IAuthState, void, import("../../types").AuthAction>, _authState: IAuthInnerState) => Promise<void>;
 }
 export {};

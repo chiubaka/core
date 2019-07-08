@@ -3,6 +3,7 @@ import ApolloClient, { gql } from "apollo-boost";
 import { IUser } from "../../../../app/types";
 import { IAuthInnerState } from "../../../model";
 import { completeLogin, successfulGetUserDetails } from "../../creators";
+import { completeLogoutAndRedirect } from "../../thunks";
 import { AuthDispatch, IAuthApiAdapter } from "../../types";
 
 // TODO: The shape of this interface may need to change to support varying
@@ -97,8 +98,8 @@ export class GraphQLApiAdapter implements IAuthApiAdapter {
     });
   }
 
-  public logout = () => {
-    console.error("Logout is not yet implemented on GraphQLApiAdapter for AuthApi");
+  public logout = (dispatch: AuthDispatch, _authState: IAuthInnerState) => {
+    dispatch(completeLogoutAndRedirect());
     return Promise.resolve();
   }
 }

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_boost_1 = require("apollo-boost");
 const creators_1 = require("../../creators");
+const thunks_1 = require("../../thunks");
 class GraphQLApiAdapter {
     constructor(client = new apollo_boost_1.default({ uri: "/graphql/" })) {
         this.socialLoginAccessToken = (provider, accessToken, dispatch, _authState) => {
@@ -29,8 +30,8 @@ class GraphQLApiAdapter {
                 dispatch(creators_1.completeLogin(response.data.socialAuth.token));
             });
         };
-        this.logout = () => {
-            console.error("Logout is not yet implemented on GraphQLApiAdapter for AuthApi");
+        this.logout = (dispatch, _authState) => {
+            dispatch(thunks_1.completeLogoutAndRedirect());
             return Promise.resolve();
         };
         this.client = client;
