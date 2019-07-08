@@ -6,7 +6,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { ProgressBar } from "../../../app/components/ProgressBar";
 import { IServiceInnerState, IServiceState } from "../../../app/model";
 import { AuthApi, AuthDispatch as Dispatch, clearRedirect } from "../../actions";
-import { IAuthState, LoginState, OAuth2ResponseType, ISocialLoginProvider } from "../../model/AuthenticationState";
+import { IAuthState, ISocialLoginProvider, LoginState, OAuth2ResponseType } from "../../model/AuthenticationState";
 import { buildOAuth2CallbackUri } from "../../utils/uri";
 
 export interface IOAuth2CompletionPageParams {
@@ -64,15 +64,12 @@ export function buildOAuth2CompletionPage(api: AuthApi) {
     // path.
     private handleOAuth2AndRedirect(props: IOAuth2CompletionPageProps) {
       const queryParams = parse(props.location.hash);
-      console.log(props);
       if (!props.loggedIn) {
-        console.log("Not logged in");
         // TODO: Need to handle case where user is not logged in but login failed.
         const provider = props.match.params.provider;
 
         props.onOAuth2Completion(provider, queryParams);
       } else {
-        console.log("logged in!");
         props.clearRedirect();
         // TODO: Should not be "/" here, should be a parameterized default path
         props.history.replace(props.redirectPath ? props.redirectPath : "/");

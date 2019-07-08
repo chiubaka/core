@@ -27,15 +27,12 @@ function buildOAuth2CompletionPage(api) {
         // path.
         handleOAuth2AndRedirect(props) {
             const queryParams = query_string_1.parse(props.location.hash);
-            console.log(props);
             if (!props.loggedIn) {
-                console.log("Not logged in");
                 // TODO: Need to handle case where user is not logged in but login failed.
                 const provider = props.match.params.provider;
                 props.onOAuth2Completion(provider, queryParams);
             }
             else {
-                console.log("logged in!");
                 props.clearRedirect();
                 // TODO: Should not be "/" here, should be a parameterized default path
                 props.history.replace(props.redirectPath ? props.redirectPath : "/");

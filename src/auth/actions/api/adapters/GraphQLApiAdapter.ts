@@ -92,8 +92,8 @@ export class GraphQLApiAdapter implements IAuthApiAdapter {
         return Promise.reject("An error occurred during the authentication process.");
       }
 
-      dispatch(completeLogin(response.data.socialAuth.token));
       dispatch(successfulGetUserDetails(GraphQLApiAdapter.userFromSocialAuthResponse(response)));
+      dispatch(completeLogin(response.data.socialAuth.token));
     });
   }
 

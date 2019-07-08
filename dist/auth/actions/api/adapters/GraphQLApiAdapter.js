@@ -25,8 +25,8 @@ class GraphQLApiAdapter {
                 if (jwtToken == null) {
                     return Promise.reject("An error occurred during the authentication process.");
                 }
-                dispatch(creators_1.completeLogin(response.data.socialAuth.token));
                 dispatch(creators_1.successfulGetUserDetails(GraphQLApiAdapter.userFromSocialAuthResponse(response)));
+                dispatch(creators_1.completeLogin(response.data.socialAuth.token));
             });
         };
         this.logout = () => {
