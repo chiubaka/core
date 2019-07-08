@@ -4,8 +4,8 @@ const apollo_boost_1 = require("apollo-boost");
 class GraphQLApiAdapter {
     constructor(client = new apollo_boost_1.default()) {
         this.socialLoginAccessToken = (provider, token, dispatch, authState) => {
-            return this.client.query({
-                query: apollo_boost_1.gql `
+            return this.client.mutate({
+                mutation: apollo_boost_1.gql `
         mutation {
           socialAuth(provider: "${provider}", accessToken: "${token}") {
             social {

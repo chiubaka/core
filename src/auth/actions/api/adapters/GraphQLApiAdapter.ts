@@ -26,8 +26,8 @@ export class GraphQLApiAdapter implements IAuthApiAdapter {
     dispatch: AuthDispatch,
     authState: IAuthInnerState,
   ) => {
-    return this.client.query({
-      query: gql`
+    return this.client.mutate({
+      mutation: gql`
         mutation {
           socialAuth(provider: "${provider}", accessToken: "${token}") {
             social {
