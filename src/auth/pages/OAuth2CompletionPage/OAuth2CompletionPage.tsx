@@ -59,7 +59,7 @@ export function buildOAuth2CompletionPage(api: AuthApi) {
     }
 
     private handleOAuth2AndRedirect(props: IOAuth2CompletionPageProps) {
-      const queryParams = parse(props.location.search);
+      const queryParams = parse(props.location.hash);
   
       if (!props.loggedIn) {
         // TODO: Need to handle case where user is not logged in but login failed.
@@ -107,7 +107,7 @@ export function buildOAuth2CompletionPage(api: AuthApi) {
 
         switch (provider.responseType) {
           case (OAuth2ResponseType.Token): {
-            return dispatchProps.socialLoginAccessToken(providerName, queryParams.token as string);
+            return dispatchProps.socialLoginAccessToken(providerName, queryParams.access_token as string);
           }
           case (OAuth2ResponseType.Code):
           default: {

@@ -22,7 +22,7 @@ function buildOAuth2CompletionPage(api) {
                     React.createElement(ProgressBar_1.ProgressBar, { progress: 100, striped: true, animated: true }))));
         }
         handleOAuth2AndRedirect(props) {
-            const queryParams = query_string_1.parse(props.location.search);
+            const queryParams = query_string_1.parse(props.location.hash);
             if (!props.loggedIn) {
                 // TODO: Need to handle case where user is not logged in but login failed.
                 const provider = props.match.params.provider;
@@ -65,7 +65,7 @@ function buildOAuth2CompletionPage(api) {
                 const provider = stateProps.providers.find((p) => p.providerName === providerName);
                 switch (provider.responseType) {
                     case (AuthenticationState_1.OAuth2ResponseType.Token): {
-                        return dispatchProps.socialLoginAccessToken(providerName, queryParams.token);
+                        return dispatchProps.socialLoginAccessToken(providerName, queryParams.access_token);
                     }
                     case (AuthenticationState_1.OAuth2ResponseType.Code):
                     default: {
