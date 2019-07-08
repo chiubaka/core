@@ -63,11 +63,13 @@ function buildOAuth2CompletionPage(api) {
             },
             socialLoginAccessToken: (provider, token) => {
                 dispatch(api.socialLoginAccessToken(provider, token));
-            }
+            },
         };
     }
     function mergeProps(stateProps, dispatchProps) {
         return {
+            clearRedirect: dispatchProps.clearRedirect,
+            loggedIn: stateProps.loggedIn,
             onOAuth2Completion: (providerName, queryParams) => {
                 const provider = stateProps.providers.find((p) => p.providerName === providerName);
                 switch (provider.responseType) {
@@ -81,7 +83,8 @@ function buildOAuth2CompletionPage(api) {
                         return dispatchProps.socialLogin(providerName, queryParams.code, oAuth2CallbackUri);
                     }
                 }
-            }
+            },
+            redirectPath: stateProps.redirectPath,
         };
     }
     return react_redux_1.connect(mapStateToProps, mapDispatchToProps, mergeProps)(react_router_dom_1.withRouter(OAuth2CompletionPage));

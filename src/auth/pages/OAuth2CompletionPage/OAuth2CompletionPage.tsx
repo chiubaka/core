@@ -43,11 +43,11 @@ export function buildOAuth2CompletionPage(api: AuthApi) {
     public componentWillMount() {
       this.handleOAuth2AndRedirect(this.props);
     }
-  
+
     public componentWillReceiveProps(nextProps: IOAuth2CompletionPageProps) {
       this.handleOAuth2AndRedirect(nextProps);
     }
-  
+
     public render(): JSX.Element {
       return (
         <div className="oauth2-completion container d-table">
@@ -79,7 +79,7 @@ export function buildOAuth2CompletionPage(api: AuthApi) {
       }
     }
   }
-  
+
   function mapStateToProps(state: IAuthState & IServiceState): IOAuth2CompletionPageStateProps {
     return {
       hostname: state.service.hostname,
@@ -102,12 +102,14 @@ export function buildOAuth2CompletionPage(api: AuthApi) {
       },
       socialLoginAccessToken: (provider: string, token: string) => {
         dispatch(api.socialLoginAccessToken(provider, token));
-      }
+      },
     };
   }
 
   function mergeProps(stateProps: IOAuth2CompletionPageStateProps, dispatchProps: IOAuth2CompletionPageDispatchProps) {
     return {
+      clearRedirect: dispatchProps.clearRedirect,
+      loggedIn: stateProps.loggedIn,
       onOAuth2Completion: (providerName: string, queryParams: ParsedQuery) => {
         const provider = stateProps.providers.find((p) => p.providerName === providerName);
 
@@ -118,13 +120,20 @@ export function buildOAuth2CompletionPage(api: AuthApi) {
           case (OAuth2ResponseType.Code):
           default: {
             const { hostname, oAuth2CallbackBasePath, port, useSsl } = stateProps;
-            const oAuth2CallbackUri = buildOAuth2CallbackUri(hostname, oAuth2CallbackBasePath, providerName, port, useSsl);
+            const oAuth2CallbackUri = buildOAuth2CallbackUri(
+              hostname,
+              oAuth2CallbackBasePath,
+              providerName,
+              port,
+              useSsl,
+            );
 
             return dispatchProps.socialLogin(providerName, queryParams.code as string, oAuth2CallbackUri);
           }
         }
-      }
-    }
+      },
+      redirectPath: stateProps.redirectPath,
+    };
   }
 
   return connect(
