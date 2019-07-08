@@ -1,7 +1,26 @@
 import ApolloClient, { gql } from "apollo-boost";
 
+import { IUser } from "../../../../app/types";
 import { IAuthInnerState } from "../../../model";
+import { completeLogin, successfulGetUserDetails } from "../../creators";
 import { AuthDispatch, IAuthApiAdapter } from "../../types";
+
+// TODO: The shape of this interface may need to change to support varying
+// scopes and multiple providers
+interface IGraphQLSocialAuthResponse {
+  data: {
+    socialAuth: {
+      social: {
+        uid: string;
+        extraData: {[key: string]: any}
+        user: {
+          id: string;
+        }
+      };
+      token: string;
+    };
+  };
+}
 
 export class GraphQLApiAdapter implements IAuthApiAdapter {
   public static getInstance(): GraphQLApiAdapter {
@@ -10,6 +29,33 @@ export class GraphQLApiAdapter implements IAuthApiAdapter {
     }
 
     return GraphQLApiAdapter.singleton;
+  }
+
+  public static jwtTokenFromSocialAuthResponse(response: IGraphQLSocialAuthResponse): string {
+    if (response.data == null || response.data.socialAuth == null || response.data.socialAuth.token == null) {
+      return null;
+    }
+
+    return response.data.socialAuth.token;
+  }
+
+  public static userFromSocialAuthResponse(response: IGraphQLSocialAuthResponse): IUser {
+    if (response.data == null || response.data.socialAuth == null || response.data.socialAuth.social == null) {
+      return null;
+    }
+
+    const social = response.data.socialAuth.social;
+    console.log(social.extraData.picture);
+
+    return {
+      id: social.user.id,
+      email: social.extraData.email,
+      firstName: social.extraData.firstName,
+      lastName: social.extraData.lastName,
+      extraData: {
+        picture: social.extraData.picture,
+      },
+    };
   }
 
   private static singleton: GraphQLApiAdapter;
@@ -22,23 +68,33 @@ export class GraphQLApiAdapter implements IAuthApiAdapter {
 
   public socialLoginAccessToken = (
     provider: string,
-    token: string,
+    accessToken: string,
     dispatch: AuthDispatch,
-    authState: IAuthInnerState,
+    _authState: IAuthInnerState,
   ) => {
     return this.client.mutate({
       mutation: gql`
         mutation {
-          socialAuth(provider: "${provider}", accessToken: "${token}") {
+          socialAuth(provider: "${provider}", accessToken: "${accessToken}") {
             social {
               uid
+              extraData
+              user {
+                id
+              }
             }
             token
           }
         }
       `,
-    }).then((response) => {
-      console.log(response);
+    }).then((response: IGraphQLSocialAuthResponse) => {
+      const jwtToken = GraphQLApiAdapter.jwtTokenFromSocialAuthResponse(response);
+      if (jwtToken == null) {
+        return Promise.reject("An error occurred during the authentication process.");
+      }
+
+      dispatch(completeLogin(response.data.socialAuth.token));
+      dispatch(successfulGetUserDetails(GraphQLApiAdapter.userFromSocialAuthResponse(response)));
     });
   }
 

@@ -32,7 +32,7 @@ export interface IAuthInnerState {
 export declare const DEFAULT_AUTH_STATE: IAuthInnerState;
 export declare function getExistingAuthState(overrideState: Partial<IAuthInnerState>): {
     token: string;
-    user: IUser;
+    user: IUser<any>;
     loginState: LoginState;
     oAuth2CallbackBasePath: string;
     socialProviders: ISocialLoginProvider[];
