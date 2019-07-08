@@ -55,8 +55,12 @@ function mapStateToProps(state: IAuthState & IServiceState,
   const providerAlias = SocialLoginButtonImpl.OAUTH2_PROVIDER_ALIAS[providerName];
 
   const oAuth2Gateway = SocialLoginButtonImpl.OAUTH2_GATEWAYS[providerName];
-  const scope = provider.scope.join(" ");
-  let oAuth2Uri = `${oAuth2Gateway}?client_id=${clientId}&response_type=${responseType}&scope=${scope}`;
+
+  let oAuth2Uri = `${oAuth2Gateway}?client_id=${clientId}&response_type=${responseType}`;
+  if (provider.scope != null) {
+    const scope = provider.scope.join(" ");
+    oAuth2Uri = `${oAuth2Uri}&scope=${scope}`;
+  }
 
   if (responseType === OAuth2ResponseType.Code) {
     const redirectUri = buildOAuth2CallbackUri(
