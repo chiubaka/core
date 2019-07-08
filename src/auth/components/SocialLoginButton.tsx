@@ -53,25 +53,20 @@ function mapStateToProps(state: IAuthState & IServiceState,
   const { hostname, port, useSsl } = state.service;
   const oAuth2CallbackBasePath = state.auth.oAuth2CallbackBasePath;
   const providerAlias = SocialLoginButtonImpl.OAUTH2_PROVIDER_ALIAS[providerName];
+  const redirectUri = buildOAuth2CallbackUri(
+    hostname,
+    oAuth2CallbackBasePath,
+    providerAlias ? providerAlias : providerName,
+    port,
+    useSsl,
+  );
 
   const oAuth2Gateway = SocialLoginButtonImpl.OAUTH2_GATEWAYS[providerName];
 
-  let oAuth2Uri = `${oAuth2Gateway}?client_id=${clientId}&response_type=${responseType}`;
+  let oAuth2Uri = `${oAuth2Gateway}?client_id=${clientId}&response_type=${responseType}&redirect_uri=${redirectUri}`;
   if (provider.scope != null) {
     const scope = provider.scope.join(" ");
     oAuth2Uri = `${oAuth2Uri}&scope=${scope}`;
-  }
-
-  if (responseType === OAuth2ResponseType.Code) {
-    const redirectUri = buildOAuth2CallbackUri(
-      hostname,
-      oAuth2CallbackBasePath,
-      providerAlias ? providerAlias : providerName,
-      port,
-      useSsl,
-    );
-
-    oAuth2Uri = `${oAuth2Uri}&redirect_uri=${redirectUri}`;
   }
 
   return {
