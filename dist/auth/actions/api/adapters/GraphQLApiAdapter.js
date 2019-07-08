@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_boost_1 = require("apollo-boost");
 class GraphQLApiAdapter {
-    constructor(client = new apollo_boost_1.default()) {
+    constructor(client = new apollo_boost_1.default({ uri: "/graphql/" })) {
         this.socialLoginAccessToken = (provider, token, dispatch, authState) => {
             return this.client.mutate({
                 mutation: apollo_boost_1.gql `

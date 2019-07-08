@@ -16,7 +16,7 @@ export class GraphQLApiAdapter implements IAuthApiAdapter {
 
   private client: ApolloClient<any>;
 
-  constructor(client: ApolloClient<any> = new ApolloClient()) {
+  constructor(client: ApolloClient<any> = new ApolloClient({ uri: "/graphql/" })) {
     this.client = client;
   }
 
