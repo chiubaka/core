@@ -21,14 +21,21 @@ function buildOAuth2CompletionPage(api) {
                 React.createElement("div", { className: "d-table-cell align-middle" },
                     React.createElement(ProgressBar_1.ProgressBar, { progress: 100, striped: true, animated: true }))));
         }
+        // If not logged in, this will trigger the login.
+        // Once the user is logged in, the redux state should change, so new props
+        // will be passed and this component should re-render, sparking the redirect
+        // path.
         handleOAuth2AndRedirect(props) {
             const queryParams = query_string_1.parse(props.location.hash);
+            console.log(props);
             if (!props.loggedIn) {
+                console.log("Not logged in");
                 // TODO: Need to handle case where user is not logged in but login failed.
                 const provider = props.match.params.provider;
                 props.onOAuth2Completion(provider, queryParams);
             }
             else {
+                console.log("logged in!");
                 props.clearRedirect();
                 // TODO: Should not be "/" here, should be a parameterized default path
                 props.history.replace(props.redirectPath ? props.redirectPath : "/");

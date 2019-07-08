@@ -52,7 +52,6 @@ class GraphQLApiAdapter {
             return null;
         }
         const social = response.data.socialAuth.social;
-        console.log(social.extraData.picture);
         return {
             id: social.user.id,
             email: social.extraData.email,

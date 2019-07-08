@@ -45,7 +45,6 @@ export class GraphQLApiAdapter implements IAuthApiAdapter {
     }
 
     const social = response.data.socialAuth.social;
-    console.log(social.extraData.picture);
 
     return {
       id: social.user.id,
