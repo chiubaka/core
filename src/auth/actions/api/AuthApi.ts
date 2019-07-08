@@ -3,17 +3,17 @@ import { Api } from "../../../api/actions/Api";
 import { IAuthState } from "../../model/AuthenticationState";
 import { startLogin } from "../creators";
 import { AuthDispatch as Dispatch, IAuthApiAdapter } from "../types";
-import { RestApiAdapter } from "./adapters/RestApiAdapter";
+import { GraphQLApiAdapter } from "./adapters";
 
 export class AuthApi extends Api<IAuthApiAdapter> {
-  constructor(adapter: IAuthApiAdapter = RestApiAdapter.getInstance()) {
+  constructor(adapter: IAuthApiAdapter = GraphQLApiAdapter.getInstance()) {
     super(adapter);
   }
 
   public login(username: string, password: string) {
     return (dispatch: Dispatch, getState: () => IAuthState) => {
       const adapter = this.getAdapter();
-      if (adapter.socialLoginAccessToken == null) {
+      if (adapter.login == null) {
         this.unimplementedError("login");
         return;
       }
@@ -26,11 +26,11 @@ export class AuthApi extends Api<IAuthApiAdapter> {
   public socialLogin(provider: string, code: string, redirectUri: string) {
     return (dispatch: Dispatch, getState: () => IAuthState) => {
       const adapter = this.getAdapter();
-      if (adapter.socialLoginAccessToken == null) {
+      if (adapter.socialLogin == null) {
         this.unimplementedError("socialLogin");
         return;
       }
-      
+
       dispatch(startLogin());
       return adapter.socialLogin(provider, code, redirectUri, dispatch, getState().auth);
     };

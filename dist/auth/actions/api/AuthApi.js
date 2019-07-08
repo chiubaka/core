@@ -2,15 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Api_1 = require("../../../api/actions/Api");
 const creators_1 = require("../creators");
-const RestApiAdapter_1 = require("./adapters/RestApiAdapter");
+const adapters_1 = require("./adapters");
 class AuthApi extends Api_1.Api {
-    constructor(adapter = RestApiAdapter_1.RestApiAdapter.getInstance()) {
+    constructor(adapter = adapters_1.GraphQLApiAdapter.getInstance()) {
         super(adapter);
     }
     login(username, password) {
         return (dispatch, getState) => {
             const adapter = this.getAdapter();
-            if (adapter.socialLoginAccessToken == null) {
+            if (adapter.login == null) {
                 this.unimplementedError("login");
                 return;
             }
@@ -21,7 +21,7 @@ class AuthApi extends Api_1.Api {
     socialLogin(provider, code, redirectUri) {
         return (dispatch, getState) => {
             const adapter = this.getAdapter();
-            if (adapter.socialLoginAccessToken == null) {
+            if (adapter.socialLogin == null) {
                 this.unimplementedError("socialLogin");
                 return;
             }
