@@ -2,6 +2,7 @@
 import { Api } from "../../../api/actions/Api";
 import { IAuthState } from "../../model/AuthenticationState";
 import { startLogin } from "../creators";
+import { completeLogoutAndRedirect } from "../thunks";
 import { AuthDispatch as Dispatch, IAuthApiAdapter } from "../types";
 import { GraphQLApiAdapter } from "./adapters";
 
@@ -17,7 +18,7 @@ export class AuthApi extends Api<IAuthApiAdapter> {
         this.unimplementedError("login");
         return;
       }
-      
+
       dispatch(startLogin());
       return adapter.login(username, password, dispatch, getState().auth);
     };
@@ -51,7 +52,9 @@ export class AuthApi extends Api<IAuthApiAdapter> {
 
   public logout() {
     return (dispatch: Dispatch, getState: () => IAuthState) => {
-      return this.getAdapter().logout(dispatch, getState().auth);
+      return this.getAdapter().logout(dispatch, getState().auth).then(() => {
+        dispatch(completeLogoutAndRedirect());
+      });
     };
   }
 

@@ -98,8 +98,8 @@ export class GraphQLApiAdapter implements IAuthApiAdapter {
     });
   }
 
-  public logout = (dispatch: AuthDispatch, _authState: IAuthInnerState) => {
-    dispatch(completeLogoutAndRedirect());
+  public logout = (_dispatch: AuthDispatch, _authState: IAuthInnerState) => {
+    // TODO: GraphQL JWT needs to have a standard way to blacklist live tokens
     return Promise.resolve();
   }
 }
