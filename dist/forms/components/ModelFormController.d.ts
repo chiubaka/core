@@ -1,5 +1,6 @@
 import * as React from "react";
-import { IModel, ModelApi } from "../../api";
+import { ModelApi } from "../../api";
+import { IModel } from "../../app";
 import { IModelFormProps } from "../types";
 export interface IModelFormControllerDispatchProps<T> {
     onSubmit: (original: Partial<T>, updated: Partial<T>) => Promise<T>;

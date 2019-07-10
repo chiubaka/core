@@ -4,6 +4,7 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./components/ProgressBar"));
+__export(require("./model"));
 __export(require("./reducers"));
 __export(require("./utils/user"));
 

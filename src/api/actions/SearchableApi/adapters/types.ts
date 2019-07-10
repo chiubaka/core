@@ -1,4 +1,4 @@
-import { IModel } from "../../../model";
+import { IModel } from "../../../../app";
 import { IModelApiAdapter } from "../../ModelApi/adapters";
 import { ApiAction } from "../../types";
 

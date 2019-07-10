@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/auth/model/IUser.ts"],"names":[],"mappings":"","file":"../../../auth/model/IUser.js","sourcesContent":["import { IModel } from \"../../app\";\n\nexport interface IUserBase extends IModel {\n  username: string;\n  email: string;\n}\n\nexport interface IUser extends IUserBase {\n  firstName: string;\n  lastName: string;\n}\n"]}

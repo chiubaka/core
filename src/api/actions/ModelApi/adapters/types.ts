@@ -1,5 +1,5 @@
 import { ModelApi } from "../";
-import { IModel } from "../../../model";
+import { IModel } from "../../../../app";
 import { ApiAction } from "../../types";
 
 export interface IModelApiAdapter<BackendType extends IModel, FrontendType extends IModel> {

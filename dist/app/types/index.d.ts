@@ -1,4 +1,4 @@
-import { IModel } from "../../api";
+import { IModel } from "../model";
 export interface ISocialLoginProvider {
     providerName: string;
     clientId: string;

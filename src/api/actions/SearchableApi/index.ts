@@ -1,6 +1,6 @@
 import * as pluralize from "pluralize";
 
-import { IModel } from "../../model";
+import { IModel } from "../../../app";
 import { ModelApi } from "../ModelApi";
 import { ApiAction } from "../types";
 import { ISearchableModelApiAdapter, RestApiAdapter } from "./adapters";

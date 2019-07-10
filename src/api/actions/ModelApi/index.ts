@@ -3,7 +3,7 @@ import { ThunkDispatch } from "redux-thunk";
 import * as pluralize from "pluralize";
 import { isNullOrUndefined } from "util";
 
-import { IModel } from "../../model";
+import { IModel } from "../../../app";
 import { Api } from "../Api";
 import { ApiAction } from "../types";
 import { IModelApiAdapter, RestApiAdapter } from "./adapters";

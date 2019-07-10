@@ -1,18 +1,8 @@
-import { IModel } from "../model";
+import { IUser } from "./model";
 
 export interface ISocialLoginProvider {
   providerName: string;
   clientId: string;
-}
-
-export interface IUserBase extends IModel {
-  username: string;
-  email: string;
-}
-
-export interface IUser extends IUserBase {
-  firstName: string;
-  lastName: string;
 }
 
 export interface IJwtResponse {

@@ -2,8 +2,8 @@ import * as pluralize from "pluralize";
 import { ThunkDispatch } from "redux-thunk";
 
 import { ModelApi } from "../";
+import { IModel } from "../../../../app/model";
 import { RestClient } from "../../../clients/RestClient";
-import { IModel } from "../../../model";
 import { ApiAction } from "../../types";
 import { IModelApiAdapter } from "./types";
 
