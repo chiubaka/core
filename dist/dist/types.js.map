@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/types.ts"],"names":[],"mappings":"","file":"../types.js","sourcesContent":["// Returns a version of T without the keys specified in K\n// Ex. Omit<{ id: string, name?: string }, \"id\"> => { name?: string }\nexport type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;\n"]}

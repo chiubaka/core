@@ -6,7 +6,7 @@ export declare type ModelEqualityFunction<T> = (model1: T, model2: T) => boolean
 export declare type GetObjectsReducer<StateType, ModelType> = (objects: ModelType[]) => StateType;
 export declare type MergeObjectReducer<StateType, ModelType> = (state: StateType, object: ModelType, locator?: any) => StateType;
 export declare type ObjectLocatorFunction<StateType, ModelType> = (state: StateType, object: ModelType) => any;
-interface IModelApiReducerOptions<StateT, ModelT> {
+interface IModelApiReducerOptions<StateT, ModelT extends IModel> {
     Apis: Array<ModelApi<ModelT>>;
     initialState: StateT;
     onBulkObjectAdd: GetObjectsReducer<StateT, ModelT>;
@@ -16,15 +16,15 @@ interface IModelApiReducerOptions<StateT, ModelT> {
     modelFilter?: ModelFilterFunction<ModelT>;
     modelEquality?: ModelEqualityFunction<ModelT>;
 }
-interface IModelApiReducerByPropertyOptions<T> extends IModelApiReducerSimpleOptions<T> {
+interface IModelApiReducerByPropertyOptions<T extends IModel> extends IModelApiReducerSimpleOptions<T> {
     propertyName: keyof T;
 }
-interface IModelApiReducerSimpleOptions<T> {
+interface IModelApiReducerSimpleOptions<T extends IModel> {
     Api: ModelApi<T>;
     modelFilter?: ModelFilterFunction<T>;
     modelEquality?: ModelEqualityFunction<T>;
 }
-interface ISearchableModelApiReducerOptions<T> {
+interface ISearchableModelApiReducerOptions<T extends IModel> {
     Api: SearchableModelApi<T>;
 }
 export declare function modelApiReducer<StateT, ModelT extends IModel>(options: IModelApiReducerOptions<StateT, ModelT>): (state: StateT, action: Action<any>) => StateT;

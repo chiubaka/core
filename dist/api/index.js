@@ -4,6 +4,7 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./actions"));
+__export(require("./model"));
 __export(require("./reducers"));
 
 //# sourceMappingURL=../dist/api/index.js.map

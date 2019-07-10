@@ -1,6 +1,7 @@
 import { ModelApi } from "../";
+import { IModel } from "../../../model";
 import { ApiAction } from "../../types";
-export interface IModelApiAdapter<BackendType, FrontendType> {
+export interface IModelApiAdapter<BackendType extends IModel, FrontendType extends IModel> {
     getAll: () => ApiAction<FrontendType[]>;
     get: (id: string) => ApiAction<FrontendType>;
     create: (payload: Partial<FrontendType>) => ApiAction<FrontendType>;
