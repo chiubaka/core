@@ -1,7 +1,7 @@
 import { Action } from "redux";
 import { isNullOrUndefined } from "util";
 
-import { IModel, IModelById, IModelIndex } from "../../app";
+import { IModel, IModelById, IModelIndex } from "../../orm";
 import { IApiDeleteResponse, IApiResponse, IApiUpdateResponse, ModelApi, SearchableModelApi } from "../actions";
 
 export declare type ModelFilterFunction<T> = (model: T) => boolean;

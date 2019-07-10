@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 
 import { ModelApi } from "../../api";
-import { IModel } from "../../app";
+import { IModel } from "../../orm";
 import { IModelFormProps } from "../types";
 
 declare type Dispatch = ThunkDispatch<any, void, any>;

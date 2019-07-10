@@ -1,4 +1,4 @@
-import { IModel } from "../model";
+import { IModel } from "../../orm";
 export interface ISocialLoginProvider {
     providerName: string;
     clientId: string;

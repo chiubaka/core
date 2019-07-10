@@ -1,5 +1,5 @@
 import { SearchableModelApi } from "../";
-import { IModel } from "../../../../app";
+import { IModel } from "../../../../orm";
 import { RestApiAdapter as RestModelApiAdapter } from "../../ModelApi/adapters";
 import { ISearchableModelApiAdapter } from "./types";
 

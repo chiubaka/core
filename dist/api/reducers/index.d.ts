@@ -1,5 +1,5 @@
 import { Action } from "redux";
-import { IModel } from "../../app";
+import { IModel } from "../../orm";
 import { ModelApi, SearchableModelApi } from "../actions";
 export declare type ModelFilterFunction<T> = (model: T) => boolean;
 export declare type ModelEqualityFunction<T> = (model1: T, model2: T) => boolean;

@@ -1,5 +1,5 @@
 import { ModelApi } from "../";
-import { IModel } from "../../../../app/model";
+import { IModel } from "../../../../orm";
 import { RestClient } from "../../../clients/RestClient";
 import { IModelApiAdapter } from "./types";
 export declare class RestApiAdapter<BackendType extends IModel, FrontendType extends IModel = BackendType> implements IModelApiAdapter<BackendType, FrontendType> {

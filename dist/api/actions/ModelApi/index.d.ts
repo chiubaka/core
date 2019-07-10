@@ -1,5 +1,5 @@
 import { ThunkDispatch } from "redux-thunk";
-import { IModel } from "../../../app";
+import { IModel } from "../../../orm";
 import { Api } from "../Api";
 import { ApiAction } from "../types";
 import { IModelApiAdapter } from "./adapters";
