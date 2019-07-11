@@ -1,17 +1,9 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var ModelActionType;
-(function (ModelActionType) {
-    ModelActionType["START_SYNCING_MODEL"] = "START_SYNCING_MODEL";
-    ModelActionType["SUCCESSFUL_SYNC_MODEL"] = "SUCCESSFUL_SYNC_MODEL";
-    ModelActionType["SUCCESSFUL_LIST_MODEL"] = "SUCCESSFUL_LIST_MODEL";
-    ModelActionType["CREATE_MODEL"] = "CREATE_MODEL";
-    ModelActionType["UPDATE_MODEL"] = "UPDATE_MODEL";
-    ModelActionType["DESTROY_MODEL"] = "DESTROY_MODEL";
-})(ModelActionType = exports.ModelActionType || (exports.ModelActionType = {}));
-function isModelAction(action) {
-    return action.modelName != null;
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-exports.isModelAction = isModelAction;
+Object.defineProperty(exports, "__esModule", { value: true });
+__export(require("./creators"));
+__export(require("./types"));
 
 //# sourceMappingURL=../../dist/orm/actions/index.js.map

@@ -2,6 +2,7 @@ import { Action } from "redux";
 import { Model, ORM, ORMCommonState, SessionWithModels } from "redux-orm";
 
 import {
+  IModelCreate,
   IModelIdAction,
   IModelUpdate,
   isModelAction,
@@ -21,7 +22,7 @@ export function ormReducer(orm: ORM) {
 
     switch (action.type) {
       case ModelActionType.CREATE_MODEL: {
-        createModel(model, action as IModelUpdate);
+        createModel(model, action as IModelCreate);
         break;
       }
       case ModelActionType.UPDATE_MODEL: {
