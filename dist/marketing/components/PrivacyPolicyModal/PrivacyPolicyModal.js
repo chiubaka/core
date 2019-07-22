@@ -4,7 +4,8 @@ const React = require("react");
 const react_redux_1 = require("react-redux");
 class PrivacyPolicyModalImpl extends React.Component {
     render() {
-        const { productName, hostname } = this.props;
+        const { productName } = this.props;
+        const hostname = window.location.hostname;
         return (React.createElement("div", { className: "modal fade", id: "privacy-policy", tabIndex: -1, role: "dialog", "aria-labelledby": "exampleModalLongTitle", "aria-hidden": "true" },
             React.createElement("div", { className: "modal-dialog", role: "document" },
                 React.createElement("div", { className: "modal-content" },
@@ -63,7 +64,6 @@ class PrivacyPolicyModalImpl extends React.Component {
 function mapStateToProps(state) {
     return {
         productName: state.product.productName,
-        hostname: state.service.hostname,
     };
 }
 exports.PrivacyPolicyModal = react_redux_1.connect(mapStateToProps)(PrivacyPolicyModalImpl);

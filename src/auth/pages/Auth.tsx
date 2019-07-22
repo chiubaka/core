@@ -2,7 +2,6 @@ import * as React from "react";
 import { Route, RouteComponentProps, Switch } from "react-router-dom";
 
 import { connect } from "react-redux";
-import { IServiceState } from "../../app/model/index";
 import { IAuthState } from "../model/AuthenticationState";
 import LoginPage from "./LoginPage/LoginPage";
 import LogoutPage from "./LogoutPage";
@@ -52,7 +51,7 @@ export class AuthImpl extends React.Component<IAuthStateProps> {
   }
 }
 
-function mapStateToProps(state: IAuthState & IServiceState) {
+function mapStateToProps(state: IAuthState) {
   return {
     oAuth2CallbackBasePath: state.auth.oAuth2CallbackBasePath,
   };

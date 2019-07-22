@@ -1,10 +1,9 @@
 import * as React from "react";
 import { RouteComponentProps } from "react-router-dom";
-import { IServiceInnerState } from "../../../app/model";
 export interface IOAuth2CompletionPageParams {
     provider: string;
 }
-export interface IOAuth2CompletionPageStateProps extends IServiceInnerState {
+export interface IOAuth2CompletionPageStateProps {
     loggedIn: boolean;
     oAuth2CallbackBasePath: string;
     redirectPath: string;
@@ -15,5 +14,5 @@ export interface IOAuth2CompletionPageDispatchProps {
 }
 export interface IOAuth2CompletionPageProps extends RouteComponentProps<IOAuth2CompletionPageParams>, IOAuth2CompletionPageStateProps, IOAuth2CompletionPageDispatchProps {
 }
-declare const _default: import("react-redux").ConnectedComponentClass<React.ComponentClass<Pick<IOAuth2CompletionPageProps, "redirectPath" | "oAuth2CallbackBasePath" | "hostname" | "port" | "useSsl" | "loggedIn" | "clearRedirect" | "onOAuth2Completion">, any>, Pick<Pick<IOAuth2CompletionPageProps, "redirectPath" | "oAuth2CallbackBasePath" | "hostname" | "port" | "useSsl" | "loggedIn" | "clearRedirect" | "onOAuth2Completion">, never>>;
+declare const _default: import("react-redux").ConnectedComponentClass<React.ComponentClass<Pick<IOAuth2CompletionPageProps, "redirectPath" | "oAuth2CallbackBasePath" | "loggedIn" | "clearRedirect" | "onOAuth2Completion">, any>, Pick<Pick<IOAuth2CompletionPageProps, "redirectPath" | "oAuth2CallbackBasePath" | "loggedIn" | "clearRedirect" | "onOAuth2Completion">, never>>;
 export default _default;

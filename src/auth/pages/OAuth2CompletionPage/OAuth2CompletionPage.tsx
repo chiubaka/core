@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 
 import { ProgressBar } from "../../../app/components/ProgressBar";
-import { IServiceInnerState, IServiceState } from "../../../app/model";
 import { AuthApi, AuthDispatch as Dispatch, clearRedirect } from "../../actions";
 import { IAuthState, LoginState } from "../../model/AuthenticationState";
 import { buildOAuth2CallbackUri } from "../../utils/uri";
@@ -13,7 +12,7 @@ export interface IOAuth2CompletionPageParams {
   provider: string;
 }
 
-export interface IOAuth2CompletionPageStateProps extends IServiceInnerState {
+export interface IOAuth2CompletionPageStateProps {
   loggedIn: boolean;
   oAuth2CallbackBasePath: string;
   redirectPath: string;
@@ -54,8 +53,8 @@ class OAuth2CompletionPage extends React.Component<IOAuth2CompletionPageProps> {
       // TODO: Need to handle case where user is not logged in but login failed.
       const provider = props.match.params.provider;
 
-      const { hostname, oAuth2CallbackBasePath, port, useSsl } = props;
-      const oAuth2CallbackUri = buildOAuth2CallbackUri(hostname, oAuth2CallbackBasePath, provider, port, useSsl);
+      const { oAuth2CallbackBasePath } = props;
+      const oAuth2CallbackUri = buildOAuth2CallbackUri(oAuth2CallbackBasePath, provider);
 
       props.onOAuth2Completion(provider, code as string, oAuth2CallbackUri);
     } else {
@@ -66,13 +65,10 @@ class OAuth2CompletionPage extends React.Component<IOAuth2CompletionPageProps> {
   }
 }
 
-function mapStateToProps(state: IAuthState & IServiceState): IOAuth2CompletionPageStateProps {
+function mapStateToProps(state: IAuthState): IOAuth2CompletionPageStateProps {
   return {
-    hostname: state.service.hostname,
     loggedIn: state.auth.loginState === LoginState.LoggedIn,
     oAuth2CallbackBasePath: state.auth.oAuth2CallbackBasePath,
-    port: state.service.port,
-    useSsl: state.service.useSsl,
     redirectPath: state.auth.redirectPath,
   };
 }
