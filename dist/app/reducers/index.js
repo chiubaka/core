@@ -30,9 +30,5 @@ function product(defaultState) {
     };
 }
 exports.product = product;
-function service(defaultState) {
-    return identityReducer(defaultState);
-}
-exports.service = service;
 
 //# sourceMappingURL=../../dist/app/reducers/index.js.map

@@ -6,11 +6,3 @@ export interface IProductInnerState {
     productName: string;
     testMarketingMode: boolean;
 }
-export interface IServiceState {
-    service: IServiceInnerState;
-}
-export interface IServiceInnerState {
-    hostname: string;
-    port?: number;
-    useSsl: boolean;
-}

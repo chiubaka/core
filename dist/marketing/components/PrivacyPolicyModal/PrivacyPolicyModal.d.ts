@@ -1,7 +1,6 @@
 import * as React from "react";
 export interface IPrivacyPolicyModalProps {
     productName: string;
-    hostname: string;
 }
 declare class PrivacyPolicyModalImpl extends React.Component<IPrivacyPolicyModalProps> {
     render(): JSX.Element;

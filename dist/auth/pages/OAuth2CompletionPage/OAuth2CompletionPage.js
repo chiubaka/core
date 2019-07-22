@@ -26,8 +26,8 @@ class OAuth2CompletionPage extends React.Component {
         if (!props.loggedIn) {
             // TODO: Need to handle case where user is not logged in but login failed.
             const provider = props.match.params.provider;
-            const { hostname, oAuth2CallbackBasePath, port, useSsl } = props;
-            const oAuth2CallbackUri = uri_1.buildOAuth2CallbackUri(hostname, oAuth2CallbackBasePath, provider, port, useSsl);
+            const { oAuth2CallbackBasePath } = props;
+            const oAuth2CallbackUri = uri_1.buildOAuth2CallbackUri(oAuth2CallbackBasePath, provider);
             props.onOAuth2Completion(provider, code, oAuth2CallbackUri);
         }
         else {
@@ -39,11 +39,8 @@ class OAuth2CompletionPage extends React.Component {
 }
 function mapStateToProps(state) {
     return {
-        hostname: state.service.hostname,
         loggedIn: state.auth.loginState === AuthenticationState_1.LoginState.LoggedIn,
         oAuth2CallbackBasePath: state.auth.oAuth2CallbackBasePath,
-        port: state.service.port,
-        useSsl: state.service.useSsl,
         redirectPath: state.auth.redirectPath,
     };
 }

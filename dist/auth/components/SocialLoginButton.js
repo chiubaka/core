@@ -32,10 +32,9 @@ SocialLoginButtonImpl.OAUTH2_ADDITIONAL_PARAMETERS = {
 };
 function mapStateToProps(state, ownProps) {
     const { clientId, providerName } = ownProps;
-    const { hostname, port, useSsl } = state.service;
     const oAuth2CallbackBasePath = state.auth.oAuth2CallbackBasePath;
     const providerAlias = SocialLoginButtonImpl.OAUTH2_PROVIDER_ALIAS[ownProps.providerName];
-    const redirectUri = uri_1.buildOAuth2CallbackUri(hostname, oAuth2CallbackBasePath, providerAlias ? providerAlias : providerName, port, useSsl);
+    const redirectUri = uri_1.buildOAuth2CallbackUri(oAuth2CallbackBasePath, providerAlias ? providerAlias : providerName);
     if (!(providerName in SocialLoginButtonImpl.OAUTH2_GATEWAYS)) {
         console.error(`Unrecognized social auth provider ${providerName}.`);
     }

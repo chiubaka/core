@@ -4,7 +4,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 
-import { IProductState, IServiceState } from "../../../app/model";
+import { IProductState } from "../../../app/model";
 import { ISocialLoginProvider } from "../../../app/types";
 import { AuthApi, AuthDispatch as Dispatch, setRedirect } from "../../actions";
 import { SocialLoginButton } from "../../components/SocialLoginButton";
@@ -226,7 +226,7 @@ class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
   }
 }
 
-function mapStateToProps(state: IAuthState & IProductState & IServiceState): ILoginPageStateProps {
+function mapStateToProps(state: IAuthState & IProductState): ILoginPageStateProps {
   return {
     loggedIn: state.auth.loginState === LoginState.LoggedIn,
     logoPath: state.product.logoPath,
