@@ -7,9 +7,6 @@ node_modules
 # JetBrains IDE project files
 .idea/
 
-# Compiled Webpack output
-dist/
-
 # Error logs when Yarn fails
 yarn-error.log
 

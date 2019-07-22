@@ -13,7 +13,7 @@ declare global {
 
 export function withPageAnalytics<TOriginalProps extends RouteComponentProps<any>>(
   WrappedComponent: (React.ComponentClass<TOriginalProps> | React.StatelessComponent<TOriginalProps>),
-): React.ComponentClass<TOriginalProps> {
+) {
   class Page extends React.Component<TOriginalProps & IAnalyticsInnerState> {
     public componentDidMount(): void {
       const path = this.props.location.pathname;
@@ -37,5 +37,5 @@ export function withPageAnalytics<TOriginalProps extends RouteComponentProps<any
     return state.analytics;
   }
 
-  return connect<IAnalyticsInnerState, null, TOriginalProps>(mapStateToProps)(Page);
+  return connect<IAnalyticsInnerState, null, TOriginalProps>(mapStateToProps)(Page as any);
 }

@@ -4,7 +4,7 @@ import { ActionTypes, ICompleteLogin, ISetRedirect, ISuccessfulGetUserDetails } 
 import { DEFAULT_AUTH_STATE, IAuthInnerState, LoginState } from "../model/AuthenticationState";
 import * as Cookies from "../utils/storage";
 
-export function auth(state: IAuthInnerState = DEFAULT_AUTH_STATE, action: Action) {
+export function auth(state: IAuthInnerState | undefined = DEFAULT_AUTH_STATE, action: Action) {
   switch (action.type) {
     case ActionTypes.START_LOGIN:
       return {...state, loginState: LoginState.LoggingIn};

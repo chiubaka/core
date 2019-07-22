@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/forms/types/index.ts"],"names":[],"mappings":"","file":"../../../forms/types/index.js","sourcesContent":["export interface IModelFormProps<T> {\n  model: Partial<T>;\n  onModelDetailsUpdate: (model: Partial<T>) => void;\n}\n\nexport type ModelFormErrors<T> = {\n  [P in keyof T]?: string;\n};\n"]}

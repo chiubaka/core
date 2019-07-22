@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 export function product(defaultState: IProductInnerState) {
-  return (state: IProductInnerState = defaultState, action: Action) => {
+  return (state: IProductInnerState | undefined = defaultState, action: Action) => {
     switch (action.type) {
       case Api.UNSUCCESSFUL_API_REQUEST_TYPE:
         const messages = new Set(ErrorToaster.getToasts().map((props) => props.message));

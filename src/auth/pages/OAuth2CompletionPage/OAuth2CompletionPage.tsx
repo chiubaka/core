@@ -57,7 +57,7 @@ class OAuth2CompletionPage extends React.Component<IOAuth2CompletionPageProps> {
       const { hostname, oAuth2CallbackBasePath, port, useSsl } = props;
       const oAuth2CallbackUri = buildOAuth2CallbackUri(hostname, oAuth2CallbackBasePath, provider, port, useSsl);
 
-      props.onOAuth2Completion(provider, code, oAuth2CallbackUri);
+      props.onOAuth2Completion(provider, code as string, oAuth2CallbackUri);
     } else {
       props.clearRedirect();
       // TODO: Should not be "/" here, should be a parameterized default path
