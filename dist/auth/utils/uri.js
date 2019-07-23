@@ -1,12 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+function isValidPort(port) {
+    return port != null && !isNaN(port) && port >= 0 && port <= 65535;
+}
 function buildUri(hostname, path, port, useSsl) {
-    return `${useSsl ? "https" : "http"}://${hostname}${port != null ? `:${port}` : ""}${path}`;
+    const portString = isValidPort(port) ? `:${port}` : "";
+    return `${useSsl ? "https" : "http"}://${hostname}${portString}${path}`;
 }
 exports.buildUri = buildUri;
 function buildOAuth2CallbackUri(path, provider) {
     const hostname = window.location.hostname;
-    const port = window.location.port;
+    const port = parseInt(window.location.port, 10);
     const useSsl = window.location.protocol.includes("https");
     return `${buildUri(hostname, path, port, useSsl)}${provider}/`;
 }
