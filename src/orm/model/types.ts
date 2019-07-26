@@ -1,5 +1,11 @@
+import { ORMCommonState } from "redux-orm";
+
 import { Omit } from "../../types";
 import { IModel } from "./Model";
+
+export interface IOrmState {
+  orm: ORMCommonState;
+}
 
 // Makes "id" not required for model types.
 export type NewModel<T extends IModel = IModel> = Omit<T, "id"> & Partial<Pick<IModel, "id">>;
