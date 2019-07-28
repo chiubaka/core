@@ -71,7 +71,13 @@ export class RestApiAdapter implements IAuthApiAdapter {
       });
   }
 
-  public socialLogin = (provider: string, code: string, redirectUri: string, dispatch: AuthDispatch, authState: IAuthInnerState) => {
+  public socialLogin = (
+    provider: string,
+    code: string,
+    redirectUri: string,
+    dispatch: AuthDispatch,
+    authState: IAuthInnerState,
+  ) => {
     const payload = {
       provider,
       code,
