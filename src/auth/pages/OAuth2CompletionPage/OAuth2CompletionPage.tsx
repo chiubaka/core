@@ -87,4 +87,4 @@ function mapDispatchToProps(dispatch: Dispatch): IOAuth2CompletionPageDispatchPr
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withRouter<IOAuth2CompletionPageProps>(OAuth2CompletionPage));
+)(withRouter(OAuth2CompletionPage) as any);

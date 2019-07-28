@@ -1,1 +1,0 @@
-{"version":3,"sources":["../src/api/model/index.ts"],"names":[],"mappings":"","file":"../../../api/model/index.js","sourcesContent":["export interface IModel {\n  [propertyName: string]: any;\n  id?: string;\n}\n\nexport interface IModelById<T extends IModel> {\n  [id: string]: T;\n}\n\nexport interface IModelIndex<T extends IModel> {\n  [key: string]: T[];\n}\n"]}
