@@ -1,6 +1,5 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { IServiceState } from "../../app/model/index";
 import { IAuthState } from "../model/AuthenticationState";
 import { buildOAuth2CallbackUri } from "../utils/uri";
 
@@ -52,19 +51,15 @@ class SocialLoginButtonImpl extends React.Component<ISocialLoginButtonProps> {
   }
 }
 
-function mapStateToProps(state: IAuthState & IServiceState,
+function mapStateToProps(state: IAuthState,
                          ownProps: ISocialLoginButtonOwnProps): ISocialLoginButtonStateProps {
   const { clientId, providerName } = ownProps;
-  const { hostname, port, useSsl } = state.service;
   const oAuth2CallbackBasePath = state.auth.oAuth2CallbackBasePath;
   const providerAlias = SocialLoginButtonImpl.OAUTH2_PROVIDER_ALIAS[ownProps.providerName];
 
   const redirectUri = buildOAuth2CallbackUri(
-    hostname,
     oAuth2CallbackBasePath,
     providerAlias ? providerAlias : providerName,
-    port,
-    useSsl,
   );
 
   if (!(providerName in SocialLoginButtonImpl.OAUTH2_GATEWAYS)) {

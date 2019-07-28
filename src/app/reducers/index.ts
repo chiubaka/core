@@ -2,7 +2,7 @@ import { Intent, IToaster, Toaster } from "@blueprintjs/core";
 import { Action } from "redux";
 import { Api } from "../../api/actions";
 import { IApiErrorResponse } from "../../index";
-import { IProductInnerState, IServiceInnerState } from "../model/index";
+import { IProductInnerState } from "../model/index";
 
 export function identityReducer<T>(defaultState: T) {
   return (state: T = defaultState, _action: Action) => {
@@ -32,8 +32,4 @@ export function product(defaultState: IProductInnerState) {
         return state;
     }
   };
-}
-
-export function service(defaultState: IServiceInnerState) {
-  return identityReducer(defaultState);
 }

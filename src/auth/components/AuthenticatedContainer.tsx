@@ -59,4 +59,4 @@ function mapStateToProps<S extends IAuthState>(state: S): IAuthenticatedContaine
 
 export const AuthenticatedContainer = connect(
   mapStateToProps,
-)(withRouter<IAuthenticatedContainerProps>(AuthenticatedContainerImpl));
+)(withRouter(AuthenticatedContainerImpl));

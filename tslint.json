@@ -2,9 +2,16 @@
   "extends": ["tslint:latest", "tslint-react", "tslint-blueprint"],
   "rules": {
     "no-console": [true, "log"],
-    "no-unused-variable": [true, {"ignore-pattern": "^_"}],
+    "no-implicit-dependencies": [true, "dev"],
+    "no-submodule-imports": [
+      true,
+      "antd/lib/form",
+      "antd/lib/icon",
+      "react-vertical-timeline-component/style.min.css"
+    ],
     "no-var-requires": false,
     "object-literal-sort-keys": false,
+    "quotemark": [true, "double", "avoid-escape"],
     "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"]
   }
 }

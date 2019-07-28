@@ -1,6 +1,6 @@
 import { ThunkDispatch } from "redux-thunk";
 
-import * as pluralize from "pluralize";
+import pluralize from "pluralize";
 import { isNullOrUndefined } from "util";
 
 import { IModel } from "../../model";

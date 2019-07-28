@@ -1,4 +1,4 @@
-import * as pluralize from "pluralize";
+import pluralize from "pluralize";
 import { ThunkDispatch } from "redux-thunk";
 
 import { ModelApi } from "../";
