@@ -1,9 +1,4 @@
-/* tslint:disable:no-unused-variable */
-import { Dispatch } from "redux";
-import { IAuthState } from "../../auth/model/AuthenticationState";
-/* tslint:enable:no-unused-variable */
-
-import * as pluralize from "pluralize";
+import pluralize from "pluralize";
 
 import { IModel } from "../model/";
 import { ApiAction } from "./Api";

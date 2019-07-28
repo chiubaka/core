@@ -1,9 +1,6 @@
-/* tslint:disable:no-unused-variable */
 import { ThunkDispatch } from "redux-thunk";
-import { IAuthState } from "../../auth/model/AuthenticationState";
-/* tslint:enable:no-unused-variable */
 
-import * as pluralize from "pluralize";
+import pluralize from "pluralize";
 import { isNullOrUndefined } from "util";
 
 import { IModel } from "../model/";

@@ -1,5 +1,5 @@
 import { Button, Classes, ControlGroup, InputGroup } from "@blueprintjs/core";
-import * as classnames from "classnames";
+import classnames from "classnames";
 import * as React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
