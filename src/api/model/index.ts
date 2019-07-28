@@ -10,3 +10,8 @@ export interface IModelById<T extends IModel> {
 export interface IModelIndex<T extends IModel> {
   [key: string]: T[];
 }
+
+export interface IApiAdapter {
+  // NOTE: Must be unique!!
+  name: string;
+}

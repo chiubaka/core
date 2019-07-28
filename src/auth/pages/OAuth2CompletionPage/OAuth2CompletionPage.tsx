@@ -12,6 +12,10 @@ export interface IOAuth2CompletionPageParams {
   provider: string;
 }
 
+export interface IOAuth2CompletionPageOwnProps extends RouteComponentProps<IOAuth2CompletionPageParams> {
+  api: AuthApi;
+}
+
 export interface IOAuth2CompletionPageStateProps {
   loggedIn: boolean;
   oAuth2CallbackBasePath: string;
@@ -20,13 +24,20 @@ export interface IOAuth2CompletionPageStateProps {
 
 export interface IOAuth2CompletionPageDispatchProps {
   clearRedirect: () => void;
+  dispatchOAuth2Completion: (api: AuthApi, provider: string, code: string, redirectUri: string) => void;
+}
+
+export interface IOAuth2CompletionPageMergeProps {
   onOAuth2Completion: (provider: string, code: string, redirectUri: string) => void;
 }
 
-export interface IOAuth2CompletionPageProps extends RouteComponentProps<IOAuth2CompletionPageParams>,
-  IOAuth2CompletionPageStateProps, IOAuth2CompletionPageDispatchProps {}
+export interface IOAuth2CompletionPageProps extends
+  Omit<IOAuth2CompletionPageOwnProps, "api">,
+  IOAuth2CompletionPageStateProps,
+  Omit<IOAuth2CompletionPageDispatchProps, "dispatchOAuth2Completion">,
+  IOAuth2CompletionPageMergeProps {}
 
-class OAuth2CompletionPage extends React.Component<IOAuth2CompletionPageProps> {
+class OAuth2CompletionPageImpl extends React.Component<IOAuth2CompletionPageProps> {
   public componentWillMount() {
     this.handleOAuth2AndRedirect(this.props);
   }
@@ -78,13 +89,24 @@ function mapDispatchToProps(dispatch: Dispatch): IOAuth2CompletionPageDispatchPr
     clearRedirect: () => {
       dispatch(clearRedirect());
     },
-    onOAuth2Completion: (provider: string, code: string, oAuth2CallbackUri: string) => {
-      dispatch(AuthApi.getInstance().socialLogin(provider, code, oAuth2CallbackUri));
+    dispatchOAuth2Completion: (api: AuthApi, provider: string, code: string, oAuth2CallbackUri: string) => {
+      dispatch(api.socialLogin(provider, code, oAuth2CallbackUri));
     },
   };
 }
 
-export default connect(
+function mergeProps(_stateProps, dispatchProps, ownProps) {
+  const api = ownProps.api;
+
+  return {
+    onOAuth2Completion: (provider: string, code: string, oAuth2CallbackUri: string) => {
+      dispatchProps.dispatchOAuth2Completion(api, provider, code, oAuth2CallbackUri);
+    },
+  };
+}
+
+export const OAuth2CompletionPage = connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withRouter(OAuth2CompletionPage) as any);
+  mergeProps,
+)(withRouter(OAuth2CompletionPageImpl) as any);

@@ -9,7 +9,8 @@
     "build": "tsc",
     "start": "tsc -w",
     "lint": "tslint -p tsconfig.json -c tslint.json 'src/**/*.{ts,tsx}'",
-    "lint-fix": "tslint -p tsconfig.json -c tslint.json --fix 'src/**/*.{ts,tsx}'"
+    "lint-fix": "tslint -p tsconfig.json -c tslint.json --fix 'src/**/*.{ts,tsx}'",
+    "check-circular": "madge --circular dist/index.js"
   },
   "author": "Daniel Chiu <daniel@chiubaka.com>",
   "license": "ISC",
@@ -32,6 +33,7 @@
     "husky": "^3.0.1",
     "jest": "^24.8.0",
     "lint-staged": "^9.2.1",
+    "madge": "^3.4.4",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.1.0",

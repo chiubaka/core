@@ -3,8 +3,10 @@ import { ThunkDispatch } from "redux-thunk";
 import pluralize from "pluralize";
 import { isNullOrUndefined } from "util";
 
-import { IModel } from "../model/";
-import { Api, ApiAction } from "./Api";
+import { IModel } from "../../model";
+import { Api } from "../Api";
+import { ApiAction } from "../types";
+import { IModelApiAdapter, RestApiAdapter } from "./adapters";
 
 export declare type Dispatch = ThunkDispatch<any, void, any>;
 
@@ -13,8 +15,10 @@ interface IModelUpdateDependency<T> {
   modelApiAction: (id: string) => ApiAction<any>;
 }
 
-export class ModelApi<BackendType extends IModel, FrontendType extends IModel = BackendType> extends Api {
-  private static API_PATH = "/api";
+export class ModelApi<
+  BackendType extends IModel,
+  FrontendType extends IModel = BackendType,
+> extends Api<IModelApiAdapter<BackendType, FrontendType>> {
 
   public SUCCESSFUL_GET_ALL_TYPE: string;
   public SUCCESSFUL_GET_TYPE: string;
@@ -25,15 +29,19 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
   protected endpoint: string;
   private modelUpdateDependencies: Array<IModelUpdateDependency<FrontendType>>;
 
-  constructor(modelName: string) {
-    super();
+  constructor(modelName: string, adapter?: IModelApiAdapter<BackendType, FrontendType>) {
+    adapter = adapter || new RestApiAdapter(modelName);
+    super(adapter);
+    // TODO: There's some code smell in having to create a bilateral reference here...
+    // Doing this also forces a lot of ModelApi methods which should be private to instead
+    // be public...
+    adapter.setApi(this);
     const modelNameUpper = modelName.toUpperCase();
     this.SUCCESSFUL_GET_ALL_TYPE = `SUCCESSFUL_GET_ALL_${pluralize(modelNameUpper)}`;
     this.SUCCESSFUL_GET_TYPE = `SUCCESSFUL_GET_${modelNameUpper}`;
     this.SUCCESSFUL_CREATE_TYPE = `SUCCESSFUL_CREATE_${modelNameUpper}`;
     this.SUCCESSFUL_UPDATE_TYPE = `SUCCESSFUL_UPDATE_${modelNameUpper}`;
     this.SUCCESSFUL_DELETE_TYPE = `SUCCESSFUL_DELETE_${modelNameUpper}`;
-    this.endpoint = `${ModelApi.API_PATH}/${pluralize(modelName.toLowerCase())}/`;
     this.modelUpdateDependencies = [];
 
     this.bulkTransformForFrontend = this.bulkTransformForFrontend.bind(this);
@@ -41,38 +49,19 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
   }
 
   public getAll(): ApiAction<FrontendType[]> {
-    return this.actionCreator(this.getListEndpoint(), null, "GET", (dispatch, response: FrontendType[]) => {
-      dispatch(this.successfulGetAllAction(response));
-    }, null, this.bulkTransformForFrontend);
+    return this.getAdapter().getAll();
   }
 
   public get(id: string): ApiAction<FrontendType> {
-    return this.actionCreator(this.getItemEndpoint(id), null, "GET", (dispatch, response: FrontendType) => {
-      dispatch(this.successfulGetAction(response));
-    }, null, this.transformForFrontend);
-  }
-
-  public getListEndpoint() {
-    return this.endpoint;
-  }
-
-  public getItemEndpoint(id: string) {
-    return `${this.endpoint}${id}/`;
+    return this.getAdapter().get(id);
   }
 
   public create(payload: Partial<FrontendType>): ApiAction<FrontendType> {
-    return this.actionCreator(this.getListEndpoint(), payload, "POST", (dispatch, response: FrontendType) => {
-      dispatch(this.successfulCreateAction(response));
-      this.processModelUpdateDependencies(dispatch, response);
-    }, this.transformForBackend, this.transformForFrontend) as ApiAction<FrontendType>;
+    return this.getAdapter().create(payload);
   }
 
   public update(original: FrontendType, updated: FrontendType): ApiAction<FrontendType> {
-    return this.actionCreator(this.getItemEndpoint(updated.id), updated, "PUT", (dispatch, response: FrontendType) => {
-      dispatch(this.successfulUpdateAction(original, response));
-      this.processModelUpdateDependencies(dispatch, original);
-      this.processModelUpdateDependencies(dispatch, response);
-    }, this.transformForBackend, this.transformForFrontend);
+    return this.getAdapter().update(original, updated);
   }
 
   public createOrUpdate(original: Partial<FrontendType>, updated: Partial<FrontendType>): ApiAction<FrontendType> {
@@ -84,9 +73,7 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
   }
 
   public delete(deleted: FrontendType) {
-    return this.actionCreator(this.getItemEndpoint(deleted.id), null, "DELETE", (dispatch, _response) => {
-      dispatch(this.successfulDeleteAction(deleted));
-    });
+    return this.getAdapter().delete(deleted);
   }
 
   public successfulGetAllAction(payload: FrontendType[]) {
@@ -127,23 +114,23 @@ export class ModelApi<BackendType extends IModel, FrontendType extends IModel = 
 
   public addModelUpdateDependency(idMapper: (data: FrontendType) => string[],
                                   dependentApiAction: (id: string) => ApiAction<any>,
-                                  apiThisArg: Api) {
+                                  apiThisArg: Api<IModelApiAdapter<BackendType, FrontendType>>) {
     this.modelUpdateDependencies.push({idMapper, modelApiAction: dependentApiAction.bind(apiThisArg)});
   }
 
-  protected transformForFrontend(object: BackendType): FrontendType {
+  public transformForFrontend(object: BackendType): FrontendType {
     return object as any;
   }
 
-  protected transformForBackend(object: FrontendType): BackendType {
+  public transformForBackend(object: FrontendType): BackendType {
     return object as any;
   }
 
-  protected bulkTransformForFrontend(objects: BackendType[]): FrontendType[] {
+  public bulkTransformForFrontend(objects: BackendType[]): FrontendType[] {
     return objects.map(this.transformForFrontend);
   }
 
-  private processModelUpdateDependencies(dispatch: Dispatch, modelObject: FrontendType) {
+  public processModelUpdateDependencies(dispatch: Dispatch, modelObject: FrontendType) {
     this.modelUpdateDependencies.forEach((dependency) => {
       const dependencyIds = dependency.idMapper(modelObject);
 

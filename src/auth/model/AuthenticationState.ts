@@ -1,4 +1,5 @@
 import { isNullOrUndefined } from "util";
+
 import { ISocialLoginProvider, IUser } from "../../app/types/index";
 import * as Cookies from "../utils/storage";
 

@@ -20,16 +20,24 @@ export interface ILoginPageStateProps {
 }
 
 export interface ILoginPageDispatchProps {
-  onSubmitLogin: (username: string, password: string) => void;
+  dispatchLogin: (api: AuthApi, username: string, password: string) => void;
   setRedirect: (redirectPath: string) => void;
 }
 
+export interface ILoginPageMergeProps {
+  onSubmitLogin: (username: string, password: string) => void;
+}
+
 export interface ILoginPageOwnProps extends RouteComponentProps<any> {
+  api: AuthApi;
   defaultRedirectPath?: string;
 }
 
-export interface ILoginPageProps extends ILoginPageStateProps, ILoginPageDispatchProps,
-  ILoginPageOwnProps {}
+export interface ILoginPageProps extends
+  ILoginPageStateProps,
+  Omit<ILoginPageDispatchProps, "dispatchLogin">,
+  ILoginPageMergeProps,
+  Omit<ILoginPageOwnProps, "api"> {}
 
 export interface ILoginPageState {
   username: string;
@@ -37,7 +45,7 @@ export interface ILoginPageState {
   showSocialLogin: boolean;
 }
 
-class LoginPage extends React.Component<ILoginPageProps, ILoginPageState> {
+class LoginPageImpl extends React.Component<ILoginPageProps, ILoginPageState> {
   public static defaultProps: Partial<ILoginPageProps> = {
     loggedIn: false,
     defaultRedirectPath: "/",
@@ -239,8 +247,8 @@ function mapStateToProps(state: IAuthState & IProductState): ILoginPageStateProp
 
 function mapDispatchToProps(dispatch: Dispatch): ILoginPageDispatchProps {
   return {
-    onSubmitLogin: (username: string, password: string) => {
-      dispatch(AuthApi.getInstance().login(username, password));
+    dispatchLogin: (api: AuthApi, username: string, password: string) => {
+      dispatch(api.login(username, password));
     },
     setRedirect: (redirectPath: string) => {
       dispatch(setRedirect(redirectPath));
@@ -248,7 +256,18 @@ function mapDispatchToProps(dispatch: Dispatch): ILoginPageDispatchProps {
   };
 }
 
-export default connect(
+function mergeProps(_stateProps, dispatchProps, ownProps) {
+  const api = ownProps.api;
+
+  return {
+    onSubmitLogin: (username: string, password: string) => {
+      dispatchProps.dispatchLogin(api.login(username, password));
+    },
+  };
+}
+
+export const LoginPage = connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withRouter(LoginPage) as any);
+  mergeProps,
+)(withRouter(LoginPageImpl) as any);
