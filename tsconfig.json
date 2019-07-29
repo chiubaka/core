@@ -10,10 +10,13 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "es6",
+      "esnext",
+      "scripthost",
     ],
     "module": "esnext",
     "moduleResolution": "node",
+    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "outDir": "./dist",

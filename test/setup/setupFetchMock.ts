@@ -21,11 +21,11 @@ customGlobal.Headers = class Headers {
     this.headers = {};
   }
 
-  public append(key, value) {
+  public append(key: string, value: string) {
     this.headers[key] = value;
   }
 
-  public get(key) {
+  public get(key: string) {
     return this.headers[key];
   }
 };

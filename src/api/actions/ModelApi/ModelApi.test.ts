@@ -1,6 +1,6 @@
 import fetchMock from "fetch-mock";
 
-import { store } from "../../../../test";
+import { assertCallPath, assertLastCallPath, store } from "../../../../test";
 
 import { RestApiAdapter } from "./adapters";
 import { ModelApi } from "./ModelApi";
@@ -34,33 +34,35 @@ describe("ModelApi", () => {
   });
 
   describe("with RestApiAdapter", () => {
+    let api: ModelApi<any>;
+
     beforeAll(() => {
-      this.api = new ModelApi("plan", new RestApiAdapter("plan"));
+      api = new ModelApi("plan", new RestApiAdapter("plan"));
     });
 
     const testGetAll = () => {
       fetchMock.getOnce(`path:${LIST_PATH}`, LIST_PAYLOAD);
-      return store.dispatch(this.api.getAll());
+      return store.dispatch(api.getAll());
     };
 
     const testGetOne = () => {
       fetchMock.getOnce(`path:${GET_ONE_PATH}`, GET_ONE_PAYLOAD);
-      return store.dispatch(this.api.get(GET_ONE_PAYLOAD.id));
+      return store.dispatch(api.get(GET_ONE_PAYLOAD.id));
     };
 
     const testCreate = () => {
       fetchMock.postOnce(`path:${CREATE_PATH}`, CREATE_PAYLOAD);
-      return store.dispatch(this.api.create(CREATE_PAYLOAD));
+      return store.dispatch(api.create(CREATE_PAYLOAD));
     };
 
     const testUpdate = () => {
       fetchMock.putOnce(`path:${UPDATE_PATH}`, UPDATE_PAYLOAD);
-      return store.dispatch(this.api.update(UPDATE_PAYLOAD, UPDATE_PAYLOAD));
+      return store.dispatch(api.update(UPDATE_PAYLOAD, UPDATE_PAYLOAD));
     };
 
     const testDelete = () => {
       fetchMock.deleteOnce(`path:${DELETE_PATH}`, DELETE_PAYLOAD);
-      return store.dispatch(this.api.delete(DELETE_PAYLOAD));
+      return store.dispatch(api.delete(DELETE_PAYLOAD));
     };
 
     describe("#getAll", () => {
@@ -114,13 +116,13 @@ describe("ModelApi", () => {
     describe("#createOrUpdate", () => {
       it("dispatches a SUCCESSFUL_CREATE_PLAN when there is no id", async () => {
         fetchMock.postOnce(`path:${CREATE_PATH}`, {});
-        await store.dispatch(this.api.createOrUpdate({}, {}));
+        await store.dispatch(api.createOrUpdate({}, {}));
         assertSingleAction("SUCCESSFUL_CREATE_PLAN");
       });
 
       it("dispatches a SUCCESSFUL_UPDATE_PLAN when there is an id", async () => {
         fetchMock.putOnce(`path:${UPDATE_PATH}`, {});
-        await store.dispatch(this.api.createOrUpdate({ id: "1" }, { id: "1"}));
+        await store.dispatch(api.createOrUpdate({ id: "1" }, { id: "1"}));
         assertSingleAction("SUCCESSFUL_UPDATE_PLAN");
       });
     });
@@ -143,9 +145,9 @@ describe("ModelApi", () => {
       fetchMock.putOnce(`path:${UPDATE_PATH}`, UPDATE_PAYLOAD);
 
       const otherApi = new ModelApi("task", new RestApiAdapter("task"));
-      this.api.addModelUpdateDependency((data: any) => [data.id], otherApi.get, otherApi);
+      api.addModelUpdateDependency((data: any) => [data.id], otherApi.get, otherApi);
 
-      await store.dispatch(this.api.update(GET_ONE_PAYLOAD, GET_ONE_PAYLOAD));
+      await store.dispatch(api.update(GET_ONE_PAYLOAD, GET_ONE_PAYLOAD));
 
       const calls = fetchMock.calls();
       expect(calls.length).toEqual(2);
@@ -163,14 +165,6 @@ describe("ModelApi", () => {
     });
   });
 });
-
-function assertLastCallPath(expected: string) {
-  assertCallPath(fetchMock.lastCall(), expected);
-}
-
-function assertCallPath(call, expected: string) {
-  expect(call[0]).toEqual(expected);
-}
 
 function assertSingleAction(type: string, payload?: any) {
   const actions = store.getActions();

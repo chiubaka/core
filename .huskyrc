@@ -1,6 +1,6 @@
 {
   "hooks": {
     "pre-commit": "yarn lint-staged",
-    "pre-push": "yarn test && yarn build && yarn check-circular"
+    "pre-push": "yarn test && rm -rf dist && yarn build && yarn check-circular"
   }
 }

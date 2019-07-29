@@ -1,11 +1,11 @@
-import { parse } from "query-string";
+import { parse, ParsedQuery } from "query-string";
 import * as React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 
 import { ProgressBar } from "../../../app/components/ProgressBar";
 import { AuthApi, AuthDispatch as Dispatch, clearRedirect } from "../../actions";
-import { IAuthState, LoginState } from "../../model/AuthenticationState";
+import { IAuthState, ISocialLoginProvider, LoginState, OAuth2ResponseType } from "../../model/AuthenticationState";
 import { buildOAuth2CallbackUri } from "../../utils/uri";
 
 export interface IOAuth2CompletionPageParams {
@@ -20,22 +20,26 @@ export interface IOAuth2CompletionPageStateProps {
   loggedIn: boolean;
   oAuth2CallbackBasePath: string;
   redirectPath: string;
+  providers: ISocialLoginProvider[];
 }
 
 export interface IOAuth2CompletionPageDispatchProps {
   clearRedirect: () => void;
-  dispatchOAuth2Completion: (api: AuthApi, provider: string, code: string, redirectUri: string) => void;
+  dispatchSocialLogin: (api: AuthApi, provider: string, code: string, redirectUri: string) => void;
+  dispatchSocialLoginAccessToken: (api: AuthApi, provider: string, token: string) => void;
 }
 
 export interface IOAuth2CompletionPageMergeProps {
-  onOAuth2Completion: (provider: string, code: string, redirectUri: string) => void;
+  onOAuth2Completion: (provider: string, queryParams: ParsedQuery) => void;
 }
 
 export interface IOAuth2CompletionPageProps extends
-  Omit<IOAuth2CompletionPageOwnProps, "api">,
-  IOAuth2CompletionPageStateProps,
-  Omit<IOAuth2CompletionPageDispatchProps, "dispatchOAuth2Completion">,
-  IOAuth2CompletionPageMergeProps {}
+  RouteComponentProps<IOAuth2CompletionPageParams>,
+  IOAuth2CompletionPageMergeProps {
+    loggedIn: boolean;
+    redirectPath: string;
+    clearRedirect: () => void;
+  }
 
 class OAuth2CompletionPageImpl extends React.Component<IOAuth2CompletionPageProps> {
   public componentWillMount() {
@@ -56,18 +60,17 @@ class OAuth2CompletionPageImpl extends React.Component<IOAuth2CompletionPageProp
     );
   }
 
+  // If not logged in, this will trigger the login.
+  // Once the user is logged in, the redux state should change, so new props
+  // will be passed and this component should re-render, sparking the redirect
+  // path.
   private handleOAuth2AndRedirect(props: IOAuth2CompletionPageProps) {
-    const queryParams = parse(props.location.search);
-    const code = queryParams.code;
-
+    const queryParams = parse(props.location.hash);
     if (!props.loggedIn) {
       // TODO: Need to handle case where user is not logged in but login failed.
       const provider = props.match.params.provider;
 
-      const { oAuth2CallbackBasePath } = props;
-      const oAuth2CallbackUri = buildOAuth2CallbackUri(oAuth2CallbackBasePath, provider);
-
-      props.onOAuth2Completion(provider, code as string, oAuth2CallbackUri);
+      props.onOAuth2Completion(provider, queryParams);
     } else {
       props.clearRedirect();
       // TODO: Should not be "/" here, should be a parameterized default path
@@ -81,6 +84,7 @@ function mapStateToProps(state: IAuthState): IOAuth2CompletionPageStateProps {
     loggedIn: state.auth.loginState === LoginState.LoggedIn,
     oAuth2CallbackBasePath: state.auth.oAuth2CallbackBasePath,
     redirectPath: state.auth.redirectPath,
+    providers: state.auth.socialProviders,
   };
 }
 
@@ -89,19 +93,45 @@ function mapDispatchToProps(dispatch: Dispatch): IOAuth2CompletionPageDispatchPr
     clearRedirect: () => {
       dispatch(clearRedirect());
     },
-    dispatchOAuth2Completion: (api: AuthApi, provider: string, code: string, oAuth2CallbackUri: string) => {
+    dispatchSocialLogin: (api: AuthApi, provider: string, code: string, oAuth2CallbackUri: string) => {
       dispatch(api.socialLogin(provider, code, oAuth2CallbackUri));
+    },
+    dispatchSocialLoginAccessToken: (api: AuthApi, provider: string, token: string) => {
+      dispatch(api.socialLoginAccessToken(provider, token));
     },
   };
 }
 
-function mergeProps(_stateProps, dispatchProps, ownProps) {
+function mergeProps(
+  stateProps: IOAuth2CompletionPageStateProps,
+  dispatchProps: IOAuth2CompletionPageDispatchProps,
+  ownProps: IOAuth2CompletionPageOwnProps,
+) {
   const api = ownProps.api;
 
   return {
-    onOAuth2Completion: (provider: string, code: string, oAuth2CallbackUri: string) => {
-      dispatchProps.dispatchOAuth2Completion(api, provider, code, oAuth2CallbackUri);
+    clearRedirect: dispatchProps.clearRedirect,
+    loggedIn: stateProps.loggedIn,
+    onOAuth2Completion: (providerName: string, queryParams: ParsedQuery) => {
+      const provider = stateProps.providers.find((p) => p.providerName === providerName);
+
+      switch (provider.responseType) {
+        case (OAuth2ResponseType.Token): {
+          return dispatchProps.dispatchSocialLoginAccessToken(api, providerName, queryParams.access_token as string);
+        }
+        case (OAuth2ResponseType.Code):
+        default: {
+          const { oAuth2CallbackBasePath } = stateProps;
+          const oAuth2CallbackUri = buildOAuth2CallbackUri(
+            oAuth2CallbackBasePath,
+            providerName,
+          );
+
+          return dispatchProps.dispatchSocialLogin(api, providerName, queryParams.code as string, oAuth2CallbackUri);
+        }
+      }
     },
+    redirectPath: stateProps.redirectPath,
   };
 }
 

@@ -1,11 +1,10 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { IAuthState } from "../model/AuthenticationState";
+import { IAuthState, ISocialLoginProvider } from "../model/AuthenticationState";
 import { buildOAuth2CallbackUri } from "../utils/uri";
 
 export interface ISocialLoginButtonOwnProps {
-  clientId: string;
-  providerName: string;
+  provider: ISocialLoginProvider;
 }
 
 export interface ISocialLoginButtonStateProps {
@@ -26,18 +25,8 @@ class SocialLoginButtonImpl extends React.Component<ISocialLoginButtonProps> {
     google: "google-oauth2",
   };
 
-  public static OAUTH2_ADDITIONAL_PARAMETERS: {[provider: string]: {[parameter: string]: string}} = {
-    facebook: {
-      response_type: "token",
-    },
-    google: {
-      response_type: "code",
-      scope: "profile email",
-    },
-  };
-
   public render(): JSX.Element {
-    const providerName = this.props.providerName;
+    const providerName = this.props.provider.providerName;
 
     return (
       <a
@@ -53,29 +42,26 @@ class SocialLoginButtonImpl extends React.Component<ISocialLoginButtonProps> {
 
 function mapStateToProps(state: IAuthState,
                          ownProps: ISocialLoginButtonOwnProps): ISocialLoginButtonStateProps {
-  const { clientId, providerName } = ownProps;
-  const oAuth2CallbackBasePath = state.auth.oAuth2CallbackBasePath;
-  const providerAlias = SocialLoginButtonImpl.OAUTH2_PROVIDER_ALIAS[ownProps.providerName];
-
-  const redirectUri = buildOAuth2CallbackUri(
-    oAuth2CallbackBasePath,
-    providerAlias ? providerAlias : providerName,
-  );
+  const provider = ownProps.provider;
+  const { clientId, providerName, responseType } = provider;
 
   if (!(providerName in SocialLoginButtonImpl.OAUTH2_GATEWAYS)) {
     console.error(`Unrecognized social auth provider ${providerName}.`);
   }
 
-  const oAuth2Gateway = SocialLoginButtonImpl.OAUTH2_GATEWAYS[providerName];
-  let oAuth2Uri = `${oAuth2Gateway}?client_id=${clientId}&redirect_uri=${redirectUri}`;
-  const additionalParameters = SocialLoginButtonImpl.OAUTH2_ADDITIONAL_PARAMETERS[providerName];
+  const oAuth2CallbackBasePath = state.auth.oAuth2CallbackBasePath;
+  const providerAlias = SocialLoginButtonImpl.OAUTH2_PROVIDER_ALIAS[providerName];
+  const redirectUri = buildOAuth2CallbackUri(
+    oAuth2CallbackBasePath,
+    providerAlias ? providerAlias : providerName,
+  );
 
-  if (additionalParameters) {
-    for (const key in additionalParameters) {
-      if (additionalParameters.hasOwnProperty(key)) {
-        oAuth2Uri += `&${key}=${additionalParameters[key]}`;
-      }
-    }
+  const oAuth2Gateway = SocialLoginButtonImpl.OAUTH2_GATEWAYS[providerName];
+
+  let oAuth2Uri = `${oAuth2Gateway}?client_id=${clientId}&response_type=${responseType}&redirect_uri=${redirectUri}`;
+  if (provider.scope != null) {
+    const scope = provider.scope.join(" ");
+    oAuth2Uri = `${oAuth2Uri}&scope=${scope}`;
   }
 
   return {

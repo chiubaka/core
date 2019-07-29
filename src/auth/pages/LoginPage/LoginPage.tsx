@@ -5,10 +5,9 @@ import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 
 import { IProductState } from "../../../app/model";
-import { ISocialLoginProvider } from "../../../app/types";
 import { AuthApi, AuthDispatch as Dispatch, setRedirect } from "../../actions";
 import { SocialLoginButton } from "../../components/SocialLoginButton";
-import { IAuthState, LoginState } from "../../model/AuthenticationState";
+import { IAuthState, ISocialLoginProvider, LoginState } from "../../model/AuthenticationState";
 
 export interface ILoginPageStateProps {
   loggedIn: boolean;
@@ -153,13 +152,10 @@ class LoginPageImpl extends React.Component<ILoginPageProps, ILoginPageState> {
     const providers = this.props.socialProviders;
 
     return providers.map((provider) => {
-      const {clientId, providerName} = provider;
-
       return (
         <SocialLoginButton
-          key={providerName}
-          clientId={clientId}
-          providerName={providerName}
+          key={provider.providerName}
+          provider={provider}
           {...this.props}
         />
       );
@@ -256,12 +252,16 @@ function mapDispatchToProps(dispatch: Dispatch): ILoginPageDispatchProps {
   };
 }
 
-function mergeProps(_stateProps, dispatchProps, ownProps) {
+function mergeProps(
+  _stateProps: ILoginPageStateProps,
+  dispatchProps: ILoginPageDispatchProps,
+  ownProps: ILoginPageOwnProps,
+) {
   const api = ownProps.api;
 
   return {
     onSubmitLogin: (username: string, password: string) => {
-      dispatchProps.dispatchLogin(api.login(username, password));
+      dispatchProps.dispatchLogin(api, username, password);
     },
   };
 }

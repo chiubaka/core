@@ -47,11 +47,17 @@ export declare type AuthAction = Action | ICompleteLogin | ISuccessfulGetUserDet
 export declare type AuthDispatch = ThunkDispatch<IAuthState, void, AuthAction>;
 
 export interface IAuthApiAdapter {
-  login: (username: string, password: string, dispatch: AuthDispatch, authState: IAuthInnerState) => Promise<any>;
-  socialLogin: (
+  login?: (username: string, password: string, dispatch: AuthDispatch, authState: IAuthInnerState) => Promise<any>;
+  socialLogin?: (
     provider: string,
     code: string,
     redirectUri: string,
+    dispatch: AuthDispatch,
+    authState: IAuthInnerState,
+  ) => Promise<any>;
+  socialLoginAccessToken?: (
+    provider: string,
+    accessToken: string,
     dispatch: AuthDispatch,
     authState: IAuthInnerState,
   ) => Promise<any>;

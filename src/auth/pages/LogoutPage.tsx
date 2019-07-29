@@ -42,7 +42,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: ILogoutPageOwnProps): 
   };
 }
 
-function mergeProps(_stateProps, dispatchProps, ownProps) {
+function mergeProps(_stateProps: null, dispatchProps: ILogoutPageDispatchProps, ownProps: ILogoutPageOwnProps) {
   const api = ownProps.api;
 
   return {
