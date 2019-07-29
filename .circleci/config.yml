@@ -9,25 +9,35 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys:
-            - node-modules-{{ arch }}-{{ checksum "yarn.lock" }}
-            - node-modules-{{ arch }}-
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+      - restore_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
       - run:
           name: Install dependencies
           command: yarn install
       - save_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+          paths:
+            - ~/.cache/yarn
+      - save_cache:
           paths:
             - ./node_modules
-          key: node-modules-{{ arch }}-{{ checksum "yarn.lock" }}
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
       - run:
           name: Lint code
           command: yarn lint
+      - run:
+          name: Security audit dependencies
+          command: ./scripts/audit_dependencies.sh
       - run:
           name: Build code
           command: yarn build
       - run:
           name: Run tests
           command: yarn test
+      - run:
+          name: Check for circular dependencies
+          command: yarn check-circular
       - store_test_results:
           path: ./coverage
       - persist_to_workspace:
@@ -36,21 +46,8 @@ jobs:
   publish:
     <<: *defaults
     steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - node-modules-{{ arch }}-{{ checksum "yarn.lock" }}
-            - node-modules-{{ arch }}-
-      - run:
-          name: Install dependencies
-          command: yarn install
-      - save_cache:
-          paths:
-            - ./node_modules
-          key: node-modules-{{ arch }}-{{ checksum "yarn.lock" }}
-      - run:
-          name: Build distribution
-          command: yarn build
+      - attach_workspace:
+          at: ~/repo
       - run:
           name: Authenticate with NPM registry
           command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
@@ -62,7 +59,7 @@ workflows:
   test-publish:
     jobs:
       - test:
-          filters: # required since `deploy-prod` has tag filters AND requires build
+          filters:
             tags:
               only: /.*/
       - publish:

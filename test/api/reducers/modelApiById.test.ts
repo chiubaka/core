@@ -3,7 +3,7 @@ import {
   IModelById,
   ModelApi,
   modelApiById,
-} from "../../../src/api";
+} from "../../../src";
 
 interface ITask extends IModel {
   id: string;
