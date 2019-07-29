@@ -1,8 +1,8 @@
 import { Action } from "redux";
 import { isNullOrUndefined } from "util";
 
+import { IModel, IModelById, IModelIndex } from "../../orm";
 import { IApiDeleteResponse, IApiResponse, IApiUpdateResponse, ModelApi, SearchableModelApi } from "../actions";
-import { IModel, IModelById, IModelIndex } from "../model";
 
 export declare type ModelFilterFunction<T> = (model: T) => boolean;
 export declare type ModelEqualityFunction<T> = (model1: T, model2: T) => boolean;
@@ -34,7 +34,7 @@ function propertyExistsInState(propertyName: string, state: any, object: any) {
   return state.hasOwnProperty(property);
 }
 
-interface IModelApiReducerOptions<StateT, ModelT> {
+interface IModelApiReducerOptions<StateT, ModelT extends IModel> {
   Apis: Array<ModelApi<ModelT>>;
   initialState: StateT;
   // Handles adding numerous objects to the state, e.g. on initial load.
@@ -64,17 +64,17 @@ interface IModelApiReducerOptions<StateT, ModelT> {
   modelEquality?: ModelEqualityFunction<ModelT>;
 }
 
-interface IModelApiReducerByPropertyOptions<T> extends IModelApiReducerSimpleOptions<T> {
+interface IModelApiReducerByPropertyOptions<T extends IModel> extends IModelApiReducerSimpleOptions<T> {
   propertyName: keyof T;
 }
 
-interface IModelApiReducerSimpleOptions<T> {
+interface IModelApiReducerSimpleOptions<T extends IModel> {
   Api: ModelApi<T>;
   modelFilter?: ModelFilterFunction<T>;
   modelEquality?: ModelEqualityFunction<T>;
 }
 
-interface ISearchableModelApiReducerOptions<T> {
+interface ISearchableModelApiReducerOptions<T extends IModel> {
   Api: SearchableModelApi<T>;
 }
 

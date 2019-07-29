@@ -1,14 +1,8 @@
-import { IModel } from "../../orm";
+import { IUser } from "./model";
 
-export interface IUserBase extends IModel {
-  username?: string;
-  email: string;
-}
-
-export interface IUser<TExtraData = any> extends IUserBase {
-  firstName: string;
-  lastName: string;
-  extraData?: TExtraData;
+export interface ISocialLoginProvider {
+  providerName: string;
+  clientId: string;
 }
 
 export interface IJwtResponse {

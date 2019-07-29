@@ -2,7 +2,8 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 
-import { IModel, ModelApi } from "../../api";
+import { ModelApi } from "../../api";
+import { IModel } from "../../orm";
 import { IModelFormProps } from "../types";
 
 declare type Dispatch = ThunkDispatch<any, void, any>;

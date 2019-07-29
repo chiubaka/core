@@ -98,6 +98,13 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.0.0"
 
+"@babel/runtime@^7.0.0":
+  version "7.5.4"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.5.4.tgz#cb7d1ad7c6d65676e66b47186577930465b5271b"
+  integrity sha512-Na84uwyImZZc3FKf4aUF1tysApzwf3p2yuFBIyBfbzT5glzKTdvYI4KVW4kcgjrzoGUjC7w3YyCHcJKaRxsr2Q==
+  dependencies:
+    regenerator-runtime "^0.13.2"
+
 "@babel/runtime@^7.1.2", "@babel/runtime@^7.4.0", "@babel/runtime@^7.4.5":
   version "7.5.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.5.5.tgz#74fba56d35efbeca444091c7850ccd494fd2f132"
@@ -561,6 +568,11 @@
   dependencies:
     redux "^4.0.0"
 
+"@types/redux-orm@0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@types/redux-orm/-/redux-orm-0.9.2.tgz#d7e548a72547826f037ae3011f6adb0563c6d710"
+  integrity sha512-OORM94D0Ntji0s/Bq5Vd1E0t6nQ4FrOAexYHYTEMzOc/ZW/6CsiOX4f+bIxhoqKKVTqrzG3KL0WRoBFxQC/l6A==
+
 "@types/redux-testkit@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@types/redux-testkit/-/redux-testkit-1.0.3.tgz#306e33d25fcef02378ae942a7575921fa618ccd1"
@@ -578,6 +590,13 @@
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-2.0.3.tgz#9c088679876f374eb5983f150d4787aa6fb32d7e"
   integrity sha512-FvUupuM3rlRsRtCN+fDudtmytGO6iHJuuRKS1Ss0pG5z8oX0diNEw94UEL7hgDbpN94rgaK5R7sWm6RrSkZuAQ==
+
+"@types/uuid@^3.4.5":
+  version "3.4.5"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-3.4.5.tgz#d4dc10785b497a1474eae0ba7f0cb09c0ddfd6eb"
+  integrity sha512-MNL15wC3EKyw1VLF+RoVO4hJJdk9t/Hlv3rt1OL65Qvuadm4BYo6g9ZJQqoq7X8NBFSsQXgAujWciovh2lpVjA==
+  dependencies:
+    "@types/node" "*"
 
 "@types/vfile-message@*":
   version "1.0.1"
@@ -2639,6 +2658,13 @@ ignore@^5.0.6, ignore@^5.1.1:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.1.2.tgz#e28e584d43ad7e92f96995019cc43b9e1ac49558"
   integrity sha512-vdqWBp7MyzdmHkkRWV5nY+PfGRbYbahfuvsBCh277tq+w9zyNi7h5CYJCK0kmzti9kU+O/cB7sE8HvKv6aXAKQ==
+
+immutable-ops@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/immutable-ops/-/immutable-ops-0.6.0.tgz#c33108fedd6d0a12656758505fda9702d512ac75"
+  integrity sha512-GK+dh0Wz4/ZFj08fBPxVVj2Gj/HABzFZNTf0WQW4KXDxOS0taAFxfeJUZgnEHTNbiLcXxi5MHNiq1rAYaVVa1w==
+  dependencies:
+    ramda "^0.26.1"
 
 immutable@^3.8.1:
   version "3.8.2"
@@ -4898,6 +4924,11 @@ quick-lru@^1.0.0:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-1.1.0.tgz#4360b17c61136ad38078397ff11416e186dcfbb8"
   integrity sha1-Q2CxfGETatOAeDl/8RQW4Ybc+7g=
 
+ramda@^0.26.1:
+  version "0.26.1"
+  resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.26.1.tgz#8d41351eb8111c55353617fc3bbffad8e4d35d06"
+  integrity sha512-hLWjpy7EnsDBb0p+Z3B7rPi3GDeRG5ZtiI33kJhTt+ORCd38AbAIjB/9zRIUoeTbE/AVX5ZkU7m6bznsvrf8eQ==
+
 rc@^1.2.7:
   version "1.2.8"
   resolved "https://registry.yarnpkg.com/rc/-/rc-1.2.8.tgz#cd924bf5200a075b83c188cd6b9e211b7fc0d3ed"
@@ -5079,6 +5110,16 @@ redux-mock-store@^1.5.3:
   integrity sha512-ryhkkb/4D4CUGpAV2ln1GOY/uh51aczjcRz9k2L2bPx/Xja3c5pSGJJPyR25GNVRXtKIExScdAgFdiXp68GmJA==
   dependencies:
     lodash.isplainobject "^4.0.6"
+
+redux-orm@^0.13.3:
+  version "0.13.3"
+  resolved "https://registry.yarnpkg.com/redux-orm/-/redux-orm-0.13.3.tgz#c13cb4c05f7045ecd98e1d64dbc3b564722e8b97"
+  integrity sha512-76PWSJ8tZVcM+ynYUZf0qd1TJVoPXWNIPfjCYHfdiMlJ6N/gEu94W1wJ16einJ/Vng0+0/F1sxEB/3vWgMS0Dg==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    immutable-ops "^0.6.0"
+    lodash "^4.17.11"
+    reselect "^3.0.1"
 
 redux-session@^1.0.4:
   version "1.0.5"
@@ -5269,6 +5310,11 @@ requirejs@^2.3.5:
   version "2.3.6"
   resolved "https://registry.yarnpkg.com/requirejs/-/requirejs-2.3.6.tgz#e5093d9601c2829251258c0b9445d4d19fa9e7c9"
   integrity sha512-ipEzlWQe6RK3jkzikgCupiTbTvm4S0/CAU5GlgptkN5SO6F3u0UD0K18wy6ErDqiCyP4J4YYe1HuAShvsxePLg==
+
+reselect@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/reselect/-/reselect-3.0.1.tgz#efdaa98ea7451324d092b2b2163a6a1d7a9a2147"
+  integrity sha1-79qpjqdFEyTQkrKyFjpqHXqaIUc=
 
 resize-observer-polyfill@^1.5.0:
   version "1.5.1"

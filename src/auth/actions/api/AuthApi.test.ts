@@ -11,6 +11,7 @@ import { AuthApi } from "./AuthApi";
 
 const MOCK_TOKEN = "faketoken";
 const USER_DETAILS: IUser = {
+  id: "1",
   firstName: "Daniel",
   lastName: "Chiu",
   email: "daniel@chiubaka.com",
