@@ -10,16 +10,12 @@ export interface IModel extends IModelWithoutLocalState {
   syncing?: boolean;
 }
 
-export const MODEL_FIELDS = {
-  id: attr(),
-  lastSynced: attr(),
-  syncing: attr(),
-};
-
 export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFields = {}>
   extends OrmModel<TFields, TAdditional, TVirtualFields> {
   public static fields = {
-    ...MODEL_FIELDS,
+    id: attr(),
+    lastSynced: attr(),
+    syncing: attr(),
   };
 
   public withoutLocalState = (): IModelWithoutLocalState => {

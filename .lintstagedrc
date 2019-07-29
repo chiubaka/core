@@ -1,0 +1,4 @@
+{
+  "src/**/*.{ts,tsx}": ["tslint --fix", "git add"],
+  "src/**/*.s+(a|c)ss": "stylelint --syntax=scss"
+}

@@ -1,10 +1,10 @@
-import * as pluralize from "pluralize";
+import pluralize from "pluralize";
 import { ThunkDispatch } from "redux-thunk";
 
-import { ModelApi } from "../";
 import { IModel } from "../../../../orm";
 import { RestClient } from "../../../clients/RestClient";
 import { ApiAction } from "../../types";
+import { ModelApi } from "../ModelApi";
 import { IModelApiAdapter } from "./types";
 
 // Clients will have all kinds of States and all kinds of Actions, so must use any here.
@@ -75,7 +75,6 @@ export class RestApiAdapter<
       "PUT",
       (dispatch: Dispatch, response: FrontendType) => {
         dispatch(this.api.successfulUpdateAction(original, response));
-        this.api.processModelUpdateDependencies(dispatch, original);
         this.api.processModelUpdateDependencies(dispatch, response);
       },
       this.api.transformForBackend,

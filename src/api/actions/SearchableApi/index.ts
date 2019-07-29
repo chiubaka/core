@@ -1,4 +1,4 @@
-import * as pluralize from "pluralize";
+import pluralize from "pluralize";
 
 import { IModel } from "../../../orm";
 import { ModelApi } from "../ModelApi";

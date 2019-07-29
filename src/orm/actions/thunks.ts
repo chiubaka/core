@@ -20,6 +20,6 @@ export const upsertModel = <TFields extends IModel>(
 ) => {
   return (dispatch: Dispatch) => {
     dispatch(api.createOrUpdate(original.withoutLocalState(), updated.withoutLocalState()));
-    dispatch(successfulSyncModel(api.model, original.getId()));
+    dispatch(successfulSyncModel(api.model, original.ref));
   };
 };

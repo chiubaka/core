@@ -1,6 +1,6 @@
-import { ModelApi } from "../";
 import { IModel } from "../../../../orm";
 import { ApiAction } from "../../types";
+import { ModelApi } from "../ModelApi";
 
 export interface IModelApiAdapter<BackendType extends IModel, FrontendType extends IModel> {
   getAll: () => ApiAction<FrontendType[]>;

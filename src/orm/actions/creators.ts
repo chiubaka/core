@@ -1,5 +1,5 @@
-import { generateId, IModel, Model, NewModel, IModelWithoutLocalState } from "../model";
-import { IModelCreate, IModelIdAction, ModelActionType, IModelUpdate } from "./types";
+import { generateId, IModel, IModelWithoutLocalState, Model, NewModel, PartialModel } from "../model";
+import { IModelCreate, IModelIdAction, IModelUpdate, ISuccessfulListModel, ModelActionType } from "./types";
 
 export function createModel<T extends IModel>(model: typeof Model, payload: NewModel<T>): IModelCreate {
   const payloadWithId: T = payload as T;
@@ -15,6 +15,30 @@ export function createModel<T extends IModel>(model: typeof Model, payload: NewM
   };
 }
 
+export function updateModel<T extends IModel>(model: typeof Model, payload: PartialModel<T>): IModelUpdate {
+  return {
+    type: ModelActionType.UPDATE_MODEL,
+    modelName: model.modelName,
+    payload,
+  };
+}
+
+export function destroyModel(model: typeof Model, id: string): IModelIdAction {
+  return {
+    type: ModelActionType.DESTROY_MODEL,
+    modelName: model.modelName,
+    id,
+  };
+}
+
+export function successfulListModel<T extends IModel>(model: typeof Model, items: T[]): ISuccessfulListModel {
+  return {
+    type: ModelActionType.SUCCESSFUL_LIST_MODEL,
+    modelName: model.modelName,
+    items,
+  };
+}
+
 export function startSyncingModel(model: typeof Model, id: string): IModelIdAction {
   return {
     type: ModelActionType.START_SYNCING_MODEL,
@@ -23,7 +47,7 @@ export function startSyncingModel(model: typeof Model, id: string): IModelIdActi
   };
 }
 
-export function successfulSyncModel(model: typeof Model, payload: IModelWithoutLocalState): IModelUpdate {
+export function successfulSyncModel<T extends IModelWithoutLocalState>(model: typeof Model, payload: T): IModelUpdate {
   return {
     type: ModelActionType.SUCCESSFUL_SYNC_MODEL,
     modelName: model.modelName,

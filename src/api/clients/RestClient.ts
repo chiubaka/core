@@ -23,8 +23,6 @@ export class RestClient {
     return RestClient.singleton;
   }
 
-  private static singleton: RestClient;
-
   // TODO: authPrefix should be customizable based on app configs somehow
   public static apiHeaders(accessToken: string, authPrefix: string = "Bearer") {
     const headers = new Headers();
@@ -41,21 +39,7 @@ export class RestClient {
     }).join("&");
   }
 
-  protected errorTransformer(_url: string, error: IRestApiError): Promise<string> {
-    let errorMessage = "";
-    for (const field in error) {
-      if (error.hasOwnProperty(field)) {
-        error[field].forEach((message) => {
-          errorMessage += message + " ";
-        });
-      }
-    }
-    return Promise.reject(errorMessage.trim());
-  }
-
-  protected handleUnsuccessfulRequest(reason: string, dispatch: Dispatch) {
-    dispatch(Api.unsuccessfulRequest(reason));
-  }
+  private static singleton: RestClient;
 
   public actionCreator<
       FrontendPayloadT,
@@ -96,6 +80,22 @@ export class RestClient {
     return this.request(pathname, dispatch, token, {
       method: "DELETE",
     });
+  }
+
+  protected errorTransformer(_url: string, error: IRestApiError): Promise<string> {
+    let errorMessage = "";
+    for (const field in error) {
+      if (error.hasOwnProperty(field)) {
+        error[field].forEach((message) => {
+          errorMessage += message + " ";
+        });
+      }
+    }
+    return Promise.reject(errorMessage.trim());
+  }
+
+  protected handleUnsuccessfulRequest(reason: string, dispatch: Dispatch) {
+    dispatch(Api.unsuccessfulRequest(reason));
   }
 
   protected handleApiResponse<T>(dispatch: Dispatch, response: Response): Promise<T | string> {

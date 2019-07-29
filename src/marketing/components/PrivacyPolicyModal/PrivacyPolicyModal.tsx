@@ -1,15 +1,15 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { IProductState, IServiceState } from "../../../app/model/index";
+import { IProductState } from "../../../app/model/index";
 
 export interface IPrivacyPolicyModalProps {
   productName: string;
-  hostname: string;
 }
 
 class PrivacyPolicyModalImpl extends React.Component<IPrivacyPolicyModalProps> {
   public render(): JSX.Element {
-    const { productName, hostname } = this.props;
+    const { productName } = this.props;
+    const hostname = window.location.hostname;
 
     return (
       <div
@@ -145,10 +145,9 @@ class PrivacyPolicyModalImpl extends React.Component<IPrivacyPolicyModalProps> {
   }
 }
 
-function mapStateToProps(state: IProductState & IServiceState) {
+function mapStateToProps(state: IProductState) {
   return {
     productName: state.product.productName,
-    hostname: state.service.hostname,
   };
 }
 

@@ -8,7 +8,7 @@ import { AuthDispatch as Dispatch } from "./types";
 // NOTE: In almost all cases you want AuthApi.getInstance().logout() instead. That method also
 // handles hitting the API backend to revoke the JWT token as an extra precaution.
 export function completeLogoutAndRedirect() {
-  return (dispatch: Dispatch, getState: () => IAuthState) => {
+  return (dispatch: Dispatch, _getState: () => IAuthState) => {
     dispatch(completeLogout());
     dispatch(push("/auth/login", {
       // TODO: This path should be configurable.

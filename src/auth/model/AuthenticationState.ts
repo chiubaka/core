@@ -1,6 +1,6 @@
 import { isNullOrUndefined } from "util";
 
-import { ISocialLoginProvider, IUser } from "../../app/types/index";
+import { IUser } from "../../app/types/index";
 import * as Cookies from "../utils/storage";
 
 export enum LoginState {
@@ -8,6 +8,18 @@ export enum LoginState {
   LoggingIn,
   LoggedIn,
   LoggingOut,
+}
+
+export enum OAuth2ResponseType {
+  Code = "code",
+  Token = "token",
+}
+
+export interface ISocialLoginProvider {
+  providerName: string;
+  clientId: string;
+  responseType: OAuth2ResponseType;
+  scope?: string[];
 }
 
 export interface IAuthState {
