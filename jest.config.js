@@ -1,4 +1,10 @@
 module.exports = {
   preset: "ts-jest",
-  testEnvironment: "node",
+  setupFiles: [
+    "<rootDir>/test/setup/setupFetchMock.ts",
+  ],
+  testPathIgnorePatterns: [
+    "/node_modules/",
+    "/dist/",
+  ],
 };
