@@ -1,4 +1,4 @@
-import * as moment from "moment";
+import moment from "moment";
 import { isNullOrUndefined } from "util";
 import { IUser } from "../../app/types/index";
 

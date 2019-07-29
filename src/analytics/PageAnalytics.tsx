@@ -22,7 +22,7 @@ export function withPageAnalytics<TOriginalProps extends RouteComponentProps<any
         window.fbq("track", "ViewContent", {content_name: `${path}${params}`});
       }
       if (this.props.googleAnalyticsId) {
-        window.gtag("config", this.props.googleAnalyticsId, {page_path: `${path}${params}`});
+        window.gtag("config", this.props.googleAnalyticsId as string, {page_path: `${path}${params}`});
       }
     }
 
@@ -37,5 +37,5 @@ export function withPageAnalytics<TOriginalProps extends RouteComponentProps<any
     return state.analytics;
   }
 
-  return connect<IAnalyticsInnerState, null, TOriginalProps>(mapStateToProps)(Page as any);
+  return connect(mapStateToProps)(Page as any);
 }

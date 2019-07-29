@@ -47,7 +47,7 @@ export class AuthApi extends Api<IAuthApiAdapter> {
 
       dispatch(startLogin());
       return adapter.socialLoginAccessToken(provider, token, dispatch, getState().auth);
-    }
+    };
   }
 
   public logout() {
@@ -59,6 +59,8 @@ export class AuthApi extends Api<IAuthApiAdapter> {
   }
 
   private unimplementedError(methodName: string) {
-    console.error(`AuthApi adapter does not implement ${methodName}! Implement this method or use a different adapter.`);
+    console.error(
+      `AuthApi adapter does not implement ${methodName}! Implement this method or use a different adapter.`,
+    );
   }
 }
