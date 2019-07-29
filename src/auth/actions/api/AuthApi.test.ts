@@ -1,12 +1,20 @@
 import fetchMock from "fetch-mock";
+import _ from "lodash";
 
 import { assertLastCallPath, assertLogoutAndRedirect, store } from "../../../../test";
 
+import { IJwtUserResponse, IUser } from "../../../app";
 import { ActionTypes } from "../types";
+import { RestApiAdapter } from "./adapters";
 import { IGraphQLSocialAuthResponse } from "./adapters/GraphQLApiAdapter";
 import { AuthApi } from "./AuthApi";
 
 const MOCK_TOKEN = "faketoken";
+const USER_DETAILS: IUser = {
+  firstName: "Daniel",
+  lastName: "Chiu",
+  email: "daniel@chiubaka.com",
+};
 
 // For some reason without this line, mocking calls to /graphql/ fails. It's not totally
 // clear why, since the postOnce mock is getting properly triggered, but only when this
@@ -19,81 +27,146 @@ describe("AuthApi", () => {
     fetchMock.reset();
   });
 
+  const testLogin = (api: AuthApi) => {
+    return store.dispatch(api.login("test", "test"));
+  };
+
+  const testSocialLogin = (api: AuthApi) => {
+    return store.dispatch(api.socialLogin("facebook", "foobar", "https://foo.bar"));
+  };
+
+  const testSocialLoginAccessToken = (api: AuthApi) => {
+    return store.dispatch(api.socialLoginAccessToken("facebook", "foobar"));
+  };
+
+  const testLogout = (api: AuthApi) => {
+    return store.dispatch(api.logout());
+  };
+
   describe("with GraphQLApiAdapter", () => {
     const api = new AuthApi();
 
-    const testLogin = () => {
-      return store.dispatch(api.login("test", "test"));
-    };
-
-    const testSocialLogin = () => {
-      return store.dispatch(api.socialLogin("facebook", "foobar", "https://foo.bar"));
-    };
-
-    const testSocialLoginAccessToken = () => {
-      const payload: IGraphQLSocialAuthResponse = {
-        data: {
-          socialAuth: {
-            __typename: "SocialAuth",
-            social: {
-              __typename: "Social",
-              uid: "1",
-              extraData: {},
-              user: {
-                __typename: "User",
-                id: "1",
-              },
-            },
-            token: MOCK_TOKEN,
-          },
-        },
-      };
-
-      fetchMock.postOnce("path:/graphql/", payload);
-      return store.dispatch(api.socialLoginAccessToken("facebook", "foobar"));
-    };
-
-    const testLogout = () => {
-      return store.dispatch(api.logout());
-    };
-
     describe("#login", () => {
       it("throws an unimplemented error", async () => {
-        expect(testLogin).toThrow();
+        expect(() => testLogin(api)).toThrow();
       });
 
-      xit("dispatches a START_LOGIN action", async () => {
-        await testLogin();
+      xit("logs the user in", async () => {
+        await testLogin(api);
         assertSuccessfulLoginActions();
       });
     });
 
     describe("#socialLogin", () => {
       it("throws an unimplemented error", async () => {
-        expect(testSocialLogin).toThrow();
+        expect(() => testSocialLogin(api)).toThrow();
       });
 
-      xit("dispatches a START_LOGIN action", async () => {
-        await testSocialLogin();
+      xit("logs the user in", async () => {
+        await testSocialLogin(api);
         assertSuccessfulLoginActions();
       });
     });
 
     describe("#socialLoginAccessToken", () => {
-      it("dispatches a START_LOGIN action", async () => {
-        await testSocialLoginAccessToken();
+      const testSocialLoginAccessTokenGraphQL = () => {
+        const payload: IGraphQLSocialAuthResponse = {
+          data: {
+            socialAuth: {
+              __typename: "SocialAuth",
+              social: {
+                __typename: "Social",
+                uid: "1",
+                extraData: {},
+                user: {
+                  __typename: "User",
+                  id: "1",
+                },
+              },
+              token: MOCK_TOKEN,
+            },
+          },
+        };
+
+        fetchMock.postOnce("path:/graphql/", payload);
+        return testSocialLoginAccessToken(api);
+      };
+
+      it("logs the user in", async () => {
+        await testSocialLoginAccessTokenGraphQL();
         assertSuccessfulLoginActions();
       });
 
       it("fires a POST call to the GraphQL endpoint", async () => {
-        await testSocialLoginAccessToken();
+        await testSocialLoginAccessTokenGraphQL();
         assertLastCallPath("/graphql/");
       });
     });
 
     describe("#logout", () => {
-      it("dispatches a logout and redirect", async () => {
-        await testLogout();
+      it("logs the user out and redirects", async () => {
+        await testLogout(api);
+        assertLogoutAndRedirect(store.getActions());
+      });
+    });
+  });
+
+  describe("with RestApiAdapter", () => {
+    const api = new AuthApi(RestApiAdapter.getInstance());
+
+    describe("#login", () => {
+      describe("when response includes user details", () => {
+        it("logs the user in", async () => {
+          fetchMock.postOnce("path:/api/login/username/jwt/", {
+            ...USER_DETAILS,
+            token: MOCK_TOKEN,
+          });
+
+          await testLogin(api);
+          assertSuccessfulLoginActions();
+        });
+      });
+
+      describe("when response does not include user details", () => {
+        it("logs the user in and retrieves the details", async () => {
+          fetchMock.postOnce("path:/api/login/username/jwt/", {
+            token: MOCK_TOKEN,
+          });
+          fetchMock.getOnce("path:/api/users/me/", USER_DETAILS);
+
+          await testLogin(api);
+          assertSuccessfulLoginActions();
+        });
+      });
+    });
+
+    describe("#socialLogin", () => {
+      it("logs the user in", async () => {
+        const payload: IJwtUserResponse = {
+          ...USER_DETAILS,
+          token: MOCK_TOKEN,
+        };
+        fetchMock.postOnce("path:/api/login/social/jwt_user/", payload);
+        await testSocialLogin(api);
+        assertSuccessfulLoginActions();
+      });
+    });
+
+    describe("#socialLoginAccessToken", () => {
+      it("throws an unimplemented error", async () => {
+        expect(() => testSocialLoginAccessToken(api)).toThrow();
+      });
+
+      xit("logs the user in", async () => {
+        await testSocialLoginAccessToken(api);
+        assertSuccessfulLoginActions();
+      });
+    });
+
+    describe("#logout", () => {
+      it("logs the user out and redirects", async () => {
+        fetchMock.deleteOnce("path:/api/logout/jwt/", {});
+        await testLogout(api);
         assertLogoutAndRedirect(store.getActions());
       });
     });
@@ -103,14 +176,15 @@ describe("AuthApi", () => {
 function assertSuccessfulLoginActions() {
   const actions = store.getActions();
   expect(actions.length).toEqual(3);
+  const actionTypes = new Set(actions.map((action) => action.type));
+  const expectedTypes = new Set([
+    ActionTypes.START_LOGIN,
+    ActionTypes.SUCCESSFUL_GET_USER_DETAILS,
+    ActionTypes.COMPLETE_LOGIN,
+  ]);
 
-  const startLogin = actions[0];
-  expect(startLogin.type).toEqual(ActionTypes.START_LOGIN);
+  expect(_.isEqual(actionTypes, expectedTypes)).toBe(true);
 
-  const successfulGetUserDetails = actions[1];
-  expect(successfulGetUserDetails.type).toEqual(ActionTypes.SUCCESSFUL_GET_USER_DETAILS);
-
-  const completeLogin = actions[2];
-  expect(completeLogin.type).toEqual(ActionTypes.COMPLETE_LOGIN);
+  const completeLogin = actions.find((action) => action.type === ActionTypes.COMPLETE_LOGIN);
   expect(completeLogin.token).toEqual(MOCK_TOKEN);
 }
