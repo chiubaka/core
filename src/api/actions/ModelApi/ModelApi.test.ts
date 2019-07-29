@@ -1,7 +1,6 @@
-/* tslint:disable:no-implicit-any */
-import fetchMock, { MockCall } from "fetch-mock";
+import fetchMock from "fetch-mock";
 
-import { store } from "../../../../test";
+import { assertCallPath, assertLastCallPath, store } from "../../../../test";
 
 import { RestApiAdapter } from "./adapters";
 import { ModelApi } from "./ModelApi";
@@ -166,14 +165,6 @@ describe("ModelApi", () => {
     });
   });
 });
-
-function assertLastCallPath(expected: string) {
-  assertCallPath(fetchMock.lastCall(), expected);
-}
-
-function assertCallPath(call: MockCall, expected: string) {
-  expect(call[0]).toEqual(expected);
-}
 
 function assertSingleAction(type: string, payload?: any) {
   const actions = store.getActions();

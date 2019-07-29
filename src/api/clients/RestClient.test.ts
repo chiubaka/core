@@ -1,9 +1,8 @@
 import fetchMock, { MockResponse } from "fetch-mock";
 import * as HttpStatus from "http-status-codes";
 
-import { store } from "../../../test";
+import { assertLogoutAndRedirect, store } from "../../../test";
 
-import { ActionTypes } from "../../auth";
 import { Api } from "../actions/Api";
 import { RestClient } from "./RestClient";
 
@@ -54,12 +53,7 @@ describe("RestClient", () => {
       await testPromiseRejection(HttpStatus.UNAUTHORIZED, "You are not logged in.");
       const actions = store.getActions();
 
-      const completeLogout = actions[0];
-      expect(completeLogout.type).toEqual(ActionTypes.COMPLETE_LOGOUT);
-
-      const redirect = actions[1];
-      expect(redirect.type).toEqual("@@router/CALL_HISTORY_METHOD");
-      expect(redirect.payload.args[0]).toEqual("/auth/login");
+      assertLogoutAndRedirect(actions);
 
       const unsuccessfulApiRequest = actions[2];
       expect(unsuccessfulApiRequest.type).toEqual(Api.UNSUCCESSFUL_API_REQUEST_TYPE);

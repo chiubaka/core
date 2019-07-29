@@ -15,8 +15,7 @@ export class AuthApi extends Api<IAuthApiAdapter> {
     return (dispatch: Dispatch, getState: () => IAuthState) => {
       const adapter = this.getAdapter();
       if (adapter.login == null) {
-        this.unimplementedError("login");
-        return;
+        return this.unimplementedError("login");
       }
 
       dispatch(startLogin());
@@ -28,8 +27,7 @@ export class AuthApi extends Api<IAuthApiAdapter> {
     return (dispatch: Dispatch, getState: () => IAuthState) => {
       const adapter = this.getAdapter();
       if (adapter.socialLogin == null) {
-        this.unimplementedError("socialLogin");
-        return;
+        return this.unimplementedError("socialLogin");
       }
 
       dispatch(startLogin());
@@ -41,8 +39,7 @@ export class AuthApi extends Api<IAuthApiAdapter> {
     return (dispatch: Dispatch, getState: () => IAuthState) => {
       const adapter = this.getAdapter();
       if (adapter.socialLoginAccessToken == null) {
-        this.unimplementedError("socialLoginAccessToken");
-        return;
+        return this.unimplementedError("socialLoginAccessToken");
       }
 
       dispatch(startLogin());
@@ -59,7 +56,7 @@ export class AuthApi extends Api<IAuthApiAdapter> {
   }
 
   private unimplementedError(methodName: string) {
-    console.error(
+    throw new Error(
       `AuthApi adapter does not implement ${methodName}! Implement this method or use a different adapter.`,
     );
   }

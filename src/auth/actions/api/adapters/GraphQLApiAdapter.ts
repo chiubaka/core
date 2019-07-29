@@ -7,13 +7,16 @@ import { AuthDispatch, IAuthApiAdapter } from "../../types";
 
 // TODO: The shape of this interface may need to change to support varying
 // scopes and multiple providers
-interface IGraphQLSocialAuthResponse {
+export interface IGraphQLSocialAuthResponse {
   data: {
     socialAuth: {
+      __typename?: string;
       social: {
+        __typename?: string;
         uid: string;
         extraData: {[key: string]: any}
         user: {
+          __typename?: string;
           id: string;
         }
       };
