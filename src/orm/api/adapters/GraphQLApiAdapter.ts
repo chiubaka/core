@@ -79,7 +79,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
     }, "");
 
     return gql`
-      fragment ${this.capitalizedModelName}Fragment on ${this.modelName} {
+      fragment ${this.capitalizedModelName}Fragment on ${this.capitalizedModelName} {
         ${fields}
       }
     `;
