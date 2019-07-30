@@ -253,13 +253,15 @@ function mapDispatchToProps(dispatch: Dispatch): ILoginPageDispatchProps {
 }
 
 function mergeProps(
-  _stateProps: ILoginPageStateProps,
+  stateProps: ILoginPageStateProps,
   dispatchProps: ILoginPageDispatchProps,
   ownProps: ILoginPageOwnProps,
 ) {
   const api = ownProps.api;
 
   return {
+    ...stateProps,
+    ...dispatchProps,
     onSubmitLogin: (username: string, password: string) => {
       dispatchProps.dispatchLogin(api, username, password);
     },
