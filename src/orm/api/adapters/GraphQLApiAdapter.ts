@@ -1,7 +1,11 @@
-import ApolloClient, { gql } from "apollo-boost";
+import { gql, InMemoryCache } from "apollo-boost";
+import { ApolloClient } from "apollo-client";
+import { setContext } from "apollo-link-context";
+import { createHttpLink } from "apollo-link-http";
 import _ from "lodash";
 import pluralize from "pluralize";
 
+import { getToken } from "../../../auth/utils/storage";
 import { IBackendModel, Model, NewModel, PartialModel } from "../../model";
 import { IModelApiAdapter } from "./types";
 
@@ -15,11 +19,8 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   private modelName: string;
   private modelNamePlural: string;
 
-  constructor(
-    model: typeof Model,
-    client: ApolloClient<any> = new ApolloClient({ uri: GraphQLApiAdapter.GRAPHQL_PATH }),
-  ) {
-    this.client = client;
+  constructor(model: typeof Model, client: ApolloClient<any>) {
+    this.client = client || this.buildDefaultClient();
     this.capitalizedModelName = _.upperFirst(model.modelName);
     this.capitalizedModelNamePlural = pluralize(this.capitalizedModelName);
     this.modelName = _.lowerFirst(this.capitalizedModelName);
@@ -66,6 +67,27 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
       },
     }).then((response: any) => {
       return response.data[`delete${this.capitalizedModelName}`][this.modelName];
+    });
+  }
+
+  private buildDefaultClient = () => {
+    const httpLink = createHttpLink({
+      uri: GraphQLApiAdapter.GRAPHQL_PATH,
+    });
+
+    const authLink = setContext((_unused, { headers }) => {
+      const token = getToken();
+      return {
+        headers: {
+          ...headers,
+          authorization: token != null ? `Bearer ${token}` : "",
+        },
+      };
+    });
+
+    return new ApolloClient({
+      link: authLink.concat(httpLink),
+      cache: new InMemoryCache(),
     });
   }
 
