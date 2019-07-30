@@ -1,8 +1,14 @@
 import { ORM } from "redux-orm";
 
 import { Dispatch } from "../../api";
-import { startListingModel, startSyncingModel, successfulListModel, successfulSyncModel } from "../actions";
-import { IBackendModel, IModel, IOrmState, Model } from "../model";
+import {
+  createModel,
+  startListingModel,
+  startSyncingModel,
+  successfulListModel,
+  successfulSyncModel,
+} from "../actions";
+import { generateId, IBackendModel, IModel, IOrmState, Model, NewModel } from "../model";
 import { modelSelector } from "../selectors";
 import { GraphQLApiAdapter } from "./adapters/GraphQLApiAdapter";
 import { IModelApiAdapter } from "./adapters/types";
@@ -25,6 +31,17 @@ export class OrmModelApi<T extends IModel> {
       return this.adapter.list().then((instances: IBackendModel[]) => {
         dispatch(successfulListModel(this.model, instances));
       });
+    };
+  }
+
+  public create = (payload: NewModel) => {
+    return (dispatch: Dispatch) => {
+      const id = generateId();
+      dispatch(createModel(this.model, {
+        id,
+        ...payload,
+      }));
+      return dispatch(this.sync(id));
     };
   }
 
