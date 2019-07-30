@@ -77,4 +77,4 @@ function mapStateToProps(state: IAuthGlobalState) {
   };
 }
 
-export const Auth = connect(mapStateToProps)(AuthImpl);
+export const Auth = connect(mapStateToProps)(AuthImpl as any);
