@@ -1,6 +1,11 @@
+import { applyMiddleware, combineReducers, createStore } from "redux";
 import configureStore from "redux-mock-store";
 import { FlushThunks } from "redux-testkit";
 import thunk, { ThunkDispatch } from "redux-thunk";
+
+import { ormReducer } from "../../src";
+
+import { orm } from "../models";
 
 export const flushThunks = FlushThunks.createMiddleware();
 
@@ -13,3 +18,10 @@ export const store = mockStore({
     token: "foobar",
   },
 });
+
+export const fullStore = createStore<any, any, DispatchExts, any>(
+  combineReducers({
+    orm: ormReducer(orm),
+  }),
+  applyMiddleware(...middlewares),
+);

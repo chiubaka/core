@@ -1,4 +1,6 @@
-import { attr, Model as OrmModel, ORM, ORMCommonState, SessionWithModels } from "redux-orm";
+import { ORMCommonState, SessionWithModels } from "redux-orm";
+
+import { IPlan, orm, Plan } from "../../../test";
 
 import {
   createModel,
@@ -8,25 +10,8 @@ import {
   successfulSyncModel,
   updateModel,
 } from "../actions";
-import { IModel, Model, NewModel } from "../model";
+import { Model, NewModel } from "../model";
 import { ormReducer } from "./ormReducer";
-
-interface IPlan extends IModel {
-  startDate: string;
-  endDate: string;
-  locations: string[];
-}
-
-class Plan extends Model<IPlan> {
-  public static fields = {
-    ...Model.fields,
-    startDate: attr(),
-    endDate: attr(),
-    locations: attr(),
-  };
-
-  public static modelName = "Plan";
-}
 
 const NEW_PLAN = {
   startDate: "2019-10-03",
@@ -35,11 +20,6 @@ const NEW_PLAN = {
 };
 
 describe("ormReducer", () => {
-  const orm = new ORM();
-  orm.register(
-    Plan as typeof OrmModel,
-  );
-
   const reducer = ormReducer(orm);
   const emptySession = orm.session(orm.getEmptyState());
 
