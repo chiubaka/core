@@ -19,7 +19,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   private modelName: string;
   private modelNamePlural: string;
 
-  constructor(model: typeof Model, client: ApolloClient<any>) {
+  constructor(model: typeof Model, client?: ApolloClient<any>) {
     this.client = client || this.buildDefaultClient();
     this.capitalizedModelName = _.upperFirst(model.modelName);
     this.capitalizedModelNamePlural = pluralize(this.capitalizedModelName);
