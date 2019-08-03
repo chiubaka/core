@@ -80,7 +80,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
       return {
         headers: {
           ...headers,
-          authorization: token != null ? `Bearer ${token}` : "",
+          Authorization: token != null ? `Bearer ${token}` : "",
         },
       };
     });
@@ -120,7 +120,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
 
   private getQuery = () => {
     return gql`
-      query Get${this.capitalizedModelName}($id: String!) {
+      query Get${this.capitalizedModelName}($id: ID!) {
         get${this.capitalizedModelName}(id: $id) {
           ...${this.capitalizedModelName}Fragment
         }
@@ -158,7 +158,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
 
   private deleteMutation = () => {
     return gql`
-      mutation Delete${this.capitalizedModelName}(id: String!) {
+      mutation Delete${this.capitalizedModelName}(id: ID!) {
         delete${this.capitalizedModelName}(id: $id) {
           ${this.modelName} {
             ...${this.capitalizedModelName}Fragment
