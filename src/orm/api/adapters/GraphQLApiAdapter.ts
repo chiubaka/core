@@ -9,6 +9,14 @@ import { getToken } from "../../../auth/utils/storage";
 import { IBackendModel, Model, NewModel, PartialModel } from "../../model";
 import { IModelApiAdapter } from "./types";
 
+interface IGraphQLApiAdapterOptions {
+  client?: ApolloClient<any>;
+  // In simple cases, the adapter can build a Fragment for the model automatically.
+  // However, if any kind of nesting is involved, a fragment must be provided by
+  // the user.
+  modelFragment?: any;
+}
+
 export class GraphQLApiAdapter implements IModelApiAdapter {
   public static GRAPHQL_PATH = "/graphql/";
 
@@ -19,13 +27,13 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   private modelName: string;
   private modelNamePlural: string;
 
-  constructor(model: typeof Model, client?: ApolloClient<any>) {
-    this.client = client || this.buildDefaultClient();
+  constructor(model: typeof Model, options?: IGraphQLApiAdapterOptions) {
+    this.client = (options != null && options.client) || this.buildDefaultClient();
     this.capitalizedModelName = _.upperFirst(model.modelName);
     this.capitalizedModelNamePlural = pluralize(this.capitalizedModelName);
     this.modelName = _.lowerFirst(this.capitalizedModelName);
     this.modelNamePlural = _.lowerFirst(this.capitalizedModelNamePlural);
-    this.modelFragment = this.buildGraphQLFragment(model);
+    this.modelFragment = (options != null && options.modelFragment) || this.buildGraphQLFragment(model);
   }
 
   public list = (): Promise<IBackendModel[]> => {
