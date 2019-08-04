@@ -13,14 +13,20 @@ import { modelSelector } from "../selectors";
 import { GraphQLApiAdapter } from "./adapters/GraphQLApiAdapter";
 import { IModelApiAdapter } from "./adapters/types";
 
+interface IOrmModelApiOptions {
+  adapter?: IModelApiAdapter;
+  adapterOptions?: any;
+}
+
 export class OrmModelApi<T extends IModel> {
   public model: typeof Model;
   public orm: ORM;
 
   private adapter: IModelApiAdapter;
 
-  constructor(model: typeof Model, orm: ORM, adapter?: IModelApiAdapter) {
-    this.adapter = adapter || new GraphQLApiAdapter(model);
+  constructor(model: typeof Model, orm: ORM, options?: IOrmModelApiOptions) {
+    this.adapter = (options != null && options.adapter)
+      || new GraphQLApiAdapter(model, options != null && options.adapterOptions);
     this.model = model;
     this.orm = orm;
   }
