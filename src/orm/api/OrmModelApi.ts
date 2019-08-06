@@ -28,6 +28,7 @@ export class OrmModelApi<T extends IModel> {
     this.adapter = (options != null && options.adapter)
       || new GraphQLApiAdapter(model, options != null && options.adapterOptions);
     this.model = model;
+
     this.orm = orm;
   }
 

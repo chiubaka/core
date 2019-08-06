@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest --coverage",
+    "test:debug": "node --inspect node_modules/.bin/jest --runInBand",
     "build": "tsc",
     "start": "tsc -w",
     "lint": "tslint -p tsconfig.json -c tslint.json 'src/**/*.{ts,tsx}'",
