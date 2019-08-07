@@ -1,4 +1,4 @@
-import { attr, many } from "redux-orm";
+import { attr } from "redux-orm";
 
 import { IModel, Model } from "../../src";
 
@@ -12,9 +12,6 @@ export class User extends Model<IPublicUser> {
     ...Model.fields,
     name: attr(),
     profilePhoto: attr(),
-    comments: many("Comment"),
-    reviews: many("Review"),
-    tasks: many("Task"),
   };
 
   public static modelName = "User";

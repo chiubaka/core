@@ -83,9 +83,9 @@ describe("Model", () => {
     // Verify relationships
     // Verify that task got assignee and vice-versa
     expect(task.assignee.equals(assignee)).toBe(true);
-    expect(assignee.tasks.count()).toEqual(1);
+    expect(assignee.taskSet.count()).toEqual(1);
     expect(
-      assignee.tasks
+      assignee.taskSet
         .filter((assigneeTask: ITask) => assigneeTask.id === task.ref.id)
         .first()
         .equals(task),
@@ -107,9 +107,9 @@ describe("Model", () => {
 
     // Verify that comment got author and vice-versa
     expect(comment.author.equals(assignee)).toBe(true);
-    expect(assignee.comments.count()).toEqual(1);
+    expect(assignee.commentSet.count()).toEqual(1);
     expect(
-      assignee.comments
+      assignee.commentSet
         .filter((assigneeComment: IComment) => assigneeComment.id === comment.ref.id)
         .first()
         .equals(comment),
@@ -117,9 +117,9 @@ describe("Model", () => {
 
     // Verify that review got reviewer and vice-versa
     expect(review.reviewer.equals(reviewer)).toBe(true);
-    expect(reviewer.reviews.count()).toEqual(1);
+    expect(reviewer.reviewSet.count()).toEqual(1);
     expect(
-      reviewer.reviews
+      reviewer.reviewSet
         .filter((reviewerReview: IReview) => reviewerReview.id === review.ref.id)
         .first()
         .equals(review),
@@ -132,8 +132,59 @@ describe("Model", () => {
       expectCorrectOrmState(session);
     });
 
-    it("handles updating of related instances", () => {
-      fail();
+    it("handles updating related instances", () => {
+      let session = orm.session(orm.getEmptyState());
+      session.User.create({
+        ...TEST_ASSIGNEE,
+        profilePhoto: "https://bogus.com/daniel.jpg",
+      });
+
+      session = createTask(session);
+      expectCorrectOrmState(session);
+    });
+  });
+
+  describe("#update", () => {
+    it("handles creation of related instances", () => {
+      const session = orm.session(orm.getEmptyState());
+      const task = session.Task.create({
+        description: "Test",
+      });
+      task.update(NEW_TASK);
+      expectCorrectOrmState(session);
+    });
+
+    it("handles updating related instances", () => {
+      const session = orm.session(orm.getEmptyState());
+      session.User.create({
+        ...TEST_ASSIGNEE,
+        profilePhoto: "https://bogus.com/daniel.jpg",
+      });
+      const task = session.Task.create({
+        description: "Test",
+      });
+      task.update(NEW_TASK);
+      expectCorrectOrmState(session);
+    });
+  });
+
+  describe("#upsert", () => {
+    it("handles creating related instances when instances doesn't exist", () => {
+      const session = orm.session(orm.getEmptyState());
+      session.Task.upsert(NEW_TASK);
+      expectCorrectOrmState(session);
+    });
+
+    it("handles updating related instances when instance already exists", () => {
+      const session = orm.session(orm.getEmptyState());
+      const task = session.Task.create({
+        description: "Test",
+      });
+      session.Task.upsert({
+        id: task.ref.id,
+        ...NEW_TASK,
+      });
+      expectCorrectOrmState(session);
     });
   });
 

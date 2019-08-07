@@ -1,4 +1,4 @@
-import { attr, fk, many, oneToOne } from "redux-orm";
+import { attr, fk, oneToOne } from "redux-orm";
 
 import { IModel, Model } from "../../src";
 
@@ -18,7 +18,6 @@ export class Task extends Model<ITask> {
     ...Model.fields,
     description: attr(),
     assignee: fk("User"),
-    comments: many("Comment"),
     review: oneToOne("Review"),
   };
 

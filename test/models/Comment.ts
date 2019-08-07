@@ -14,8 +14,8 @@ export interface IComment extends IModel {
 export class Comment extends Model<IComment> {
   public static fields = {
     ...Model.fields,
-    task: fk("Task"),
     text: attr(),
+    task: fk("Task", "comments"),
     author: fk("User"),
   };
 
