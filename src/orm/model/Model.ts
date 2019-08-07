@@ -36,6 +36,20 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     return Model.LOCAL_FIELD_KEYS.has(fieldName);
   }
 
+  public static get relationalFields() {
+    if (this._relationalFields == null) {
+      this._relationalFields = {};
+
+      Object.entries(this.fields).forEach(([fieldName, fieldDefinition]) => {
+        if (this.isRelationalField(fieldDefinition)) {
+          this._relationalFields[fieldName] = fieldDefinition;
+        }
+      });
+    }
+
+    return this._relationalFields;
+  }
+
   public static get allFields() {
     return {
       ...this.fields,
@@ -87,6 +101,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     return backRelationFieldName;
   }
 
+  private static _relationalFields: {[fieldName: string]: ForeignKey | OneToOne | ManyToMany};
   private static _relationshipMap: {[fieldName: string]: string};
 
   private static isManyRelationship(fieldName: string) {
@@ -200,7 +215,8 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     }
   }
 
-  private static isRelationalField = (fieldDefinition: any) => {
+  private static isRelationalField =
+    (fieldDefinition: any): fieldDefinition is (ForeignKey | ManyToMany | OneToOne) => {
     return fieldDefinition instanceof ForeignKey
       || fieldDefinition instanceof ManyToMany
       || fieldDefinition instanceof OneToOne;
@@ -229,7 +245,6 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
   public update(props: any) {
     const model = this.constructor as typeof Model;
     const relatedInstanceMap = model.upsertRelatedInstances(props, this);
-    model.linkRelatedInstances(relatedInstanceMap, this);
     super.update({
       ...props,
       ...relatedInstanceMap,
@@ -238,9 +253,34 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
 
   public forBackend = (): IBackendModel => {
     const ref = {...this.ref};
+    this.scrubLocalFields(ref);
+    return this.normalizeRelationships(ref);
+  }
+
+  private scrubLocalFields = (ref: TFields) => {
     Model.LOCAL_FIELD_KEYS.forEach((fieldName) => {
       delete ref[fieldName];
     });
+  }
+
+  private normalizeRelationships = (ref: TFields) => {
+    // Get each non-virtual relationship. Delete any key in the ref
+    // corresponding to the relationship. Replace it with a key
+
+    const model = this.constructor as typeof Model;
+    Object.entries(model.relationalFields).forEach(([fieldName, fieldDefinition]) => {
+      if (fieldDefinition instanceof ManyToMany) {
+        const relatedRefs = (this as any)[fieldName].all().toRefArray();
+        (ref as any)[fieldName] = relatedRefs.map((relatedRef: IModel) => relatedRef.id);
+      } else {
+        const relatedInstance = (this as any)[fieldName];
+        if (relatedInstance != null) {
+          (ref as any)[`${fieldName}Id`] = relatedInstance.ref.id;
+        }
+        delete ref[fieldName];
+      }
+    });
+
     return ref;
   }
 }

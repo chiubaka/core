@@ -235,5 +235,20 @@ describe("Model", () => {
       expect(planForBackend.lastSynced).toBeUndefined();
       expect(planForBackend.syncing).toBeUndefined();
     });
+
+    it("normalizes relationships to ids", () => {
+      const session = orm.session(orm.getEmptyState());
+
+      const task = session.Task.create(NEW_TASK);
+      const taskForBackend = task.forBackend();
+
+      expect(taskForBackend.assignee).toBeUndefined();
+      expect(taskForBackend.review).toBeUndefined();
+      expect(taskForBackend).toMatchObject({
+        description: NEW_TASK.description,
+        assigneeId: NEW_TASK.assignee.id,
+        reviewId: NEW_TASK.review.id,
+      });
+    });
   });
 });
