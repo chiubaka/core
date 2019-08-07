@@ -1,6 +1,8 @@
 import { ORMCommonState, SessionWithModels } from "redux-orm";
 
-import { IComment, IReview, ITask, orm, Task } from "../../../test";
+import { IComment, IReview, ITask, orm, Review, Task, User } from "../../../test";
+
+import { Model } from "./Model";
 
 const TEST_ASSIGNEE = {
   id: "1",
@@ -83,9 +85,9 @@ describe("Model", () => {
     // Verify relationships
     // Verify that task got assignee and vice-versa
     expect(task.assignee.equals(assignee)).toBe(true);
-    expect(assignee.taskSet.count()).toEqual(1);
+    expect(assignee.assignedTasks.count()).toEqual(1);
     expect(
-      assignee.taskSet
+      assignee.assignedTasks
         .filter((assigneeTask: ITask) => assigneeTask.id === task.ref.id)
         .first()
         .equals(task),
@@ -193,8 +195,24 @@ describe("Model", () => {
       expect(Task.getRelationshipMap()).toEqual({
         assignee: "User",
         comments: "Comment",
+        creator: "User",
         review: "Review",
       });
+    });
+  });
+
+  describe(".getBackRelationFieldName", () => {
+    it("handles oneToOne relationships properly", () => {
+      expect(Task.getBackRelationFieldName("review", Review as typeof Model)).toEqual("task");
+      expect(Review.getBackRelationFieldName("task", Task as typeof Model)).toEqual("review");
+    });
+
+    it("handles relations defined with the `relatedName` option properly", () => {
+      expect(Task.getBackRelationFieldName("assignee", User as typeof Model)).toEqual("assignedTasks");
+      expect(Task.getBackRelationFieldName("creator", User as typeof Model)).toEqual("createdTasks");
+
+      expect(User.getBackRelationFieldName("assignedTasks", Task as typeof Model)).toEqual("assignee");
+      expect(User.getBackRelationFieldName("createdTasks", Task as typeof Model)).toEqual("creator");
     });
   });
 

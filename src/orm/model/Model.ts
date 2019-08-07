@@ -65,25 +65,26 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     return this._relationshipMap;
   }
 
-  public static getBackRelationFieldName(fromModel: typeof Model, toModel: typeof Model) {
-    // TODO: Need to handle the case where there is ambiguity, and user is forced to pass a
-    // "relatedName" with the field definition.
+  public static getBackRelationFieldName(fieldName: string, relatedModel: typeof Model) {
+    const field = this.allFields[fieldName];
+    if (field.relatedName != null) {
+      return field.relatedName;
+    }
 
-    const fromModelName = fromModel.modelName;
-    const entry = Object.entries(toModel.fields).find(([_fieldName, fieldDefinition]) => {
+    const entry = Object.entries(relatedModel.allFields).find(([_fieldName, fieldDefinition]) => {
       if (fieldDefinition instanceof Attribute) {
         return false;
       }
 
-      return (fieldDefinition as any).toModelName === fromModelName;
+      return (fieldDefinition as any).toModelName === this.modelName;
     });
 
     if (entry == null) {
       return null;
     }
 
-    const [fieldName] = entry;
-    return fieldName;
+    const [backRelationFieldName] = entry;
+    return backRelationFieldName;
   }
 
   private static _relationshipMap: {[fieldName: string]: string};
@@ -164,17 +165,18 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
 
     return values.map((value: IModel) => {
       const relatedInstance = RelatedModel.upsert(value);
-      this.addManyBackRelation(instance, relatedInstance, RelatedModel);
+      this.addManyBackRelation(fieldName, instance, relatedInstance, RelatedModel);
       return relatedInstance;
     });
   }
 
   private static addManyBackRelation(
+    fieldName: string,
     instance: ModelWithFields<any>,
     relatedInstance: ModelWithFields<any>,
     RelatedModel: typeof Model,
   ) {
-    const relatedFieldName = this.getBackRelationFieldName(this, RelatedModel);
+    const relatedFieldName = this.getBackRelationFieldName(fieldName, RelatedModel);
 
     if (relatedFieldName == null) {
       return;

@@ -17,7 +17,8 @@ export class Task extends Model<ITask> {
   public static fields = {
     ...Model.fields,
     description: attr(),
-    assignee: fk("User"),
+    assignee: fk("User", "assignedTasks"),
+    creator: fk("User", "createdTasks"),
     review: oneToOne("Review"),
   };
 
