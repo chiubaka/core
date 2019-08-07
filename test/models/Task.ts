@@ -23,4 +23,9 @@ export class Task extends Model<ITask> {
   };
 
   public static modelName = "Task";
+
+  // Proof of concept for trivially overriding super class behavior.
+  public forBackend() {
+    return super.forBackend();
+  }
 }

@@ -251,7 +251,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     });
   }
 
-  public forBackend = (): IBackendModel => {
+  public forBackend(): IBackendModel {
     const ref = {...this.ref};
     this.scrubLocalFields(ref);
     return this.normalizeRelationships(ref);
