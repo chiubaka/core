@@ -2,6 +2,7 @@ import fetchMock from "fetch-mock";
 
 import { assertGraphQLCall, fullStore, orm, Plan, store } from "../../../test";
 
+import { Dispatch } from "../../types";
 import { createModel, ModelActionType } from "../actions";
 import { Model } from "../model";
 import { GraphQLApiAdapter } from "./adapters/GraphQLApiAdapter";
@@ -11,6 +12,9 @@ fetchMock.catch();
 
 describe("OrmModelApi", () => {
   const api = new OrmModelApi(Plan as typeof Model, orm);
+  // We need to typecast to support promise chaining. Clients will do something similar
+  // in mapDispatchToProps by explicitly declaring a type for the dispatch arg.
+  const dispatch: Dispatch = fullStore.dispatch;
 
   afterEach(() => {
     store.clearActions();
@@ -52,10 +56,16 @@ describe("OrmModelApi", () => {
         expect(successfulListModel.modelName).toEqual(Plan.modelName);
         expect(successfulListModel.items).toEqual(plans);
       });
+
+      it("allows promise chaining", async (done) => {
+        dispatch(api.list()).then(() => {
+          done();
+        });
+      });
     });
 
     describe("#sync", () => {
-      it("dispatches the correct actions and fires a call to the GraphQL API", async () => {
+      const prepareSync = () => {
         const plan = {
           __typename: Plan.modelName,
           id: "1",
@@ -64,7 +74,7 @@ describe("OrmModelApi", () => {
           locations: ["Mexico City, Mexico"],
         };
 
-        fullStore.dispatch(createModel(Plan as typeof Model, plan));
+        dispatch(createModel(Plan as typeof Model, plan));
 
         const response = {
           data: {
@@ -76,13 +86,27 @@ describe("OrmModelApi", () => {
         };
 
         fetchMock.postOnce(`path:${GraphQLApiAdapter.GRAPHQL_PATH}`, response);
-        await fullStore.dispatch(api.sync(plan.id));
+
+        return plan;
+      };
+
+      it("dispatches the correct actions and fires a call to the GraphQL API", async () => {
+        const plan = prepareSync();
+        await dispatch(api.sync(plan.id));
         assertGraphQLCall();
 
         const session = orm.session(fullStore.getState().orm);
         const updated = session.Plan.withId(plan.id);
         expect(updated.ref.lastSynced).toBeDefined();
         expect(updated.ref.syncing).toBe(false);
+      });
+
+      it("supports promise chaining", async (done) => {
+        const plan = prepareSync();
+
+        dispatch(api.sync(plan.id)).then(() => {
+          done();
+        });
       });
     });
   });

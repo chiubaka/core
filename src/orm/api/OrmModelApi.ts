@@ -1,6 +1,6 @@
 import { ORM } from "redux-orm";
 
-import { Dispatch } from "../../api";
+import { Dispatch, ThunkResult } from "../../types";
 import {
   createModel,
   startListingModel,
@@ -32,28 +32,31 @@ export class OrmModelApi<T extends IModel> {
     this.orm = orm;
   }
 
-  public list = () => {
+  public list = (): ThunkResult<Promise<IBackendModel[]>> => {
     return (dispatch: Dispatch) => {
       dispatch(startListingModel(this.model));
       return this.adapter.list().then((instances: IBackendModel[]) => {
         dispatch(successfulListModel(this.model, instances));
+        return instances;
       });
     };
   }
 
-  public create = (payload: NewModel) => {
+  public create = (payload: NewModel): ThunkResult<Promise<IBackendModel>> => {
     return (dispatch: Dispatch) => {
       const id = generateId();
       dispatch(createModel(this.model, {
         id,
         ...payload,
       }));
-      return dispatch(this.sync(id));
+      return dispatch(this.sync(id)).then((result) => {
+        return result;
+      });
     };
   }
 
-  public sync = (id: string) => {
-    return (dispatch: Dispatch, getState: () => IOrmState) => {
+  public sync = (id: string): ThunkResult<Promise<IBackendModel>> => {
+    return async (dispatch: Dispatch, getState: () => IOrmState) => {
       dispatch(startSyncingModel(this.model, id));
       const current: Model<T> = modelSelector(this.orm, this.model, id)(getState().orm);
       if (current == null) {
@@ -62,6 +65,7 @@ export class OrmModelApi<T extends IModel> {
 
       return this.adapter.upsert(current.forBackend()).then((updated: IBackendModel) => {
         dispatch(successfulSyncModel(this.model, updated));
+        return updated;
       });
     };
   }

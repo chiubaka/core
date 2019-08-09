@@ -1,14 +1,11 @@
-import { ThunkDispatch } from "redux-thunk";
-
 import pluralize from "pluralize";
 import { isNullOrUndefined } from "util";
 
 import { IModel } from "../../../orm";
+import { Dispatch } from "../../../types";
 import { Api } from "../Api";
 import { ApiAction } from "../types";
 import { IModelApiAdapter, RestApiAdapter } from "./adapters";
-
-export declare type Dispatch = ThunkDispatch<any, void, any>;
 
 interface IModelUpdateDependency<T> {
   idMapper: (modelObject: T) => string[];

@@ -1,25 +1,23 @@
-import { applyMiddleware, combineReducers, createStore } from "redux";
+import { Action, applyMiddleware, combineReducers, createStore } from "redux";
 import configureStore from "redux-mock-store";
 import { FlushThunks } from "redux-testkit";
-import thunk, { ThunkDispatch } from "redux-thunk";
+import thunk, { ThunkMiddleware } from "redux-thunk";
 
-import { ormReducer } from "../../src";
+import { Dispatch, ormReducer } from "../../src";
 
 import { orm } from "../models";
 
 export const flushThunks = FlushThunks.createMiddleware();
 
-type DispatchExts = ThunkDispatch<any, void, any>;
-
-const middlewares = [flushThunks, thunk];
-const mockStore = configureStore<any, DispatchExts>(middlewares);
+const middlewares = [flushThunks, thunk as ThunkMiddleware<any, Action>];
+const mockStore = configureStore<any, Dispatch>(middlewares);
 export const store = mockStore({
   auth: {
     token: "foobar",
   },
 });
 
-export const fullStore = createStore<any, any, DispatchExts, any>(
+export const fullStore = createStore<any, Action, Dispatch, any>(
   combineReducers({
     orm: ormReducer(orm),
   }),
