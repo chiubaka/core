@@ -3,12 +3,16 @@ import { ORM } from "redux-orm";
 import { Dispatch, ThunkResult } from "../../types";
 import {
   createModel,
+  destroyModel,
+  startDestroyingModel,
   startListingModel,
   startSyncingModel,
+  successfulDestroyModel,
   successfulListModel,
   successfulSyncModel,
+  updateModel,
 } from "../actions";
-import { generateId, IBackendModel, IModel, IOrmState, Model, NewModel } from "../model";
+import { generateId, IBackendModel, IModel, IOrmState, Model, NewModel, PartialModel } from "../model";
 import { modelSelector } from "../selectors";
 import { GraphQLApiAdapter } from "./adapters/GraphQLApiAdapter";
 import { IModelApiAdapter } from "./adapters/types";
@@ -33,7 +37,7 @@ export class OrmModelApi<T extends IModel> {
   }
 
   public list = (): ThunkResult<Promise<IBackendModel[]>> => {
-    return (dispatch: Dispatch) => {
+    return async (dispatch: Dispatch) => {
       dispatch(startListingModel(this.model));
       return this.adapter.list().then((instances: IBackendModel[]) => {
         dispatch(successfulListModel(this.model, instances));
@@ -43,12 +47,22 @@ export class OrmModelApi<T extends IModel> {
   }
 
   public create = (payload: NewModel): ThunkResult<Promise<IBackendModel>> => {
-    return (dispatch: Dispatch) => {
+    return async (dispatch: Dispatch) => {
       const id = generateId();
       dispatch(createModel(this.model, {
         id,
         ...payload,
       }));
+      return dispatch(this.sync(id)).then((result) => {
+        return result;
+      });
+    };
+  }
+
+  public update = (payload: PartialModel): ThunkResult<Promise<IBackendModel>> => {
+    return async (dispatch: Dispatch) => {
+      const id = payload.id;
+      dispatch(updateModel(this.model, payload));
       return dispatch(this.sync(id)).then((result) => {
         return result;
       });
@@ -66,6 +80,17 @@ export class OrmModelApi<T extends IModel> {
       return this.adapter.upsert(current.forBackend()).then((updated: IBackendModel) => {
         dispatch(successfulSyncModel(this.model, updated));
         return updated;
+      });
+    };
+  }
+
+  public delete = (id: string): ThunkResult<Promise<IBackendModel>> => {
+    return async (dispatch: Dispatch) => {
+      dispatch(startDestroyingModel(this.model, id));
+      return this.adapter.delete(id).then((_deleted: IBackendModel) => {
+        const promise = dispatch(successfulDestroyModel(this.model, id));
+        dispatch(destroyModel(this.model, id));
+        return promise;
       });
     };
   }

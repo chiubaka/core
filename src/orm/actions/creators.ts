@@ -68,3 +68,19 @@ export function successfulSyncModel<T extends IBackendModel>(model: typeof Model
     payload,
   };
 }
+
+export function startDestroyingModel(model: typeof Model, id: string): IModelIdAction {
+  return {
+    type: ModelActionType.START_DESTROYING_MODEL,
+    modelName: model.modelName,
+    id,
+  };
+}
+
+export function successfulDestroyModel(model: typeof Model, id: string): IModelIdAction {
+  return {
+    type: ModelActionType.SUCCESSFUL_DESTROY_MODEL,
+    modelName: model.modelName,
+    id,
+  };
+}

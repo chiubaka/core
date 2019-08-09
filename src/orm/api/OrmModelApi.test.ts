@@ -16,6 +16,29 @@ describe("OrmModelApi", () => {
   // in mapDispatchToProps by explicitly declaring a type for the dispatch arg.
   const dispatch: Dispatch = fullStore.dispatch;
 
+  const prepare = (action: string) => {
+    const plan = {
+      __typename: Plan.modelName,
+      id: "1",
+      startDate: "2019-09-02",
+      endDate: "2019-10-02",
+      locations: ["Mexico City, Mexico"],
+    };
+
+    const response: { data: {[key: string]: any}} = {
+      data: {},
+    };
+
+    response.data[`${action}Plan`] = {
+      __typename: `${action}Plan`,
+      plan,
+    };
+
+    fetchMock.postOnce(`path:${GraphQLApiAdapter.GRAPHQL_PATH}`, response);
+
+    return plan;
+  };
+
   afterEach(() => {
     store.clearActions();
     fetchMock.reset();
@@ -64,34 +87,24 @@ describe("OrmModelApi", () => {
       });
     });
 
+    describe("#create", () => {
+      xit("dispatches the right actions and fires a call to the GraphQL API", () => { return; });
+
+      xit("supports promise chaining", async (done) => {
+        const plan = prepare("create");
+
+        dispatch(api.create(plan)).then(() => {
+          done();
+        });
+      });
+    });
+
+    xdescribe("#update", () => { return; });
+
     describe("#sync", () => {
-      const prepareSync = () => {
-        const plan = {
-          __typename: Plan.modelName,
-          id: "1",
-          startDate: "2019-09-02",
-          endDate: "2019-10-02",
-          locations: ["Mexico City, Mexico"],
-        };
-
-        dispatch(createModel(Plan as typeof Model, plan));
-
-        const response = {
-          data: {
-            upsertPlan: {
-              __typename: "upsertPlan",
-              plan,
-            },
-          },
-        };
-
-        fetchMock.postOnce(`path:${GraphQLApiAdapter.GRAPHQL_PATH}`, response);
-
-        return plan;
-      };
-
       it("dispatches the correct actions and fires a call to the GraphQL API", async () => {
-        const plan = prepareSync();
+        const plan = prepare("upsert");
+        dispatch(createModel(Plan as typeof Model, plan));
         await dispatch(api.sync(plan.id));
         assertGraphQLCall();
 
@@ -102,12 +115,14 @@ describe("OrmModelApi", () => {
       });
 
       it("supports promise chaining", async (done) => {
-        const plan = prepareSync();
+        const plan = prepare("upsert");
 
         dispatch(api.sync(plan.id)).then(() => {
           done();
         });
       });
     });
+
+    xdescribe("#delete", () => { return; });
   });
 });
