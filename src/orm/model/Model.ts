@@ -6,6 +6,7 @@ import {
   ModelFields,
   ModelWithFields,
   OneToOne,
+  ORMId,
 } from "redux-orm";
 
 export interface IBackendModel {
@@ -20,20 +21,28 @@ export interface IModel extends IBackendModel {
 
 export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFields = {}>
   extends OrmModel<TFields, TAdditional, TVirtualFields> {
-  public static LOCAL_FIELDS = {
+  public static localFields = {
     lastSynced: attr(),
     syncing: attr(),
   };
 
-  public static LOCAL_FIELD_KEYS = new Set(Object.keys(Model.LOCAL_FIELDS));
+  public static get localFieldKeys() {
+    if (this._localFieldKeys == null) {
+      this._localFieldKeys = new Set(Object.keys(this.localFields));
+    }
+    return this._localFieldKeys;
+  }
+
+  public static excludedFieldKeys: string[] = [];
+  public static backendFieldKeys: string[] = ["__typename"];
 
   public static fields: ModelFields = {
     id: attr(),
-    ...Model.LOCAL_FIELDS,
+    ...Model.localFields,
   };
 
   public static isLocalField = (fieldName: string) => {
-    return Model.LOCAL_FIELD_KEYS.has(fieldName);
+    return Model.localFieldKeys.has(fieldName);
   }
 
   public static get relationalFields() {
@@ -57,8 +66,9 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     };
   }
 
-  public static create(props: any) {
-    const instance = super.create(props);
+  public static create<TFields = any>(props: TFields) {
+    const filteredProps = this.scrubProperties(this.backendFieldKeys, props);
+    const instance = super.create(filteredProps);
     const relatedInstanceMap = this.upsertRelatedInstances(props, instance);
     this.linkRelatedInstances(relatedInstanceMap, instance);
 
@@ -101,8 +111,17 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     return backRelationFieldName;
   }
 
+  private static _localFieldKeys: Set<string>;
   private static _relationalFields: {[fieldName: string]: ForeignKey | OneToOne | ManyToMany};
   private static _relationshipMap: {[fieldName: string]: string};
+
+  private static scrubProperties = (keys: Set<string> | string[], obj: any) => {
+    const copy = {...obj};
+    keys.forEach((fieldName: string) => {
+      delete copy[fieldName];
+    });
+    return copy;
+  }
 
   private static isManyRelationship(fieldName: string) {
     const field = this.allFields[fieldName];
@@ -244,23 +263,28 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
   // Update gets called anytime we change a property on a model
   public update(props: any) {
     const model = this.constructor as typeof Model;
-    const relatedInstanceMap = model.upsertRelatedInstances(props, this);
+    const filteredProps = model.scrubProperties(model.backendFieldKeys, props);
+    const relatedInstanceMap = model.upsertRelatedInstances(filteredProps, this);
     super.update({
-      ...props,
+      ...filteredProps,
       ...relatedInstanceMap,
     });
   }
 
   public forBackend(): IBackendModel {
-    const ref = {...this.ref};
-    this.scrubLocalFields(ref);
+    let ref = this.scrubLocalFields(this.ref);
+    ref = this.scrubExcludedFields(ref);
     return this.normalizeRelationships(ref);
   }
 
-  private scrubLocalFields = (ref: TFields) => {
-    Model.LOCAL_FIELD_KEYS.forEach((fieldName) => {
-      delete ref[fieldName];
-    });
+  private scrubLocalFields = (ref: TFields & TAdditional & ORMId) => {
+    const model = this.constructor as typeof Model;
+    return model.scrubProperties(model.localFieldKeys, ref);
+  }
+
+  private scrubExcludedFields = (ref: TFields & TAdditional & ORMId) => {
+    const model = this.constructor as typeof Model;
+    return model.scrubProperties(model.excludedFieldKeys, ref);
   }
 
   private normalizeRelationships = (ref: TFields) => {
