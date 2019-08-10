@@ -23,6 +23,9 @@ export class Task extends Model<ITask> {
   };
 
   public static modelName = "Task";
+  public static get excludedFieldKeys() {
+    return ["description", "review"];
+  }
 
   // Proof of concept for trivially overriding super class behavior.
   public forBackend() {

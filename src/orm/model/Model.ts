@@ -293,6 +293,10 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
 
     const model = this.constructor as typeof Model;
     Object.entries(model.relationalFields).forEach(([fieldName, fieldDefinition]) => {
+      if (!ref.hasOwnProperty(fieldName)) {
+        return;
+      }
+
       if (fieldDefinition instanceof ManyToMany) {
         const relatedRefs = (this as any)[fieldName].all().toRefArray();
         (ref as any)[fieldName] = relatedRefs.map((relatedRef: IModel) => relatedRef.id);

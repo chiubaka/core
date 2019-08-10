@@ -31,6 +31,7 @@ const NEW_TASK = {
     text: "A monkey could have done better",
     reviewer: TEST_REVIEWER,
   },
+  creator: TEST_ASSIGNEE,
 };
 
 describe("Model", () => {
@@ -245,10 +246,21 @@ describe("Model", () => {
       expect(taskForBackend.assignee).toBeUndefined();
       expect(taskForBackend.review).toBeUndefined();
       expect(taskForBackend).toMatchObject({
-        description: NEW_TASK.description,
         assigneeId: NEW_TASK.assignee.id,
-        reviewId: NEW_TASK.review.id,
+        // review is marked for exclusion!!
+        // reviewId: NEW_TASK.review.id,
       });
+    });
+
+    it("excludes any fields marked for exclusion", () => {
+      const session = orm.session(orm.getEmptyState());
+
+      const task = session.Task.create(NEW_TASK);
+      const taskForBackend = task.forBackend();
+
+      expect(taskForBackend.description).toBeUndefined();
+      expect(taskForBackend.review).toBeUndefined();
+      expect(taskForBackend.reviewId).toBeUndefined();
     });
   });
 });
