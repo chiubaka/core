@@ -20,15 +20,43 @@ interface IGraphQLApiAdapterOptions {
 export class GraphQLApiAdapter implements IModelApiAdapter {
   public static GRAPHQL_PATH = "/graphql/";
 
+  public static get defaultClient() {
+    if (this._defaultClient == null) {
+      const httpLink = createHttpLink({
+        uri: GraphQLApiAdapter.GRAPHQL_PATH,
+      });
+
+      const authLink = setContext((_unused, { headers }) => {
+        const token = getToken();
+        return {
+          headers: {
+            ...headers,
+            Authorization: token != null ? `Bearer ${token}` : "",
+          },
+        };
+      });
+
+      this._defaultClient = new ApolloClient({
+        link: authLink.concat(httpLink),
+        cache: new InMemoryCache(),
+      });
+    }
+
+    return this._defaultClient;
+  }
+
+  private static _defaultClient: ApolloClient<any>;
+
+  public readonly modelFragment: string;
+
   private client: ApolloClient<any>;
   private capitalizedModelName: string;
   private capitalizedModelNamePlural: string;
-  private modelFragment: string;
   private modelName: string;
   private modelNamePlural: string;
 
   constructor(model: typeof Model, options?: IGraphQLApiAdapterOptions) {
-    this.client = (options != null && options.client) || this.buildDefaultClient();
+    this.client = (options != null && options.client) || GraphQLApiAdapter.defaultClient;
     this.capitalizedModelName = _.upperFirst(model.modelName);
     this.capitalizedModelNamePlural = pluralize(this.capitalizedModelName);
     this.modelName = _.lowerFirst(this.capitalizedModelName);
@@ -75,27 +103,6 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
       },
     }).then((response: any) => {
       return response.data[`delete${this.capitalizedModelName}`][this.modelName];
-    });
-  }
-
-  private buildDefaultClient = () => {
-    const httpLink = createHttpLink({
-      uri: GraphQLApiAdapter.GRAPHQL_PATH,
-    });
-
-    const authLink = setContext((_unused, { headers }) => {
-      const token = getToken();
-      return {
-        headers: {
-          ...headers,
-          Authorization: token != null ? `Bearer ${token}` : "",
-        },
-      };
-    });
-
-    return new ApolloClient({
-      link: authLink.concat(httpLink),
-      cache: new InMemoryCache(),
     });
   }
 
