@@ -136,7 +136,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   private getQuery = () => {
     return gql`
       query Get${this.capitalizedModelName}($id: ID!) {
-        get${this.capitalizedModelName}(id: $id) {
+        ${this.modelName}(id: $id) {
           ...${this.capitalizedModelName}Fragment
         }
       }
