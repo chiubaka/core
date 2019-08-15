@@ -4,7 +4,7 @@ import { Model, ORM, ORMCommonState, SessionWithModels } from "redux-orm";
 import {
   IModelCreate,
   IModelIdAction,
-  IModelUpdate,
+  IModelPayloadAction,
   isModelAction,
   ISuccessfulListModel,
   ModelAction,
@@ -26,7 +26,7 @@ export function ormReducer(orm: ORM) {
         break;
       }
       case ModelActionType.UPDATE_MODEL: {
-        updateModel(model, action as IModelUpdate);
+        updateModel(model, action as IModelPayloadAction);
         break;
       }
       case ModelActionType.DESTROY_MODEL: {
@@ -37,12 +37,16 @@ export function ormReducer(orm: ORM) {
         successfulListModel(model, action as ISuccessfulListModel);
         break;
       }
+      case ModelActionType.SUCCESSFUL_GET_MODEL: {
+        successfulGetModel(model, action as IModelPayloadAction);
+        break;
+      }
       case ModelActionType.START_SYNCING_MODEL: {
         startSyncingModel(model, action as IModelIdAction);
         break;
       }
       case ModelActionType.SUCCESSFUL_SYNC_MODEL: {
-        successfulSyncModel(model, action as IModelUpdate);
+        successfulSyncModel(model, action as IModelPayloadAction);
         break;
       }
     }
@@ -59,11 +63,11 @@ function getModel(action: Action, session: SessionWithModels<ORMCommonState>): t
   return null;
 }
 
-function createModel(model: typeof Model, action: IModelUpdate) {
+function createModel(model: typeof Model, action: IModelPayloadAction) {
   model.create(action.payload);
 }
 
-function updateModel(model: typeof Model, action: IModelUpdate) {
+function updateModel(model: typeof Model, action: IModelPayloadAction) {
   const payload = action.payload;
   model.withId(payload.id).update(payload);
 }
@@ -82,11 +86,16 @@ function successfulListModel(model: typeof Model, action: ISuccessfulListModel) 
   });
 }
 
+function successfulGetModel(model: typeof Model, action: IModelPayloadAction) {
+  const payload = action.payload;
+  model.upsert(payload);
+}
+
 function startSyncingModel(model: typeof Model, action: IModelIdAction) {
   model.withId(action.id).update({syncing: true});
 }
 
-function successfulSyncModel(model: typeof Model, action: IModelUpdate) {
+function successfulSyncModel(model: typeof Model, action: IModelPayloadAction) {
   const updatedAction = {
     ...action,
     payload: {

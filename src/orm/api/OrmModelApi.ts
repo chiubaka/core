@@ -5,9 +5,11 @@ import {
   createModel,
   destroyModel,
   startDestroyingModel,
+  startGettingModel,
   startListingModel,
   startSyncingModel,
   successfulDestroyModel,
+  successfulGetModel,
   successfulListModel,
   successfulSyncModel,
   updateModel,
@@ -42,6 +44,16 @@ export class OrmModelApi<T extends IModel> {
       return this.adapter.list().then((instances: IBackendModel[]) => {
         dispatch(successfulListModel(this.model, instances));
         return instances;
+      });
+    };
+  }
+
+  public get = (id: string): ThunkResult<Promise<IBackendModel>> => {
+    return async (dispatch: Dispatch) => {
+      dispatch(startGettingModel(this.model, id));
+      return this.adapter.get(id).then((instance: IBackendModel) => {
+        dispatch(successfulGetModel(this.model, instance));
+        return instance;
       });
     };
   }
