@@ -33,7 +33,8 @@ export function ormReducer(orm: ORM) {
         destroyModel(model, action as IModelIdAction);
         break;
       }
-      case ModelActionType.SUCCESSFUL_LIST_MODEL: {
+      case ModelActionType.SUCCESSFUL_LIST_MODEL:
+      case ModelActionType.SUCCESSFUL_SEARCH_MODEL: {
         successfulListModel(model, action as ISuccessfulListModel);
         break;
       }
