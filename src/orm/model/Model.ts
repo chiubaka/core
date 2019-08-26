@@ -21,6 +21,7 @@ export interface IModel extends IBackendModel {
 
 export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFields = {}>
   extends OrmModel<TFields, TAdditional, TVirtualFields> {
+  public static searchable = false;
   public static localFields = {
     lastSynced: attr(),
     syncing: attr(),
