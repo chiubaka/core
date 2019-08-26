@@ -54,6 +54,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   private capitalizedModelNamePlural: string;
   private modelName: string;
   private modelNamePlural: string;
+  private searchable: boolean;
 
   constructor(model: typeof Model, options?: IGraphQLApiAdapterOptions) {
     this.client = (options != null && options.client) || GraphQLApiAdapter.defaultClient;
@@ -62,6 +63,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
     this.modelName = _.lowerFirst(this.capitalizedModelName);
     this.modelNamePlural = _.lowerFirst(this.capitalizedModelNamePlural);
     this.modelFragment = (options != null && options.modelFragment) || this.buildGraphQLFragment(model);
+    this.searchable = model.searchable;
   }
 
   public list = (variables?: any): Promise<IBackendModel[]> => {
@@ -150,9 +152,12 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   }
 
   private listQuery = () => {
+    const searchVariables = this.searchable ? "($searchTerm: String)" : "";
+    const searchArguments = this.searchable ? "(searchTerm: $searchTerm)" : "";
+
     return gql`
-      query List${this.capitalizedModelNamePlural}($searchTerm: String) {
-        ${this.modelNamePlural}(searchTerm: $searchTerm) {
+      query List${this.capitalizedModelNamePlural}${searchVariables} {
+        ${this.modelNamePlural}${searchArguments} {
           ...${this.capitalizedModelName}Fragment
         }
       }
