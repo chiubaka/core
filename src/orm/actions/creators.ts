@@ -53,6 +53,21 @@ export function successfulListModel<T extends IModel>(model: typeof Model, items
   };
 }
 
+export function startSearchingModel(model: typeof Model): IModelAction {
+  return {
+    type: ModelActionType.START_SEARCHING_MODEL,
+    modelName: model.modelName,
+  };
+}
+
+export function successfulSearchModel<T extends IModel>(model: typeof Model, items: T[]): ISuccessfulListModel {
+  return {
+    type: ModelActionType.SUCCESSFUL_SEARCH_MODEL,
+    modelName: model.modelName,
+    items,
+  };
+}
+
 export function startGettingModel(model: typeof Model, id: string): IModelIdAction {
   return {
     type: ModelActionType.START_GETTING_MODEL,

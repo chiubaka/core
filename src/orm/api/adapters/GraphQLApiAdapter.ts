@@ -64,12 +64,17 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
     this.modelFragment = (options != null && options.modelFragment) || this.buildGraphQLFragment(model);
   }
 
-  public list = (): Promise<IBackendModel[]> => {
+  public list = (variables?: any): Promise<IBackendModel[]> => {
     return this.client.query({
       query: this.listQuery(),
+      variables,
     }).then((response: any) => {
       return response.data[this.modelNamePlural];
     });
+  }
+
+  public search = (searchTerm: string): Promise<IBackendModel[]> => {
+    return this.list({ searchTerm });
   }
 
   public get = (id: string): Promise<IBackendModel> => {
@@ -146,8 +151,8 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
 
   private listQuery = () => {
     return gql`
-      query list${this.capitalizedModelNamePlural} {
-        ${this.modelNamePlural} {
+      query List${this.capitalizedModelNamePlural}($searchTerm: String) {
+        ${this.modelNamePlural}(searchTerm: $searchTerm) {
           ...${this.capitalizedModelName}Fragment
         }
       }

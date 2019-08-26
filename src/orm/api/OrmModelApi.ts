@@ -7,10 +7,12 @@ import {
   startDestroyingModel,
   startGettingModel,
   startListingModel,
+  startSearchingModel,
   startSyncingModel,
   successfulDestroyModel,
   successfulGetModel,
   successfulListModel,
+  successfulSearchModel,
   successfulSyncModel,
   updateModel,
 } from "../actions";
@@ -43,6 +45,16 @@ export class OrmModelApi<T extends IModel> {
       dispatch(startListingModel(this.model));
       return this.adapter.list().then((instances: IBackendModel[]) => {
         dispatch(successfulListModel(this.model, instances));
+        return instances;
+      });
+    };
+  }
+
+  public search = (searchTerm: string): ThunkResult<Promise<IBackendModel[]>> => {
+    return async (dispatch: Dispatch) => {
+      dispatch(startSearchingModel(this.model));
+      return this.adapter.search(searchTerm).then((instances: IBackendModel[]) => {
+        dispatch(successfulSearchModel(this.model, instances));
         return instances;
       });
     };
