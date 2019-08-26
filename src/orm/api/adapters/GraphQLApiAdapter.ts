@@ -9,12 +9,28 @@ import { getToken } from "../../../auth/utils/storage";
 import { IBackendModel, Model, NewModel, PartialModel } from "../../model";
 import { IModelApiAdapter } from "./types";
 
+interface ICustomQueries {
+  list?: any;
+  search?: any;
+  get?: any;
+}
+
+interface ICustomMutations {
+  [action: string]: any;
+  create?: any;
+  update?: any;
+  upsert?: any;
+  delete?: any;
+}
+
 interface IGraphQLApiAdapterOptions {
   client?: ApolloClient<any>;
   // In simple cases, the adapter can build a Fragment for the model automatically.
   // However, if any kind of nesting is involved, a fragment must be provided by
   // the user.
   modelFragment?: any;
+  customQueries?: ICustomQueries;
+  customMutations?: ICustomMutations;
 }
 
 export class GraphQLApiAdapter implements IModelApiAdapter {
@@ -52,6 +68,8 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   private client: ApolloClient<any>;
   private capitalizedModelName: string;
   private capitalizedModelNamePlural: string;
+  private customQueries: ICustomQueries;
+  private customMutations: ICustomMutations;
   private modelName: string;
   private modelNamePlural: string;
   private searchable: boolean;
@@ -60,15 +78,17 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
     this.client = (options != null && options.client) || GraphQLApiAdapter.defaultClient;
     this.capitalizedModelName = _.upperFirst(model.modelName);
     this.capitalizedModelNamePlural = pluralize(this.capitalizedModelName);
+    this.customQueries = (options != null && options.customQueries) || null;
+    this.customMutations = (options != null && options.customMutations) || null;
     this.modelName = _.lowerFirst(this.capitalizedModelName);
     this.modelNamePlural = _.lowerFirst(this.capitalizedModelNamePlural);
     this.modelFragment = (options != null && options.modelFragment) || this.buildGraphQLFragment(model);
     this.searchable = model.searchable;
   }
 
-  public list = (variables?: any): Promise<IBackendModel[]> => {
+  public list = (variables?: any, query?: any): Promise<IBackendModel[]> => {
     return this.client.query({
-      query: this.listQuery(),
+      query: query || this.listQuery(),
       variables,
     }).then((response: any) => {
       return response.data[this.modelNamePlural];
@@ -76,7 +96,12 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   }
 
   public search = (searchTerm: string): Promise<IBackendModel[]> => {
-    return this.list({ searchTerm });
+    let query;
+    if (this.customQueries != null && this.customQueries.search != null) {
+      query = this.customQueries.search;
+    }
+
+    return this.list({ searchTerm }, query);
   }
 
   public get = (id: string): Promise<IBackendModel> => {
@@ -141,6 +166,10 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   }
 
   private getQuery = () => {
+    if (this.customQueries != null && this.customQueries.get != null) {
+      return this.customQueries.get;
+    }
+
     return gql`
       query Get${this.capitalizedModelName}($id: ID!) {
         ${this.modelName}(id: $id) {
@@ -152,6 +181,10 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   }
 
   private listQuery = () => {
+    if (this.customQueries != null && this.customQueries.list != null) {
+      return this.customQueries.list;
+    }
+
     const searchVariables = this.searchable ? "($searchTerm: String)" : "";
     const searchArguments = this.searchable ? "(searchTerm: $searchTerm)" : "";
 
@@ -166,6 +199,10 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   }
 
   private mutation = (action: string) => {
+    if (this.customMutations != null && this.customMutations[action] != null) {
+      return this.customMutations[action];
+    }
+
     const capitalizedAction = _.upperFirst(action);
     return gql`
       mutation ${capitalizedAction}${this.capitalizedModelName}(
@@ -182,6 +219,10 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   }
 
   private deleteMutation = () => {
+    if (this.customMutations != null && this.customMutations.delete != null) {
+      return this.customMutations.delete;
+    }
+
     return gql`
       mutation Delete${this.capitalizedModelName}(id: ID!) {
         delete${this.capitalizedModelName}(id: $id) {
