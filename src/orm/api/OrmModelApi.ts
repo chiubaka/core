@@ -20,6 +20,7 @@ import { generateId, IBackendModel, IModel, IOrmState, Model, NewModel, PartialM
 import { modelSelector } from "../selectors";
 import { GraphQLApiAdapter } from "./adapters/GraphQLApiAdapter";
 import { IModelApiAdapter } from "./adapters/types";
+import { IApiRequestOptions } from "./types";
 
 interface IOrmModelApiOptions {
   adapter?: IModelApiAdapter;
@@ -40,60 +41,63 @@ export class OrmModelApi<T extends IModel> {
     this.orm = orm;
   }
 
-  public list = (): ThunkResult<Promise<IBackendModel[]>> => {
+  public list = (options?: IApiRequestOptions): ThunkResult<Promise<IBackendModel[]>> => {
     return async (dispatch: Dispatch) => {
       dispatch(startListingModel(this.model));
-      return this.adapter.list().then((instances: IBackendModel[]) => {
+      return this.adapter.list(options).then((instances: IBackendModel[]) => {
         dispatch(successfulListModel(this.model, instances));
         return instances;
       });
     };
   }
 
-  public search = (searchTerm: string): ThunkResult<Promise<IBackendModel[]>> => {
+  public search = (searchTerm: string, options?: IApiRequestOptions): ThunkResult<Promise<IBackendModel[]>> => {
     return async (dispatch: Dispatch) => {
       dispatch(startSearchingModel(this.model));
-      return this.adapter.search(searchTerm).then((instances: IBackendModel[]) => {
+      return this.adapter.search(searchTerm, options).then((instances: IBackendModel[]) => {
         dispatch(successfulSearchModel(this.model, instances));
         return instances;
       });
     };
   }
 
-  public get = (id: string): ThunkResult<Promise<IBackendModel>> => {
+  public get = (id: string, options?: IApiRequestOptions): ThunkResult<Promise<IBackendModel>> => {
     return async (dispatch: Dispatch) => {
       dispatch(startGettingModel(this.model, id));
-      return this.adapter.get(id).then((instance: IBackendModel) => {
+      return this.adapter.get(id, options).then((instance: IBackendModel) => {
         dispatch(successfulGetModel(this.model, instance));
         return instance;
       });
     };
   }
 
-  public create = (payload: NewModel): ThunkResult<Promise<IBackendModel>> => {
+  public create = (payload: NewModel, options?: IApiRequestOptions): ThunkResult<Promise<IBackendModel>> => {
     return async (dispatch: Dispatch) => {
       const id = generateId();
       dispatch(createModel(this.model, {
         id,
         ...payload,
       }));
-      return dispatch(this.sync(id)).then((result) => {
+      return dispatch(this.sync(id, options)).then((result) => {
         return result;
       });
     };
   }
 
-  public update = (payload: PartialModel): ThunkResult<Promise<IBackendModel>> => {
+  public update = (
+    payload: PartialModel,
+    options?: IApiRequestOptions,
+  ): ThunkResult<Promise<IBackendModel>> => {
     return async (dispatch: Dispatch) => {
       const id = payload.id;
       dispatch(updateModel(this.model, payload));
-      return dispatch(this.sync(id)).then((result) => {
+      return dispatch(this.sync(id, options)).then((result) => {
         return result;
       });
     };
   }
 
-  public sync = (id: string): ThunkResult<Promise<IBackendModel>> => {
+  public sync = (id: string, options?: IApiRequestOptions): ThunkResult<Promise<IBackendModel>> => {
     return async (dispatch: Dispatch, getState: () => IOrmState) => {
       dispatch(startSyncingModel(this.model, id));
       const current: Model<T> = modelSelector(this.orm, this.model, id)(getState().orm);
@@ -101,17 +105,17 @@ export class OrmModelApi<T extends IModel> {
         return Promise.reject(`No ${this.model.modelName} instance found with id ${id}`);
       }
 
-      return this.adapter.upsert(current.forBackend()).then((updated: IBackendModel) => {
+      return this.adapter.upsert(current.forBackend(), options).then((updated: IBackendModel) => {
         dispatch(successfulSyncModel(this.model, updated));
         return updated;
       });
     };
   }
 
-  public delete = (id: string): ThunkResult<Promise<IBackendModel>> => {
+  public delete = (id: string, options?: IApiRequestOptions): ThunkResult<Promise<IBackendModel>> => {
     return async (dispatch: Dispatch) => {
       dispatch(startDestroyingModel(this.model, id));
-      return this.adapter.delete(id).then((_deleted: IBackendModel) => {
+      return this.adapter.delete(id, options).then((_deleted: IBackendModel) => {
         const promise = dispatch(successfulDestroyModel(this.model, id));
         dispatch(destroyModel(this.model, id));
         return promise;

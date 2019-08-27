@@ -1,5 +1,5 @@
 import { gql, InMemoryCache } from "apollo-boost";
-import { ApolloClient } from "apollo-client";
+import { ApolloClient, MutationOptions, QueryOptions } from "apollo-client";
 import { setContext } from "apollo-link-context";
 import { createHttpLink } from "apollo-link-http";
 import _ from "lodash";
@@ -7,6 +7,7 @@ import pluralize from "pluralize";
 
 import { getToken } from "../../../auth/utils/storage";
 import { IBackendModel, Model, NewModel, PartialModel } from "../../model";
+import { IApiRequestOptions } from "../types";
 import { IModelApiAdapter } from "./types";
 
 interface ICustomQueries {
@@ -86,54 +87,54 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
     this.searchable = model.searchable;
   }
 
-  public list = (variables?: any, query?: any): Promise<IBackendModel[]> => {
-    return this.client.query({
+  public list = (options?: IApiRequestOptions, variables?: any, query?: any): Promise<IBackendModel[]> => {
+    return this.query({
       query: query || this.listQuery(),
       variables,
-    }).then((response: any) => {
+    }, options).then((response: any) => {
       return response.data[this.modelNamePlural];
     });
   }
 
-  public search = (searchTerm: string): Promise<IBackendModel[]> => {
+  public search = (searchTerm: string, options?: IApiRequestOptions): Promise<IBackendModel[]> => {
     let query;
     if (this.customQueries != null && this.customQueries.search != null) {
       query = this.customQueries.search;
     }
 
-    return this.list({ searchTerm }, query);
+    return this.list(options, { searchTerm }, query);
   }
 
-  public get = (id: string): Promise<IBackendModel> => {
-    return this.client.query({
+  public get = (id: string, options?: IApiRequestOptions): Promise<IBackendModel> => {
+    return this.query({
       query: this.getQuery(),
       variables: {
         id,
       },
-    }).then((response: any) => {
+    }, options).then((response: any) => {
       return response.data[this.modelName];
     });
   }
 
-  public create = (payload: NewModel): Promise<IBackendModel> => {
-    return this.mutate("create", payload);
+  public create = (payload: NewModel, options?: IApiRequestOptions): Promise<IBackendModel> => {
+    return this.mutateAction("create", payload, options);
   }
 
-  public update = (payload: PartialModel): Promise<IBackendModel> => {
-    return this.mutate("update", payload);
+  public update = (payload: PartialModel, options?: IApiRequestOptions): Promise<IBackendModel> => {
+    return this.mutateAction("update", payload, options);
   }
 
-  public upsert = (payload: NewModel | PartialModel): Promise<IBackendModel> => {
-    return this.mutate("upsert", payload);
+  public upsert = (payload: NewModel | PartialModel, options?: IApiRequestOptions): Promise<IBackendModel> => {
+    return this.mutateAction("upsert", payload, options);
   }
 
-  public delete = (id: string): Promise<IBackendModel> => {
-    return this.client.mutate({
+  public delete = (id: string, options?: IApiRequestOptions): Promise<IBackendModel> => {
+    return this.mutate({
       mutation: this.deleteMutation(),
       variables: {
         id,
       },
-    }).then((response: any) => {
+    }, options).then((response: any) => {
       return response.data[`delete${this.capitalizedModelName}`][this.modelName];
     });
   }
@@ -154,14 +155,48 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
     `;
   }
 
-  private mutate = (action: string, payload: NewModel | PartialModel): Promise<IBackendModel> => {
-    return this.client.mutate({
+  private requestOptionsToGraphQLOptions(
+    requestOptions?: IApiRequestOptions,
+  ): Partial<QueryOptions> | Partial<MutationOptions> {
+    if (requestOptions == null) {
+      return {};
+    }
+
+    const additionalOptions: Partial<QueryOptions> | Partial<MutationOptions> = {};
+
+    if (requestOptions.noCache) {
+      additionalOptions.fetchPolicy = "no-cache";
+    }
+
+    return additionalOptions;
+  }
+
+  private query = (queryOptions: QueryOptions, requestOptions?: IApiRequestOptions) => {
+    return this.client.query({
+      ...queryOptions,
+      ...this.requestOptionsToGraphQLOptions(requestOptions),
+    });
+  }
+
+  private mutateAction = (
+    action: string,
+    payload: NewModel | PartialModel,
+    options?: IApiRequestOptions,
+  ): Promise<IBackendModel> => {
+    return this.mutate({
       mutation: this.mutation(action),
       variables: {
         input: payload,
       },
-    }).then((response: any) => {
+    }, options).then((response: any) => {
       return response.data[`${action}${this.capitalizedModelName}`][this.modelName];
+    });
+  }
+
+  private mutate = (mutationOptions: MutationOptions, requestOptions?: IApiRequestOptions) => {
+    return this.client.mutate({
+      ...mutationOptions,
+      ...this.requestOptionsToGraphQLOptions(requestOptions),
     });
   }
 
