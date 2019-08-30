@@ -1,5 +1,5 @@
 import { gql, InMemoryCache } from "apollo-boost";
-import { ApolloClient, MutationOptions, QueryOptions } from "apollo-client";
+import { ApolloClient, ApolloClientOptions, MutationOptions, QueryOptions } from "apollo-client";
 import { setContext } from "apollo-link-context";
 import { createHttpLink } from "apollo-link-http";
 import _ from "lodash";
@@ -37,8 +37,29 @@ interface IGraphQLApiAdapterOptions {
 export class GraphQLApiAdapter implements IModelApiAdapter {
   public static GRAPHQL_PATH = "/graphql/";
 
-  public static get defaultClient() {
-    if (this._defaultClient == null) {
+  public static get sharedClient() {
+    if (this._sharedClient == null) {
+      this._sharedClient = new ApolloClient(this.sharedClientOptions);
+    }
+
+    return this._sharedClient;
+  }
+
+  public static get sharedClientOptions() {
+    if (this._sharedClientOptions == null) {
+      this._sharedClientOptions = this.defaultClientOptions;
+    }
+
+    return this._sharedClientOptions;
+  }
+
+  public static setClientOptions(options: Partial<ApolloClientOptions<any>>) {
+    this._sharedClientOptions = {...this.sharedClientOptions, ...options};
+    this._sharedClient = new ApolloClient(this.sharedClientOptions);
+  }
+
+  private static get defaultClientOptions() {
+    if (this._defaultClientOptions == null) {
       const httpLink = createHttpLink({
         uri: GraphQLApiAdapter.GRAPHQL_PATH,
       });
@@ -53,20 +74,22 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
         };
       });
 
-      this._defaultClient = new ApolloClient({
+      this._defaultClientOptions = {
         link: authLink.concat(httpLink),
         cache: new InMemoryCache(),
-      });
+      };
     }
 
-    return this._defaultClient;
+    return this._defaultClientOptions;
   }
 
-  private static _defaultClient: ApolloClient<any>;
+  private static _defaultClientOptions: ApolloClientOptions<any>;
+  private static _sharedClientOptions: ApolloClientOptions<any>;
+
+  private static _sharedClient: ApolloClient<any>;
 
   public readonly modelFragment: string;
 
-  private client: ApolloClient<any>;
   private capitalizedModelName: string;
   private capitalizedModelNamePlural: string;
   private customQueries: ICustomQueries;
@@ -76,7 +99,6 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   private searchable: boolean;
 
   constructor(model: typeof Model, options?: IGraphQLApiAdapterOptions) {
-    this.client = (options != null && options.client) || GraphQLApiAdapter.defaultClient;
     this.capitalizedModelName = _.upperFirst(model.modelName);
     this.capitalizedModelNamePlural = pluralize(this.capitalizedModelName);
     this.customQueries = (options != null && options.customQueries) || null;
@@ -172,7 +194,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   }
 
   private query = (queryOptions: QueryOptions, requestOptions?: IApiRequestOptions) => {
-    return this.client.query({
+    return GraphQLApiAdapter.sharedClient.query({
       ...queryOptions,
       ...this.requestOptionsToGraphQLOptions(requestOptions),
     });
@@ -194,7 +216,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   }
 
   private mutate = (mutationOptions: MutationOptions, requestOptions?: IApiRequestOptions) => {
-    return this.client.mutate({
+    return GraphQLApiAdapter.sharedClient.mutate({
       ...mutationOptions,
       ...this.requestOptionsToGraphQLOptions(requestOptions),
     });
