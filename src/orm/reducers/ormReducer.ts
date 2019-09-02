@@ -70,7 +70,7 @@ function createModel(model: typeof Model, action: IModelPayloadAction) {
 
 function updateModel(model: typeof Model, action: IModelPayloadAction) {
   const payload = action.payload;
-  model.withId(payload.id).update(payload);
+  model.upsert(payload);
 }
 
 function destroyModel(model: typeof Model, action: IModelIdAction) {
