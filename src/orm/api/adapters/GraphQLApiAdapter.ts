@@ -151,14 +151,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
   }
 
   public delete = (id: string, options?: IApiRequestOptions): Promise<IBackendModel> => {
-    return this.mutate({
-      mutation: this.deleteMutation(),
-      variables: {
-        id,
-      },
-    }, options).then((response: any) => {
-      return response.data[`delete${this.capitalizedModelName}`][this.modelName];
-    });
+    return this.mutateAction("delete", { id }, options);
   }
 
   private buildGraphQLFragment = (model: typeof Model) => {
@@ -202,7 +195,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
 
   private mutateAction = (
     action: string,
-    payload: NewModel | PartialModel,
+    payload: NewModel | PartialModel | string,
     options?: IApiRequestOptions,
   ): Promise<IBackendModel> => {
     return this.mutate({
@@ -272,22 +265,6 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
         }
       }
       ${this.modelFragment}
-    `;
-  }
-
-  private deleteMutation = () => {
-    if (this.customMutations != null && this.customMutations.delete != null) {
-      return this.customMutations.delete;
-    }
-
-    return gql`
-      mutation Delete${this.capitalizedModelName}($id: ID!) {
-        delete${this.capitalizedModelName}(id: $id) {
-          ${this.modelName} {
-            ...${this.capitalizedModelName}Fragment
-          }
-        }
-      }
     `;
   }
 }
