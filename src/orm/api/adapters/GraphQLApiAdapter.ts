@@ -281,7 +281,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
     }
 
     return gql`
-      mutation Delete${this.capitalizedModelName}(id: ID!) {
+      mutation Delete${this.capitalizedModelName}($id: ID!) {
         delete${this.capitalizedModelName}(id: $id) {
           ${this.modelName} {
             ...${this.capitalizedModelName}Fragment
