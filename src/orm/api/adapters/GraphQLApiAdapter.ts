@@ -154,7 +154,9 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
     return this.mutate({
       mutation: this.deleteMutation(),
       variables: {
-        id,
+        input: {
+          id,
+        },
       },
     }, options).then((response: any) => {
       return response.data[`delete${this.capitalizedModelName}`][this.modelName];
