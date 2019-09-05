@@ -14,7 +14,7 @@
       "esnext",
       "scripthost",
     ],
-    "module": "esnext",
+    "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noUnusedLocals": true,
