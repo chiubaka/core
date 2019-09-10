@@ -1,2 +1,5 @@
-export * from "./GraphQLApiAdapter";
-export * from "./RestApiAdapter";
+import { GraphQLApiAdapter } from "./GraphQLApiAdapter";
+export const AuthGraphQLApiAdapter = GraphQLApiAdapter;
+
+import { RestApiAdapter } from "./RestApiAdapter";
+export const AuthRestApiAdapter = RestApiAdapter;

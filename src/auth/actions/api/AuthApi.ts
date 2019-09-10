@@ -4,10 +4,10 @@ import { IAuthState } from "../../model/AuthenticationState";
 import { startLogin } from "../creators";
 import { completeLogoutAndRedirect } from "../thunks";
 import { AuthDispatch as Dispatch, IAuthApiAdapter } from "../types";
-import { GraphQLApiAdapter } from "./adapters";
+import { AuthGraphQLApiAdapter } from "./adapters";
 
 export class AuthApi extends Api<IAuthApiAdapter> {
-  constructor(adapter: IAuthApiAdapter = GraphQLApiAdapter.getInstance()) {
+  constructor(adapter: IAuthApiAdapter = AuthGraphQLApiAdapter.getInstance()) {
     super(adapter);
   }
 

@@ -5,7 +5,7 @@ import { assertLastCallPath, assertLogoutAndRedirect, store } from "../../../../
 
 import { IJwtUserResponse, IUser } from "../../../app";
 import { ActionTypes } from "../types";
-import { RestApiAdapter } from "./adapters";
+import { AuthRestApiAdapter } from "./adapters";
 import { IGraphQLSocialAuthResponse } from "./adapters/GraphQLApiAdapter";
 import { AuthApi } from "./AuthApi";
 
@@ -113,7 +113,7 @@ describe("AuthApi", () => {
   });
 
   describe("with RestApiAdapter", () => {
-    const api = new AuthApi(RestApiAdapter.getInstance());
+    const api = new AuthApi(AuthRestApiAdapter.getInstance());
 
     describe("#login", () => {
       describe("when response includes user details", () => {
