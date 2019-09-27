@@ -82,6 +82,7 @@ describe("AuthApi", () => {
                 user: {
                   __typename: "User",
                   id: "1",
+                  createdAt: 1569602786,
                 },
               },
               token: MOCK_TOKEN,
