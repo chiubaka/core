@@ -1,9 +1,11 @@
-import { gql, InMemoryCache } from "apollo-boost";
+import { ApolloLink, gql, InMemoryCache } from "apollo-boost";
 import { ApolloClient, ApolloClientOptions, MutationOptions, QueryOptions } from "apollo-client";
 import { setContext } from "apollo-link-context";
 import { createHttpLink } from "apollo-link-http";
+import { WebSocketLink } from "apollo-link-ws";
 import _ from "lodash";
 import pluralize from "pluralize";
+import { SubscriptionClient } from "subscriptions-transport-ws";
 
 import { getToken } from "../../../auth/utils/storage";
 import { IBackendModel, Model, NewModel, PartialModel } from "../../model";
@@ -74,8 +76,22 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
         };
       });
 
+      const subscriptionClient = new SubscriptionClient(`ws://${window.location.host}${this.GRAPHQL_PATH}`, {
+        reconnect: true,
+      });
+
+      const wsLink = new WebSocketLink(subscriptionClient);
+
+      const link = ApolloLink.split(
+        (operation) => {
+          return operation.operationName === "subscription";
+        },
+        wsLink,
+        authLink.concat(httpLink),
+      );
+
       this._defaultClientOptions = {
-        link: authLink.concat(httpLink),
+        link,
         cache: new InMemoryCache(),
       };
     }
