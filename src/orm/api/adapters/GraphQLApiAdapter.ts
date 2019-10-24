@@ -3,6 +3,7 @@ import { ApolloClient, ApolloClientOptions, MutationOptions, QueryOptions } from
 import { setContext } from "apollo-link-context";
 import { createHttpLink } from "apollo-link-http";
 import { WebSocketLink } from "apollo-link-ws";
+import { getOperationAST } from "graphql";
 import _ from "lodash";
 import pluralize from "pluralize";
 import { SubscriptionClient } from "subscriptions-transport-ws";
@@ -82,9 +83,11 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
 
       const wsLink = new WebSocketLink(subscriptionClient);
 
+      // https://github.com/apollographql/subscriptions-transport-ws/issues/275#issuecomment-330294921
       const link = ApolloLink.split(
         (operation) => {
-          return operation.operationName === "subscription";
+          const operationAST = getOperationAST(operation.query, operation.operationName);
+          return !!operationAST && operationAST.operation === "subscription";
         },
         wsLink,
         authLink.concat(httpLink),
