@@ -67,18 +67,24 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
         uri: GraphQLApiAdapter.GRAPHQL_PATH,
       });
 
+      const token = getToken();
+      const authHeader = token != null ? `Bearer ${token}` : "";
       const authLink = setContext((_unused, { headers }) => {
-        const token = getToken();
         return {
           headers: {
             ...headers,
-            Authorization: token != null ? `Bearer ${token}` : "",
+            Authorization: authHeader,
           },
         };
       });
 
       const subscriptionClient = new SubscriptionClient(`ws://${window.location.host}${this.GRAPHQL_PATH}`, {
         reconnect: true,
+        connectionParams: {
+          headers: {
+            Authorization: authHeader,
+          },
+        },
       });
 
       const wsLink = new WebSocketLink(subscriptionClient);
