@@ -68,12 +68,11 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
       });
 
       const token = getToken();
-      const authHeader = token != null ? `Bearer ${token}` : "";
       const authLink = setContext((_unused, { headers }) => {
         return {
           headers: {
             ...headers,
-            Authorization: authHeader,
+            Authorization: token != null ? `Bearer ${token}` : "",
           },
         };
       });
@@ -81,9 +80,7 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
       const subscriptionClient = new SubscriptionClient(`ws://${window.location.host}${this.GRAPHQL_PATH}`, {
         reconnect: true,
         connectionParams: {
-          headers: {
-            Authorization: authHeader,
-          },
+          authToken: token,
         },
       });
 
