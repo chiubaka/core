@@ -15,6 +15,3 @@ yarn-error.log
 
 # Jest coverage output
 coverage/
-
-# Build products
-dist/
