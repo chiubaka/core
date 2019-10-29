@@ -159,7 +159,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
       // For each one that matches a relationship on the model...
       if (relationships.hasOwnProperty(fieldName)) {
         const relatedModelName = relationships[fieldName];
-        const RelatedModel = this.session[relatedModelName];
+        const RelatedModel = relatedModelName === "this" ? this : this.session[relatedModelName];
 
         // Branch based on whether or not there are many related instances included
         // or just one.
