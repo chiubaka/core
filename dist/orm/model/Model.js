@@ -221,8 +221,8 @@ class Model extends redux_orm_1.Model {
         Object.entries(relationships).forEach(([fieldName, relatedModelName]) => {
             const RelatedModel = model.modelForName(relatedModelName);
             const relatedInstances = this[fieldName];
-            if (relatedInstances instanceof Array) {
-                relatedInstances.forEach((relatedInstance) => {
+            if (model.isManyRelationship(fieldName)) {
+                relatedInstances.all().toModelArray().forEach((relatedInstance) => {
                     Model.touchRelatedInstance(relatedInstance, RelatedModel);
                 });
             }
