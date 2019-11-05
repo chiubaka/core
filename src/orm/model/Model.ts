@@ -148,6 +148,21 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     return this.virtualFields.hasOwnProperty(fieldName);
   }
 
+  private static modelForName(modelName: string) {
+    return modelName === "this" ? this : this.session[modelName];
+  }
+
+  private static touchRelatedInstance(instance: ModelWithFields<any>, RelatedModel: typeof Model | typeof OrmModel) {
+    if (instance == null) {
+      return;
+    }
+
+    RelatedModel.upsert({
+      ...instance.ref,
+      lastUpdated: Date.now(),
+    });
+  }
+
   private static upsertRelatedInstances(props: any, instance: ModelWithFields<any>) {
     const relationships = this.getRelationshipMap();
     const relatedInstanceMap: {[fieldName: string]: Model<any> | Array<Model<any>>} = {};
@@ -164,7 +179,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
       // For each one that matches a relationship on the model...
       if (relationships.hasOwnProperty(fieldName)) {
         const relatedModelName = relationships[fieldName];
-        const RelatedModel = relatedModelName === "this" ? this : this.session[relatedModelName];
+        const RelatedModel = this.modelForName(relatedModelName);
 
         // Branch based on whether or not there are many related instances included
         // or just one.
@@ -285,9 +300,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
   }
 
   public delete() {
-    const model = this.constructor as typeof Model;
-    const filteredProps = model.scrubProperties(model.backendFieldKeys, this.ref);
-    model.upsertRelatedInstances(filteredProps, this);
+    this.touchRelatedInstances();
 
     super.delete();
   }
@@ -296,6 +309,23 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     let ref = this.scrubLocalFields(this.ref);
     ref = this.scrubExcludedFields(ref);
     return this.normalizeRelationships(ref);
+  }
+
+  private touchRelatedInstances() {
+    const model = this.constructor as typeof Model;
+    const relationships = model.getRelationshipMap();
+
+    Object.entries(relationships).forEach(([fieldName, relatedModelName]) => {
+      const RelatedModel = model.modelForName(relatedModelName);
+      const relatedInstances = (this as ModelWithFields<any>)[fieldName];
+      if (relatedInstances instanceof Array) {
+        relatedInstances.forEach((relatedInstance: ModelWithFields<any>) => {
+          Model.touchRelatedInstance(relatedInstance, RelatedModel);
+        });
+      } else {
+        Model.touchRelatedInstance(relatedInstances, RelatedModel);
+      }
+    });
   }
 
   private scrubLocalFields = (ref: TFields & TAdditional & ORMId) => {
