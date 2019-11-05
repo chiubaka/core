@@ -112,7 +112,10 @@ class Model extends redux_orm_1.Model {
         if (instance == null) {
             return;
         }
-        RelatedModel.upsert(Object.assign({}, instance.ref, { lastUpdated: Date.now() }));
+        RelatedModel.upsert({
+            id: instance.id,
+            lastUpdated: Date.now(),
+        });
     }
     static upsertRelatedInstances(props, instance) {
         const relationships = this.getRelationshipMap();
