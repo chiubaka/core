@@ -203,7 +203,7 @@ class Model extends redux_orm_1.Model {
 Model.searchable = false;
 Model.localFields = {
     lastSynced: redux_orm_1.attr(),
-    lastUpdate: redux_orm_1.attr(),
+    lastUpdated: redux_orm_1.attr(),
     syncing: redux_orm_1.attr(),
 };
 Model.excludedFieldKeys = [];

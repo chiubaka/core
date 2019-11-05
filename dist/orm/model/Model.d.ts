@@ -5,14 +5,14 @@ export interface IBackendModel {
 }
 export interface IModel extends IBackendModel {
     lastSynced?: number;
-    lastUpdate?: number;
+    lastUpdated?: number;
     syncing?: boolean;
 }
 export declare abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFields = {}> extends OrmModel<TFields, TAdditional, TVirtualFields> {
     static searchable: boolean;
     static localFields: {
         lastSynced: Attribute;
-        lastUpdate: Attribute;
+        lastUpdated: Attribute;
         syncing: Attribute;
     };
     static readonly localFieldKeys: Set<string>;
