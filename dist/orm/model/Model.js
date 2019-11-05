@@ -204,8 +204,8 @@ class Model extends redux_orm_1.Model {
         super.update(Object.assign({}, filteredProps, relatedInstanceMap, { lastUpdated: Date.now() }));
     }
     delete() {
-        this.touchRelatedInstances();
         super.delete();
+        this.touchRelatedInstances();
     }
     forBackend() {
         let ref = this.scrubLocalFields(this.ref);
