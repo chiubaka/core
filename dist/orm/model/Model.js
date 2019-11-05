@@ -57,7 +57,7 @@ class Model extends redux_orm_1.Model {
     }
     static create(props) {
         const filteredProps = this.scrubProperties(this.backendFieldKeys, props);
-        const instance = super.create(filteredProps);
+        const instance = super.create(Object.assign({}, filteredProps, { lastUpdated: Date.now() }));
         const relatedInstanceMap = this.upsertRelatedInstances(props, instance);
         this.linkRelatedInstances(relatedInstanceMap, instance);
         return instance;
@@ -134,7 +134,7 @@ class Model extends redux_orm_1.Model {
                     relatedInstanceMap[fieldName] = this.upsertManyRelatedInstances(fieldName, value, RelatedModel, instance);
                 }
                 else {
-                    relatedInstanceMap[fieldName] = RelatedModel.upsert(value);
+                    relatedInstanceMap[fieldName] = RelatedModel.upsert(Object.assign({}, value, { lastUpdated: Date.now() }));
                 }
             }
         });
@@ -145,7 +145,7 @@ class Model extends redux_orm_1.Model {
             throw Error(`Encountered non-array value for many-to-many field ${fieldName}`);
         }
         return values.map((value) => {
-            const relatedInstance = RelatedModel.upsert(value);
+            const relatedInstance = RelatedModel.upsert(Object.assign({}, value, { lastUpdated: Date.now() }));
             this.addManyBackRelation(fieldName, instance, relatedInstance, RelatedModel);
             return relatedInstance;
         });
@@ -192,7 +192,7 @@ class Model extends redux_orm_1.Model {
         const model = this.constructor;
         const filteredProps = model.scrubProperties(model.backendFieldKeys, props);
         const relatedInstanceMap = model.upsertRelatedInstances(filteredProps, this);
-        super.update(Object.assign({}, filteredProps, relatedInstanceMap));
+        super.update(Object.assign({}, filteredProps, relatedInstanceMap, { lastUpdated: Date.now() }));
     }
     forBackend() {
         let ref = this.scrubLocalFields(this.ref);
@@ -203,6 +203,7 @@ class Model extends redux_orm_1.Model {
 Model.searchable = false;
 Model.localFields = {
     lastSynced: redux_orm_1.attr(),
+    lastUpdate: redux_orm_1.attr(),
     syncing: redux_orm_1.attr(),
 };
 Model.excludedFieldKeys = [];
