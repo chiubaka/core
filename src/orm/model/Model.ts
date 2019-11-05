@@ -284,6 +284,14 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     });
   }
 
+  public delete() {
+    const model = this.constructor as typeof Model;
+    const filteredProps = model.scrubProperties(model.backendFieldKeys, this.ref);
+    model.upsertRelatedInstances(filteredProps, this);
+
+    super.delete();
+  }
+
   public forBackend(): IBackendModel {
     let ref = this.scrubLocalFields(this.ref);
     ref = this.scrubExcludedFields(ref);

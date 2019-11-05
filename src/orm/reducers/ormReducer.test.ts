@@ -118,6 +118,7 @@ describe("ormReducer", () => {
 
     plan = session.Plan.withId(plan.id).ref;
     // Assert that the original plan was updated
+    delete updatedPlan.lastUpdated;
     expect(plan).toMatchObject(updatedPlan);
     // Assert that the lastSynced variable was set, since we pulled changes from a remote
     expect(plan.lastSynced).toBeDefined();
@@ -157,6 +158,7 @@ describe("ormReducer", () => {
     // Assert that total number of instances hasn't changed
     expect(getPlanCount(session)).toEqual(1);
     // Assert that updates were applied to the instance
+    delete updatedPlan.lastUpdated;
     expect(plan).toMatchObject(updatedPlan);
     // Assert that sync state was updated
     expect(plan.lastSynced).toBeDefined();

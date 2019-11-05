@@ -59,9 +59,9 @@ describe("Model", () => {
     // One for the assignee, one for the reviewer
     expect(users.count()).toEqual(2);
     const assignee = session.User.withId(TEST_ASSIGNEE.id);
-    expect(assignee.ref).toEqual(TEST_ASSIGNEE);
+    expect(assignee.ref).toMatchObject(TEST_ASSIGNEE);
     const reviewer = session.User.withId(TEST_REVIEWER.id);
-    expect(reviewer.ref).toEqual(TEST_REVIEWER);
+    expect(reviewer.ref).toMatchObject(TEST_REVIEWER);
 
     // Verify Comment state
     const comments = session.Comment.all();
@@ -145,6 +145,16 @@ describe("Model", () => {
       session = createTask(session);
       expectCorrectOrmState(session);
     });
+
+    it("marks related instances as updated", () => {
+      const session = createTask();
+      const task = session.Task.all().first();
+
+      expect(task.lastUpdated).toBeDefined();
+      expect(task.assignee.lastUpdated).toBeDefined();
+      expect(task.review.lastUpdated).toBeDefined();
+      expect(task.review.reviewer.lastUpdated).toBeDefined();
+    });
   });
 
   describe("#update", () => {
@@ -188,6 +198,38 @@ describe("Model", () => {
         ...NEW_TASK,
       });
       expectCorrectOrmState(session);
+    });
+
+    it("marks related instances as updated", () => {
+      const session = orm.session(orm.getEmptyState());
+      let task = session.Task.upsert(NEW_TASK);
+      let user = task.assignee;
+      const lastUpdated = user.lastUpdated;
+
+      task = session.Task.upsert({
+        ...NEW_TASK,
+        id: task.id,
+        description: "Lorem ipsum",
+      });
+
+      user = task.assignee;
+
+      expect(task.lastUpdated).toBeDefined();
+      expect(user.lastUpdated).toBeDefined();
+      expect(lastUpdated).toBeLessThan(user.lastUpdated);
+    });
+  });
+
+  describe("#delete", () => {
+    it("marks related instances as updated", () => {
+      const session = orm.session(orm.getEmptyState());
+      const task = session.Task.upsert(NEW_TASK);
+      let user = session.User.withId(task.assignee.id);
+      const lastUpdated = user.lastUpdated;
+
+      task.delete();
+      user = session.User.withId(task.assignee.id);
+      expect(lastUpdated).toBeLessThan(user.lastUpdated);
     });
   });
 
