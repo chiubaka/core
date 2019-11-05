@@ -300,9 +300,8 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
   }
 
   public delete() {
-    this.touchRelatedInstances();
-
     super.delete();
+    this.touchRelatedInstances();
   }
 
   public forBackend(): IBackendModel {
