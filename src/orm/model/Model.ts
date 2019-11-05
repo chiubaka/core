@@ -317,8 +317,8 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     Object.entries(relationships).forEach(([fieldName, relatedModelName]) => {
       const RelatedModel = model.modelForName(relatedModelName);
       const relatedInstances = (this as ModelWithFields<any>)[fieldName];
-      if (relatedInstances instanceof Array) {
-        relatedInstances.forEach((relatedInstance: ModelWithFields<any>) => {
+      if (model.isManyRelationship(fieldName)) {
+        relatedInstances.all().toModelArray().forEach((relatedInstance: ModelWithFields<any>) => {
           Model.touchRelatedInstance(relatedInstance, RelatedModel);
         });
       } else {
