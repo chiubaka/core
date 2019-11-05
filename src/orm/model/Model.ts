@@ -16,7 +16,7 @@ export interface IBackendModel {
 
 export interface IModel extends IBackendModel {
   lastSynced?: number;
-  lastUpdate?: number;
+  lastUpdated?: number;
   syncing?: boolean;
 }
 
@@ -25,7 +25,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
   public static searchable = false;
   public static localFields = {
     lastSynced: attr(),
-    lastUpdate: attr(),
+    lastUpdated: attr(),
     syncing: attr(),
   };
 
