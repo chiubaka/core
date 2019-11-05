@@ -158,7 +158,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     }
 
     RelatedModel.upsert({
-      ...instance.ref,
+      id: instance.id,
       lastUpdated: Date.now(),
     });
   }
