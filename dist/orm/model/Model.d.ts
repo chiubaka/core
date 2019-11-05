@@ -37,6 +37,8 @@ export declare abstract class Model<TFields extends IModel, TAdditional = {}, TV
     private static scrubProperties;
     private static isManyRelationship;
     private static isVirtualField;
+    private static modelForName;
+    private static touchRelatedInstance;
     private static upsertRelatedInstances;
     private static upsertManyRelatedInstances;
     private static addManyBackRelation;
@@ -45,6 +47,7 @@ export declare abstract class Model<TFields extends IModel, TAdditional = {}, TV
     update(props: any): void;
     delete(): void;
     forBackend(): IBackendModel;
+    private touchRelatedInstances;
     private scrubLocalFields;
     private scrubExcludedFields;
     private normalizeRelationships;

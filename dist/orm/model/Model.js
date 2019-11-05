@@ -105,6 +105,15 @@ class Model extends redux_orm_1.Model {
     static isVirtualField(fieldName) {
         return this.virtualFields.hasOwnProperty(fieldName);
     }
+    static modelForName(modelName) {
+        return modelName === "this" ? this : this.session[modelName];
+    }
+    static touchRelatedInstance(instance, RelatedModel) {
+        if (instance == null) {
+            return;
+        }
+        RelatedModel.upsert(Object.assign({}, instance.ref, { lastUpdated: Date.now() }));
+    }
     static upsertRelatedInstances(props, instance) {
         const relationships = this.getRelationshipMap();
         const relatedInstanceMap = {};
@@ -119,7 +128,7 @@ class Model extends redux_orm_1.Model {
             // For each one that matches a relationship on the model...
             if (relationships.hasOwnProperty(fieldName)) {
                 const relatedModelName = relationships[fieldName];
-                const RelatedModel = relatedModelName === "this" ? this : this.session[relatedModelName];
+                const RelatedModel = this.modelForName(relatedModelName);
                 // Branch based on whether or not there are many related instances included
                 // or just one.
                 // The cases in which there are many will always be some form of either many-to-many
@@ -195,15 +204,29 @@ class Model extends redux_orm_1.Model {
         super.update(Object.assign({}, filteredProps, relatedInstanceMap, { lastUpdated: Date.now() }));
     }
     delete() {
-        const model = this.constructor;
-        const filteredProps = model.scrubProperties(model.backendFieldKeys, this.ref);
-        model.upsertRelatedInstances(filteredProps, this);
+        this.touchRelatedInstances();
         super.delete();
     }
     forBackend() {
         let ref = this.scrubLocalFields(this.ref);
         ref = this.scrubExcludedFields(ref);
         return this.normalizeRelationships(ref);
+    }
+    touchRelatedInstances() {
+        const model = this.constructor;
+        const relationships = model.getRelationshipMap();
+        Object.entries(relationships).forEach(([fieldName, relatedModelName]) => {
+            const RelatedModel = model.modelForName(relatedModelName);
+            const relatedInstances = this[fieldName];
+            if (relatedInstances instanceof Array) {
+                relatedInstances.forEach((relatedInstance) => {
+                    Model.touchRelatedInstance(relatedInstance, RelatedModel);
+                });
+            }
+            else {
+                Model.touchRelatedInstance(relatedInstances, RelatedModel);
+            }
+        });
     }
 }
 Model.searchable = false;
