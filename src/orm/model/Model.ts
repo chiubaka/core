@@ -16,6 +16,7 @@ export interface IBackendModel {
 
 export interface IModel extends IBackendModel {
   lastSynced?: number;
+  lastUpdate?: number;
   syncing?: boolean;
 }
 
@@ -24,6 +25,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
   public static searchable = false;
   public static localFields = {
     lastSynced: attr(),
+    lastUpdate: attr(),
     syncing: attr(),
   };
 
@@ -69,7 +71,10 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
 
   public static create<TFields = any>(props: TFields) {
     const filteredProps = this.scrubProperties(this.backendFieldKeys, props);
-    const instance = super.create(filteredProps);
+    const instance = super.create({
+      ...filteredProps,
+      lastUpdated: Date.now(),
+    });
     const relatedInstanceMap = this.upsertRelatedInstances(props, instance);
     this.linkRelatedInstances(relatedInstanceMap, instance);
 
@@ -180,7 +185,10 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
             instance,
           );
         } else {
-          relatedInstanceMap[fieldName] = RelatedModel.upsert(value);
+          relatedInstanceMap[fieldName] = RelatedModel.upsert({
+            ...value,
+            lastUpdated: Date.now(),
+          });
         }
       }
     });
@@ -199,7 +207,10 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     }
 
     return values.map((value: IModel) => {
-      const relatedInstance = RelatedModel.upsert(value);
+      const relatedInstance = RelatedModel.upsert({
+        ...value,
+        lastUpdated: Date.now(),
+      });
       this.addManyBackRelation(fieldName, instance, relatedInstance, RelatedModel);
       return relatedInstance;
     });
@@ -269,6 +280,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     super.update({
       ...filteredProps,
       ...relatedInstanceMap,
+      lastUpdated: Date.now(),
     });
   }
 
