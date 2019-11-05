@@ -194,6 +194,12 @@ class Model extends redux_orm_1.Model {
         const relatedInstanceMap = model.upsertRelatedInstances(filteredProps, this);
         super.update(Object.assign({}, filteredProps, relatedInstanceMap, { lastUpdated: Date.now() }));
     }
+    delete() {
+        const model = this.constructor;
+        const filteredProps = model.scrubProperties(model.backendFieldKeys, this.ref);
+        model.upsertRelatedInstances(filteredProps, this);
+        super.delete();
+    }
     forBackend() {
         let ref = this.scrubLocalFields(this.ref);
         ref = this.scrubExcludedFields(ref);

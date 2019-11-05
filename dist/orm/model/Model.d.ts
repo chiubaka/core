@@ -43,6 +43,7 @@ export declare abstract class Model<TFields extends IModel, TAdditional = {}, TV
     private static isRelationalField;
     private static linkRelatedInstances;
     update(props: any): void;
+    delete(): void;
     forBackend(): IBackendModel;
     private scrubLocalFields;
     private scrubExcludedFields;
