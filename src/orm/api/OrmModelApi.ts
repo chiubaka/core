@@ -16,7 +16,7 @@ import {
   successfulSyncModel,
   updateModel,
 } from "../actions";
-import { generateId, IBackendModel, IModel, IOrmState, Model, NewModel, PartialModel } from "../model";
+import { IBackendModel, IModel, IOrmState, Model, NewModel, PartialModel } from "../model";
 import { modelSelector } from "../selectors";
 import { GraphQLApiAdapter } from "./adapters/GraphQLApiAdapter";
 import { IModelApiAdapter } from "./adapters/types";
@@ -73,7 +73,7 @@ export class OrmModelApi<T extends IModel> {
 
   public create = (payload: NewModel, options?: IApiRequestOptions): ThunkResult<Promise<IBackendModel>> => {
     return async (dispatch: Dispatch) => {
-      const id = generateId();
+      const id = this.model.generateId(payload);
       dispatch(createModel(this.model, {
         id,
         ...payload,

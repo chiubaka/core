@@ -8,6 +8,7 @@ import {
   OneToOne,
   ORMId,
 } from "redux-orm";
+import * as uuid from "uuid";
 
 export interface IBackendModel {
   [propertyName: string]: any;
@@ -67,6 +68,10 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
       ...this.fields,
       ...this.virtualFields,
     };
+  }
+
+  public static generateId<TFields = any>(_props: TFields) {
+    return uuid.v4();
   }
 
   public static create<TFields = any>(props: TFields) {
