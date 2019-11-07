@@ -75,9 +75,11 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
   }
 
   public static create<TFields = any>(props: TFields) {
+    const id = (props as any).id != null ? (props as any).id : this.generateId(props);
     const filteredProps = this.scrubProperties(this.backendFieldKeys, props);
     const instance = super.create({
       ...filteredProps,
+      id,
       lastUpdated: Date.now(),
     });
     const relatedInstanceMap = this.upsertRelatedInstances(props, instance);

@@ -67,8 +67,9 @@ class Model extends redux_orm_1.Model {
         return uuid.v4();
     }
     static create(props) {
+        const id = props.id != null ? props.id : this.generateId(props);
         const filteredProps = this.scrubProperties(this.backendFieldKeys, props);
-        const instance = super.create(Object.assign({}, filteredProps, { lastUpdated: Date.now() }));
+        const instance = super.create(Object.assign({}, filteredProps, { id, lastUpdated: Date.now() }));
         const relatedInstanceMap = this.upsertRelatedInstances(props, instance);
         this.linkRelatedInstances(relatedInstanceMap, instance);
         return instance;
