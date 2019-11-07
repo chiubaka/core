@@ -26,6 +26,7 @@ export declare abstract class Model<TFields extends IModel, TAdditional = {}, TV
     static readonly allFields: {
         [x: string]: any;
     };
+    static generateId<TFields = any>(_props: TFields): string;
     static create<TFields = any>(props: TFields): any;
     static getRelationshipMap(): {
         [fieldName: string]: string;

@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const actions_1 = require("../actions");
-const model_1 = require("../model");
 const selectors_1 = require("../selectors");
 const GraphQLApiAdapter_1 = require("./adapters/GraphQLApiAdapter");
 class OrmModelApi {
@@ -43,7 +42,7 @@ class OrmModelApi {
         };
         this.create = (payload, options) => {
             return (dispatch) => __awaiter(this, void 0, void 0, function* () {
-                const id = model_1.generateId();
+                const id = this.model.generateId(payload);
                 dispatch(actions_1.createModel(this.model, Object.assign({ id }, payload)));
                 return dispatch(this.sync(id, options)).then((result) => {
                     return result;
