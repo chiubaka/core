@@ -17,6 +17,7 @@ export interface IBackendModel {
 
 export interface IModel extends IBackendModel {
   lastSynced?: number;
+  lastUpdated?: number;
   syncing?: boolean;
 }
 
@@ -25,6 +26,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
   public static searchable = false;
   public static localFields = {
     lastSynced: attr(),
+    lastUpdated: attr(),
     syncing: attr(),
   };
 
@@ -78,6 +80,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     const instance = super.create({
       ...filteredProps,
       id,
+      lastUpdated: Date.now(),
     });
     const relatedInstanceMap = this.upsertRelatedInstances(props, instance);
     this.linkRelatedInstances(relatedInstanceMap, instance);
@@ -152,6 +155,21 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     return this.virtualFields.hasOwnProperty(fieldName);
   }
 
+  private static modelForName(modelName: string) {
+    return modelName === "this" ? this : this.session[modelName];
+  }
+
+  private static touchRelatedInstance(instance: ModelWithFields<any>, RelatedModel: typeof Model | typeof OrmModel) {
+    if (instance == null) {
+      return;
+    }
+
+    RelatedModel.upsert({
+      id: instance.id,
+      lastUpdated: Date.now(),
+    });
+  }
+
   private static upsertRelatedInstances(props: any, instance: ModelWithFields<any>) {
     const relationships = this.getRelationshipMap();
     const relatedInstanceMap: {[fieldName: string]: Model<any> | Array<Model<any>>} = {};
@@ -168,7 +186,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
       // For each one that matches a relationship on the model...
       if (relationships.hasOwnProperty(fieldName)) {
         const relatedModelName = relationships[fieldName];
-        const RelatedModel = relatedModelName === "this" ? this : this.session[relatedModelName];
+        const RelatedModel = this.modelForName(relatedModelName);
 
         // Branch based on whether or not there are many related instances included
         // or just one.
@@ -189,7 +207,10 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
             instance,
           );
         } else {
-          relatedInstanceMap[fieldName] = RelatedModel.upsert(value);
+          relatedInstanceMap[fieldName] = RelatedModel.upsert({
+            ...value,
+            lastUpdated: Date.now(),
+          });
         }
       }
     });
@@ -208,7 +229,10 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     }
 
     return values.map((value: IModel) => {
-      const relatedInstance = RelatedModel.upsert(value);
+      const relatedInstance = RelatedModel.upsert({
+        ...value,
+        lastUpdated: Date.now(),
+      });
       this.addManyBackRelation(fieldName, instance, relatedInstance, RelatedModel);
       return relatedInstance;
     });
@@ -278,13 +302,36 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     super.update({
       ...filteredProps,
       ...relatedInstanceMap,
+      lastUpdated: Date.now(),
     });
+  }
+
+  public delete() {
+    super.delete();
+    this.touchRelatedInstances();
   }
 
   public forBackend(): IBackendModel {
     let ref = this.scrubLocalFields(this.ref);
     ref = this.scrubExcludedFields(ref);
     return this.normalizeRelationships(ref);
+  }
+
+  private touchRelatedInstances() {
+    const model = this.constructor as typeof Model;
+    const relationships = model.getRelationshipMap();
+
+    Object.entries(relationships).forEach(([fieldName, relatedModelName]) => {
+      const RelatedModel = model.modelForName(relatedModelName);
+      const relatedInstances = (this as ModelWithFields<any>)[fieldName];
+      if (model.isManyRelationship(fieldName)) {
+        relatedInstances.all().toModelArray().forEach((relatedInstance: ModelWithFields<any>) => {
+          Model.touchRelatedInstance(relatedInstance, RelatedModel);
+        });
+      } else {
+        Model.touchRelatedInstance(relatedInstances, RelatedModel);
+      }
+    });
   }
 
   private scrubLocalFields = (ref: TFields & TAdditional & ORMId) => {
