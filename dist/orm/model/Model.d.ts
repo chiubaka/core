@@ -1,4 +1,4 @@
-import { Attribute, ForeignKey, ManyToMany, Model as OrmModel, ModelFields, OneToOne, ORMId } from "redux-orm";
+import { Attribute, ForeignKey, ManyToMany, Model as OrmModel, ModelFields, OneToOne } from "redux-orm";
 export interface IBackendModel {
     [propertyName: string]: any;
     id: string;
@@ -32,14 +32,10 @@ export declare abstract class Model<TFields extends IModel, TAdditional = {}, TV
         [fieldName: string]: string;
     };
     static getBackRelationFieldName(fieldName: string, relatedModel: typeof Model): any;
-    static forBackend<TFields extends IModel, TAdditional = {}>(ref: TFields & TAdditional & ORMId): IBackendModel;
     private static _localFieldKeys;
     private static _relationalFields;
     private static _relationshipMap;
     private static scrubProperties;
-    private static scrubLocalFields;
-    private static scrubExcludedFields;
-    private static normalizeRelationships;
     private static isManyRelationship;
     private static isVirtualField;
     private static modelForName;
@@ -51,5 +47,9 @@ export declare abstract class Model<TFields extends IModel, TAdditional = {}, TV
     private static linkRelatedInstances;
     update(props: any): void;
     delete(): void;
+    forBackend(): IBackendModel;
     private touchRelatedInstances;
+    private scrubLocalFields;
+    private scrubExcludedFields;
+    private normalizeRelationships;
 }

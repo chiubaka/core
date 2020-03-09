@@ -59,10 +59,17 @@ class OrmModelApi {
             });
         };
         this.update = (payload, options) => {
-            return (dispatch) => __awaiter(this, void 0, void 0, function* () {
+            return (dispatch, getState) => __awaiter(this, void 0, void 0, function* () {
                 const id = payload.id;
                 dispatch(actions_1.startUpdatingModel(this.model, id));
-                return this.adapter.update(this.model.forBackend(payload), options).then((result) => {
+                const current = selectors_1.modelSelector(this.orm, this.model, id)(getState().orm);
+                if (current == null) {
+                    return Promise.reject(`No ${this.model.modelName} instance found with id ${id}`);
+                }
+                // We can safely update without this being pre-emptive because this update occurs
+                // without saving the updates to the session.
+                current.update(payload);
+                return this.adapter.update(current.forBackend(), options).then((result) => {
                     dispatch(actions_1.updateModel(this.model, result));
                     return result;
                 });
@@ -84,7 +91,7 @@ class OrmModelApi {
                 if (current == null) {
                     return Promise.reject(`No ${this.model.modelName} instance found with id ${id}`);
                 }
-                return this.adapter.upsert(this.model.forBackend(current.ref), options).then((updated) => {
+                return this.adapter.upsert(current.forBackend(), options).then((updated) => {
                     dispatch(actions_1.successfulSyncModel(this.model, updated));
                     return updated;
                 });
