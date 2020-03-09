@@ -4,12 +4,13 @@ import { Dispatch, ThunkResult } from "../../types";
 import {
   createModel,
   destroyModel,
+  startCreatingModel,
   startDestroyingModel,
   startGettingModel,
   startListingModel,
   startSearchingModel,
   startSyncingModel,
-  successfulDestroyModel,
+  startUpdatingModel,
   successfulGetModel,
   successfulListModel,
   successfulSearchModel,
@@ -73,6 +74,16 @@ export class OrmModelApi<T extends IModel> {
 
   public create = (payload: NewModel, options?: IApiRequestOptions): ThunkResult<Promise<IBackendModel>> => {
     return async (dispatch: Dispatch) => {
+      dispatch(startCreatingModel(this.model, payload));
+      return this.adapter.create(payload, options).then((instance: IBackendModel) => {
+        dispatch(createModel(this.model, instance));
+        return instance;
+      });
+    };
+  }
+
+  public createOptimistic = (payload: NewModel, options?: IApiRequestOptions): ThunkResult<Promise<IBackendModel>> => {
+    return async (dispatch: Dispatch) => {
       const id = this.model.generateId(payload);
       dispatch(createModel(this.model, {
         id,
@@ -84,7 +95,18 @@ export class OrmModelApi<T extends IModel> {
     };
   }
 
-  public update = (
+  public update = (payload: PartialModel, options?: IApiRequestOptions): ThunkResult<Promise<IBackendModel>> => {
+    return async (dispatch: Dispatch) => {
+      const id = payload.id;
+      dispatch(startUpdatingModel(this.model, id));
+      return this.adapter.update(payload, options).then((result) => {
+        dispatch(updateModel(this.model, result));
+        return result;
+      });
+    };
+  }
+
+  public updateOptimistic = (
     payload: PartialModel,
     options?: IApiRequestOptions,
   ): ThunkResult<Promise<IBackendModel>> => {
@@ -115,10 +137,9 @@ export class OrmModelApi<T extends IModel> {
   public delete = (id: string, options?: IApiRequestOptions): ThunkResult<Promise<IBackendModel>> => {
     return async (dispatch: Dispatch) => {
       dispatch(startDestroyingModel(this.model, id));
-      return this.adapter.delete(id, options).then((_deleted: IBackendModel) => {
-        const promise = dispatch(successfulDestroyModel(this.model, id));
+      return this.adapter.delete(id, options).then((deleted: IBackendModel) => {
         dispatch(destroyModel(this.model, id));
-        return promise;
+        return deleted;
       });
     };
   }

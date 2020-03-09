@@ -4,9 +4,18 @@ import {
   IModelCreate,
   IModelIdAction,
   IModelPayloadAction,
+  IModelStartCreate,
   ISuccessfulListModel,
   ModelActionType,
 } from "./types";
+
+export function startCreatingModel<T extends IModel>(model: typeof Model, payload: NewModel<T>): IModelStartCreate {
+  return {
+    type: ModelActionType.START_CREATING_MODEL,
+    modelName: model.modelName,
+    payload,
+  };
+}
 
 export function createModel<T extends IModel>(model: typeof Model, payload: NewModel<T>): IModelCreate {
   const payloadWithId: T = payload as T;
@@ -19,6 +28,14 @@ export function createModel<T extends IModel>(model: typeof Model, payload: NewM
     type: ModelActionType.CREATE_MODEL,
     modelName: model.modelName,
     payload: payloadWithId,
+  };
+}
+
+export function startUpdatingModel(model: typeof Model, id: string): IModelIdAction {
+  return {
+    type: ModelActionType.START_UPDATING_MODEL,
+    modelName: model.modelName,
+    id,
   };
 }
 
@@ -103,14 +120,6 @@ export function successfulSyncModel<T extends IBackendModel>(model: typeof Model
 export function startDestroyingModel(model: typeof Model, id: string): IModelIdAction {
   return {
     type: ModelActionType.START_DESTROYING_MODEL,
-    modelName: model.modelName,
-    id,
-  };
-}
-
-export function successfulDestroyModel(model: typeof Model, id: string): IModelIdAction {
-  return {
-    type: ModelActionType.SUCCESSFUL_DESTROY_MODEL,
     modelName: model.modelName,
     id,
   };
