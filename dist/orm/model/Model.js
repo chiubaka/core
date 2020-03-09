@@ -10,39 +10,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const redux_orm_1 = require("redux-orm");
 const uuid = __importStar(require("uuid"));
 class Model extends redux_orm_1.Model {
-    constructor() {
-        super(...arguments);
-        this.scrubLocalFields = (ref) => {
-            const model = this.constructor;
-            return model.scrubProperties(model.localFieldKeys, ref);
-        };
-        this.scrubExcludedFields = (ref) => {
-            const model = this.constructor;
-            return model.scrubProperties(model.excludedFieldKeys, ref);
-        };
-        this.normalizeRelationships = (ref) => {
-            // Get each non-virtual relationship. Delete any key in the ref
-            // corresponding to the relationship. Replace it with a key
-            const model = this.constructor;
-            Object.entries(model.relationalFields).forEach(([fieldName, fieldDefinition]) => {
-                if (!ref.hasOwnProperty(fieldName)) {
-                    return;
-                }
-                if (fieldDefinition instanceof redux_orm_1.ManyToMany) {
-                    const relatedRefs = this[fieldName].all().toRefArray();
-                    ref[fieldName] = relatedRefs.map((relatedRef) => relatedRef.id);
-                }
-                else {
-                    const relatedInstance = this[fieldName];
-                    if (relatedInstance != null) {
-                        ref[`${fieldName}Id`] = relatedInstance.ref.id;
-                    }
-                    delete ref[fieldName];
-                }
-            });
-            return ref;
-        };
-    }
     static get localFieldKeys() {
         if (this._localFieldKeys == null) {
             this._localFieldKeys = new Set(Object.keys(this.localFields));
@@ -101,6 +68,40 @@ class Model extends redux_orm_1.Model {
         }
         const [backRelationFieldName] = entry;
         return backRelationFieldName;
+    }
+    static forBackend(ref) {
+        ref = this.scrubLocalFields(ref);
+        ref = this.scrubExcludedFields(ref);
+        return this.normalizeRelationships(ref);
+    }
+    static scrubLocalFields(ref) {
+        return this.scrubProperties(this.localFieldKeys, ref);
+    }
+    static scrubExcludedFields(ref) {
+        const model = this.constructor;
+        return model.scrubProperties(model.excludedFieldKeys, ref);
+    }
+    static normalizeRelationships(ref) {
+        // Get each non-virtual relationship. Delete any key in the ref
+        // corresponding to the relationship. Replace it with a key
+        const model = this.constructor;
+        Object.entries(model.relationalFields).forEach(([fieldName, fieldDefinition]) => {
+            if (!ref.hasOwnProperty(fieldName)) {
+                return;
+            }
+            if (fieldDefinition instanceof redux_orm_1.ManyToMany) {
+                const relatedRefs = this[fieldName].all().toRefArray();
+                ref[fieldName] = relatedRefs.map((relatedRef) => relatedRef.id);
+            }
+            else {
+                const relatedInstance = this[fieldName];
+                if (relatedInstance != null) {
+                    ref[`${fieldName}Id`] = relatedInstance.ref.id;
+                }
+                delete ref[fieldName];
+            }
+        });
+        return ref;
     }
     static isManyRelationship(fieldName) {
         const field = this.allFields[fieldName];
@@ -221,11 +222,6 @@ class Model extends redux_orm_1.Model {
     delete() {
         super.delete();
         this.touchRelatedInstances();
-    }
-    forBackend() {
-        let ref = this.scrubLocalFields(this.ref);
-        ref = this.scrubExcludedFields(ref);
-        return this.normalizeRelationships(ref);
     }
     touchRelatedInstances() {
         const model = this.constructor;

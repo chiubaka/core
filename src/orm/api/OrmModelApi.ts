@@ -99,7 +99,7 @@ export class OrmModelApi<T extends IModel> {
     return async (dispatch: Dispatch) => {
       const id = payload.id;
       dispatch(startUpdatingModel(this.model, id));
-      return this.adapter.update(payload, options).then((result) => {
+      return this.adapter.update(this.model.forBackend(payload), options).then((result) => {
         dispatch(updateModel(this.model, result));
         return result;
       });
@@ -127,7 +127,7 @@ export class OrmModelApi<T extends IModel> {
         return Promise.reject(`No ${this.model.modelName} instance found with id ${id}`);
       }
 
-      return this.adapter.upsert(current.forBackend(), options).then((updated: IBackendModel) => {
+      return this.adapter.upsert(this.model.forBackend(current.ref), options).then((updated: IBackendModel) => {
         dispatch(successfulSyncModel(this.model, updated));
         return updated;
       });

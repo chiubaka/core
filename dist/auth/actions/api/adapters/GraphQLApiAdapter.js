@@ -21,6 +21,7 @@ class GraphQLApiAdapter {
               extraData
               user {
                 id
+                createdAt
               }
             }
             token
@@ -61,6 +62,7 @@ class GraphQLApiAdapter {
         const social = response.data.socialAuth.social;
         return {
             id: social.user.id,
+            createdAt: social.user.createdAt,
             email: social.extraData.email,
             firstName: social.extraData.firstName,
             lastName: social.extraData.lastName,

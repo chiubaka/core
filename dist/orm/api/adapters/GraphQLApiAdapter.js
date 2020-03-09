@@ -7,8 +7,11 @@ const apollo_boost_1 = require("apollo-boost");
 const apollo_client_1 = require("apollo-client");
 const apollo_link_context_1 = require("apollo-link-context");
 const apollo_link_http_1 = require("apollo-link-http");
+const apollo_link_ws_1 = require("apollo-link-ws");
+const graphql_1 = require("graphql");
 const lodash_1 = __importDefault(require("lodash"));
 const pluralize_1 = __importDefault(require("pluralize"));
+const subscriptions_transport_ws_1 = require("subscriptions-transport-ws");
 const storage_1 = require("../../../auth/utils/storage");
 const model_1 = require("../../model");
 class GraphQLApiAdapter {
@@ -177,14 +180,26 @@ class GraphQLApiAdapter {
             const httpLink = apollo_link_http_1.createHttpLink({
                 uri: GraphQLApiAdapter.GRAPHQL_PATH,
             });
+            const token = storage_1.getToken();
             const authLink = apollo_link_context_1.setContext((_unused, { headers }) => {
-                const token = storage_1.getToken();
                 return {
                     headers: Object.assign({}, headers, { Authorization: token != null ? `Bearer ${token}` : "" }),
                 };
             });
+            const subscriptionClient = new subscriptions_transport_ws_1.SubscriptionClient(`ws://${window.location.host}${this.GRAPHQL_PATH}`, {
+                reconnect: true,
+                connectionParams: {
+                    authToken: token,
+                },
+            });
+            const wsLink = new apollo_link_ws_1.WebSocketLink(subscriptionClient);
+            // https://github.com/apollographql/subscriptions-transport-ws/issues/275#issuecomment-330294921
+            const link = apollo_boost_1.ApolloLink.split((operation) => {
+                const operationAST = graphql_1.getOperationAST(operation.query, operation.operationName);
+                return !!operationAST && operationAST.operation === "subscription";
+            }, wsLink, authLink.concat(httpLink));
             this._defaultClientOptions = {
-                link: authLink.concat(httpLink),
+                link,
                 cache: new apollo_boost_1.InMemoryCache(),
             };
         }

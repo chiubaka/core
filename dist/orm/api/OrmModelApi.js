@@ -62,7 +62,7 @@ class OrmModelApi {
             return (dispatch) => __awaiter(this, void 0, void 0, function* () {
                 const id = payload.id;
                 dispatch(actions_1.startUpdatingModel(this.model, id));
-                return this.adapter.update(payload, options).then((result) => {
+                return this.adapter.update(this.model.forBackend(payload), options).then((result) => {
                     dispatch(actions_1.updateModel(this.model, result));
                     return result;
                 });
@@ -84,7 +84,7 @@ class OrmModelApi {
                 if (current == null) {
                     return Promise.reject(`No ${this.model.modelName} instance found with id ${id}`);
                 }
-                return this.adapter.upsert(current.forBackend(), options).then((updated) => {
+                return this.adapter.upsert(this.model.forBackend(current.ref), options).then((updated) => {
                     dispatch(actions_1.successfulSyncModel(this.model, updated));
                     return updated;
                 });

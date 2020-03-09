@@ -5,7 +5,7 @@ const creators_1 = require("../creators");
 const thunks_1 = require("../thunks");
 const adapters_1 = require("./adapters");
 class AuthApi extends Api_1.Api {
-    constructor(adapter = adapters_1.GraphQLApiAdapter.getInstance()) {
+    constructor(adapter = adapters_1.AuthGraphQLApiAdapter.getInstance()) {
         super(adapter);
     }
     login(username, password) {

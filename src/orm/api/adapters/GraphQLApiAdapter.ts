@@ -1,9 +1,12 @@
-import { gql, InMemoryCache } from "apollo-boost";
+import { ApolloLink, gql, InMemoryCache } from "apollo-boost";
 import { ApolloClient, ApolloClientOptions, MutationOptions, QueryOptions } from "apollo-client";
 import { setContext } from "apollo-link-context";
 import { createHttpLink } from "apollo-link-http";
+import { WebSocketLink } from "apollo-link-ws";
+import { getOperationAST } from "graphql";
 import _ from "lodash";
 import pluralize from "pluralize";
+import { SubscriptionClient } from "subscriptions-transport-ws";
 
 import { getToken } from "../../../auth/utils/storage";
 import { IBackendModel, Model, NewModel, PartialModel } from "../../model";
@@ -64,8 +67,8 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
         uri: GraphQLApiAdapter.GRAPHQL_PATH,
       });
 
+      const token = getToken();
       const authLink = setContext((_unused, { headers }) => {
-        const token = getToken();
         return {
           headers: {
             ...headers,
@@ -74,8 +77,27 @@ export class GraphQLApiAdapter implements IModelApiAdapter {
         };
       });
 
+      const subscriptionClient = new SubscriptionClient(`ws://${window.location.host}${this.GRAPHQL_PATH}`, {
+        reconnect: true,
+        connectionParams: {
+          authToken: token,
+        },
+      });
+
+      const wsLink = new WebSocketLink(subscriptionClient);
+
+      // https://github.com/apollographql/subscriptions-transport-ws/issues/275#issuecomment-330294921
+      const link = ApolloLink.split(
+        (operation) => {
+          const operationAST = getOperationAST(operation.query, operation.operationName);
+          return !!operationAST && operationAST.operation === "subscription";
+        },
+        wsLink,
+        authLink.concat(httpLink),
+      );
+
       this._defaultClientOptions = {
-        link: authLink.concat(httpLink),
+        link,
         cache: new InMemoryCache(),
       };
     }

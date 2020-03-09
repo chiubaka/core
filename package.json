@@ -68,6 +68,7 @@
     "apollo-client": "^2.6.3",
     "apollo-link-context": "^1.0.18",
     "apollo-link-http": "^1.5.15",
+    "apollo-link-ws": "^1.0.19",
     "bootstrap": "^4.3.1",
     "classnames": "^2.2.6",
     "connected-react-router": "^6.5.0",
@@ -80,6 +81,7 @@
     "react-router-dom": "^5.0.1",
     "redux-session": "^1.0.4",
     "redux-thunk": "^2.3.0",
+    "subscriptions-transport-ws": "^0.9.16",
     "uuid": "^3.3.2"
   }
 }

@@ -5,7 +5,7 @@ import { assertLastCallPath, assertLogoutAndRedirect, store } from "../../../../
 
 import { IJwtUserResponse, IUser } from "../../../app";
 import { ActionTypes } from "../types";
-import { RestApiAdapter } from "./adapters";
+import { AuthRestApiAdapter } from "./adapters";
 import { IGraphQLSocialAuthResponse } from "./adapters/GraphQLApiAdapter";
 import { AuthApi } from "./AuthApi";
 
@@ -82,6 +82,7 @@ describe("AuthApi", () => {
                 user: {
                   __typename: "User",
                   id: "1",
+                  createdAt: "2019-08-28T16:24:57.355125+00:00",
                 },
               },
               token: MOCK_TOKEN,
@@ -113,7 +114,7 @@ describe("AuthApi", () => {
   });
 
   describe("with RestApiAdapter", () => {
-    const api = new AuthApi(RestApiAdapter.getInstance());
+    const api = new AuthApi(AuthRestApiAdapter.getInstance());
 
     describe("#login", () => {
       describe("when response includes user details", () => {

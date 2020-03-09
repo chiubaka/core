@@ -15,6 +15,7 @@ export interface IGraphQLSocialAuthResponse {
                 user: {
                     __typename?: string;
                     id: string;
+                    createdAt: string;
                 };
             };
             token: string;
