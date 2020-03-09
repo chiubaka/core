@@ -1,6 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const types_1 = require("./types");
+function startCreatingModel(model, payload) {
+    return {
+        type: types_1.ModelActionType.START_CREATING_MODEL,
+        modelName: model.modelName,
+        payload,
+    };
+}
+exports.startCreatingModel = startCreatingModel;
 function createModel(model, payload) {
     const payloadWithId = payload;
     if (payloadWithId.id == null) {
@@ -13,6 +21,14 @@ function createModel(model, payload) {
     };
 }
 exports.createModel = createModel;
+function startUpdatingModel(model, id) {
+    return {
+        type: types_1.ModelActionType.START_UPDATING_MODEL,
+        modelName: model.modelName,
+        id,
+    };
+}
+exports.startUpdatingModel = startUpdatingModel;
 function updateModel(model, payload) {
     return {
         type: types_1.ModelActionType.UPDATE_MODEL,
@@ -99,12 +115,4 @@ function startDestroyingModel(model, id) {
     };
 }
 exports.startDestroyingModel = startDestroyingModel;
-function successfulDestroyModel(model, id) {
-    return {
-        type: types_1.ModelActionType.SUCCESSFUL_DESTROY_MODEL,
-        modelName: model.modelName,
-        id,
-    };
-}
-exports.successfulDestroyModel = successfulDestroyModel;
 //# sourceMappingURL=creators.js.map

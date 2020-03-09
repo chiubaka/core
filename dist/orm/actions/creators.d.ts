@@ -1,6 +1,8 @@
 import { IBackendModel, IModel, Model, NewModel, PartialModel } from "../model";
-import { IModelAction, IModelCreate, IModelIdAction, IModelPayloadAction, ISuccessfulListModel } from "./types";
+import { IModelAction, IModelCreate, IModelIdAction, IModelPayloadAction, IModelStartCreate, ISuccessfulListModel } from "./types";
+export declare function startCreatingModel<T extends IModel>(model: typeof Model, payload: NewModel<T>): IModelStartCreate;
 export declare function createModel<T extends IModel>(model: typeof Model, payload: NewModel<T>): IModelCreate;
+export declare function startUpdatingModel(model: typeof Model, id: string): IModelIdAction;
 export declare function updateModel<T extends IModel>(model: typeof Model, payload: PartialModel<T>): IModelPayloadAction;
 export declare function destroyModel(model: typeof Model, id: string): IModelIdAction;
 export declare function startListingModel(model: typeof Model): IModelAction;
@@ -12,4 +14,3 @@ export declare function successfulGetModel<T extends IModel>(model: typeof Model
 export declare function startSyncingModel(model: typeof Model, id: string): IModelIdAction;
 export declare function successfulSyncModel<T extends IBackendModel>(model: typeof Model, payload: T): IModelPayloadAction;
 export declare function startDestroyingModel(model: typeof Model, id: string): IModelIdAction;
-export declare function successfulDestroyModel(model: typeof Model, id: string): IModelIdAction;

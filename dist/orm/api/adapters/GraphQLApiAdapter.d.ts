@@ -43,7 +43,7 @@ export declare class GraphQLApiAdapter implements IModelApiAdapter {
     get: (id: string, options?: IApiRequestOptions) => Promise<IBackendModel>;
     create: (payload: NewModel<import("../../model").IModel>, options?: IApiRequestOptions) => Promise<IBackendModel>;
     update: (payload: PartialModel<import("../../model").IModel>, options?: IApiRequestOptions) => Promise<IBackendModel>;
-    upsert: (payload: PartialModel<import("../../model").IModel> | NewModel<import("../../model").IModel>, options?: IApiRequestOptions) => Promise<IBackendModel>;
+    upsert: (payload: NewModel<import("../../model").IModel> | PartialModel<import("../../model").IModel>, options?: IApiRequestOptions) => Promise<IBackendModel>;
     delete: (id: string, options?: IApiRequestOptions) => Promise<IBackendModel>;
     private buildGraphQLFragment;
     private requestOptionsToGraphQLOptions;

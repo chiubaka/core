@@ -15,7 +15,9 @@ export declare class OrmModelApi<T extends IModel> {
     search: (searchTerm: string, options?: IApiRequestOptions) => import("redux-thunk").ThunkAction<Promise<IBackendModel[]>, any, null, import("redux").Action<any>>;
     get: (id: string, options?: IApiRequestOptions) => import("redux-thunk").ThunkAction<Promise<IBackendModel>, any, null, import("redux").Action<any>>;
     create: (payload: NewModel<IModel>, options?: IApiRequestOptions) => import("redux-thunk").ThunkAction<Promise<IBackendModel>, any, null, import("redux").Action<any>>;
+    createOptimistic: (payload: NewModel<IModel>, options?: IApiRequestOptions) => import("redux-thunk").ThunkAction<Promise<IBackendModel>, any, null, import("redux").Action<any>>;
     update: (payload: PartialModel<IModel>, options?: IApiRequestOptions) => import("redux-thunk").ThunkAction<Promise<IBackendModel>, any, null, import("redux").Action<any>>;
+    updateOptimistic: (payload: PartialModel<IModel>, options?: IApiRequestOptions) => import("redux-thunk").ThunkAction<Promise<IBackendModel>, any, null, import("redux").Action<any>>;
     sync: (id: string, options?: IApiRequestOptions) => import("redux-thunk").ThunkAction<Promise<IBackendModel>, any, null, import("redux").Action<any>>;
     delete: (id: string, options?: IApiRequestOptions) => import("redux-thunk").ThunkAction<Promise<IBackendModel>, any, null, import("redux").Action<any>>;
 }

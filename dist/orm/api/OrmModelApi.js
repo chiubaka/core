@@ -42,6 +42,15 @@ class OrmModelApi {
         };
         this.create = (payload, options) => {
             return (dispatch) => __awaiter(this, void 0, void 0, function* () {
+                dispatch(actions_1.startCreatingModel(this.model, payload));
+                return this.adapter.create(payload, options).then((instance) => {
+                    dispatch(actions_1.createModel(this.model, instance));
+                    return instance;
+                });
+            });
+        };
+        this.createOptimistic = (payload, options) => {
+            return (dispatch) => __awaiter(this, void 0, void 0, function* () {
                 const id = this.model.generateId(payload);
                 dispatch(actions_1.createModel(this.model, Object.assign({ id }, payload)));
                 return dispatch(this.sync(id, options)).then((result) => {
@@ -50,6 +59,16 @@ class OrmModelApi {
             });
         };
         this.update = (payload, options) => {
+            return (dispatch) => __awaiter(this, void 0, void 0, function* () {
+                const id = payload.id;
+                dispatch(actions_1.startUpdatingModel(this.model, id));
+                return this.adapter.update(payload, options).then((result) => {
+                    dispatch(actions_1.updateModel(this.model, result));
+                    return result;
+                });
+            });
+        };
+        this.updateOptimistic = (payload, options) => {
             return (dispatch) => __awaiter(this, void 0, void 0, function* () {
                 const id = payload.id;
                 dispatch(actions_1.updateModel(this.model, payload));
@@ -74,10 +93,9 @@ class OrmModelApi {
         this.delete = (id, options) => {
             return (dispatch) => __awaiter(this, void 0, void 0, function* () {
                 dispatch(actions_1.startDestroyingModel(this.model, id));
-                return this.adapter.delete(id, options).then((_deleted) => {
-                    const promise = dispatch(actions_1.successfulDestroyModel(this.model, id));
+                return this.adapter.delete(id, options).then((deleted) => {
                     dispatch(actions_1.destroyModel(this.model, id));
-                    return promise;
+                    return deleted;
                 });
             });
         };
