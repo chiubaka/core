@@ -18,6 +18,7 @@ export interface IGraphQLSocialAuthResponse {
         user: {
           __typename?: string;
           id: string;
+          createdAt: string;
         }
       };
       token: string;
@@ -51,6 +52,7 @@ export class GraphQLApiAdapter implements IAuthApiAdapter {
 
     return {
       id: social.user.id,
+      createdAt: social.user.createdAt,
       email: social.extraData.email,
       firstName: social.extraData.firstName,
       lastName: social.extraData.lastName,
@@ -83,6 +85,7 @@ export class GraphQLApiAdapter implements IAuthApiAdapter {
               extraData
               user {
                 id
+                createdAt
               }
             }
             token
