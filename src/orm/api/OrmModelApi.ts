@@ -96,10 +96,20 @@ export class OrmModelApi<T extends IModel> {
   }
 
   public update = (payload: PartialModel, options?: IApiRequestOptions): ThunkResult<Promise<IBackendModel>> => {
-    return async (dispatch: Dispatch) => {
+    return async (dispatch: Dispatch, getState: () => IOrmState) => {
       const id = payload.id;
       dispatch(startUpdatingModel(this.model, id));
-      return this.adapter.update(this.model.forBackend(payload), options).then((result) => {
+
+      const current: Model<T> = modelSelector(this.orm, this.model, id)(getState().orm);
+      if (current == null) {
+        return Promise.reject(`No ${this.model.modelName} instance found with id ${id}`);
+      }
+
+      // We can safely update without this being pre-emptive because this update occurs
+      // without saving the updates to the session.
+      current.update(payload);
+
+      return this.adapter.update(current.forBackend(), options).then((result) => {
         dispatch(updateModel(this.model, result));
         return result;
       });
@@ -127,7 +137,7 @@ export class OrmModelApi<T extends IModel> {
         return Promise.reject(`No ${this.model.modelName} instance found with id ${id}`);
       }
 
-      return this.adapter.upsert(this.model.forBackend(current.ref), options).then((updated: IBackendModel) => {
+      return this.adapter.upsert(current.forBackend(), options).then((updated: IBackendModel) => {
         dispatch(successfulSyncModel(this.model, updated));
         return updated;
       });
