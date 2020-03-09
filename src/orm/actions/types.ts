@@ -1,6 +1,6 @@
 import { Action } from "redux";
 
-import { IModel, PartialModel } from "../model";
+import { IModel, NewModel, PartialModel } from "../model";
 
 export enum ModelActionType {
   START_SYNCING_MODEL = "START_SYNCING_MODEL",
@@ -12,8 +12,9 @@ export enum ModelActionType {
   START_GETTING_MODEL = "START_GETTING_MODEL",
   SUCCESSFUL_GET_MODEL = "SUCCESSFUL_GET_MODEL",
   START_DESTROYING_MODEL = "START_DESTROYING_MODEL",
-  SUCCESSFUL_DESTROY_MODEL = "SUCCESSFUL_DESTROY_MODEL",
+  START_CREATING_MODEL = "START_CREATING_MODEL",
   CREATE_MODEL = "CREATE_MODEL",
+  START_UPDATING_MODEL = "START_UPDATING_MODEL",
   UPDATE_MODEL = "UPDATE_MODEL",
   DESTROY_MODEL = "DESTROY_MODEL",
 }
@@ -24,6 +25,10 @@ export interface IModelAction extends Action {
 
 export function isModelAction(action: Action): action is IModelAction {
   return (action as IModelAction).modelName != null;
+}
+
+export interface IModelStartCreate<T extends IModel = IModel> extends IModelAction {
+  payload: NewModel<T>;
 }
 
 // When creating, all fields non-optional fields are required.
