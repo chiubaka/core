@@ -8,6 +8,7 @@ import {
   OneToOne,
   ORMId,
 } from "redux-orm";
+import * as uuid from "uuid";
 
 export interface IBackendModel {
   [propertyName: string]: any;
@@ -67,9 +68,17 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     };
   }
 
+  public static generateId<TFields = any>(_props: TFields) {
+    return uuid.v4();
+  }
+
   public static create<TFields = any>(props: TFields) {
+    const id = (props as any).id != null ? (props as any).id : this.generateId(props);
     const filteredProps = this.scrubProperties(this.backendFieldKeys, props);
-    const instance = super.create(filteredProps);
+    const instance = super.create({
+      ...filteredProps,
+      id,
+    });
     const relatedInstanceMap = this.upsertRelatedInstances(props, instance);
     this.linkRelatedInstances(relatedInstanceMap, instance);
 
@@ -159,7 +168,7 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
       // For each one that matches a relationship on the model...
       if (relationships.hasOwnProperty(fieldName)) {
         const relatedModelName = relationships[fieldName];
-        const RelatedModel = this.session[relatedModelName];
+        const RelatedModel = relatedModelName === "this" ? this : this.session[relatedModelName];
 
         // Branch based on whether or not there are many related instances included
         // or just one.

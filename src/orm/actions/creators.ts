@@ -1,4 +1,4 @@
-import { generateId, IBackendModel, IModel, Model, NewModel, PartialModel } from "../model";
+import { IBackendModel, IModel, Model, NewModel, PartialModel } from "../model";
 import {
   IModelAction,
   IModelCreate,
@@ -12,7 +12,7 @@ export function createModel<T extends IModel>(model: typeof Model, payload: NewM
   const payloadWithId: T = payload as T;
 
   if (payloadWithId.id == null) {
-    payloadWithId.id = generateId();
+    payloadWithId.id = model.generateId(payload);
   }
 
   return {
