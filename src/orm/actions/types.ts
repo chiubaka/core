@@ -7,6 +7,12 @@ export enum ModelActionType {
   SUCCESSFUL_SYNC_MODEL = "SUCCESSFUL_SYNC_MODEL",
   START_LISTING_MODEL = "START_LISTING_MODEL",
   SUCCESSFUL_LIST_MODEL = "SUCCESSFUL_LIST_MODEL",
+  START_SEARCHING_MODEL = "START_SEARCHING_MODEL",
+  SUCCESSFUL_SEARCH_MODEL = "SUCCESSFUL_SEARCH_MODEL",
+  START_GETTING_MODEL = "START_GETTING_MODEL",
+  SUCCESSFUL_GET_MODEL = "SUCCESSFUL_GET_MODEL",
+  START_DESTROYING_MODEL = "START_DESTROYING_MODEL",
+  SUCCESSFUL_DESTROY_MODEL = "SUCCESSFUL_DESTROY_MODEL",
   CREATE_MODEL = "CREATE_MODEL",
   UPDATE_MODEL = "UPDATE_MODEL",
   DESTROY_MODEL = "DESTROY_MODEL",
@@ -26,7 +32,7 @@ export interface IModelCreate<T extends IModel = IModel> extends IModelAction {
 }
 
 // When updating, all fields are optional in order to support partial updates.
-export interface IModelUpdate<T extends IModel = IModel> extends IModelAction {
+export interface IModelPayloadAction<T extends IModel = IModel> extends IModelAction {
   payload: PartialModel<T>;
 }
 
@@ -38,4 +44,4 @@ export interface ISuccessfulListModel<T extends IModel = IModel> extends IModelA
   items: T[];
 }
 
-export declare type ModelAction = IModelCreate | IModelUpdate | IModelIdAction | ISuccessfulListModel;
+export declare type ModelAction = IModelCreate | IModelPayloadAction | IModelIdAction | ISuccessfulListModel;

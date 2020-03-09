@@ -3,7 +3,7 @@ import {
   IModelAction,
   IModelCreate,
   IModelIdAction,
-  IModelUpdate,
+  IModelPayloadAction,
   ISuccessfulListModel,
   ModelActionType,
 } from "./types";
@@ -22,7 +22,7 @@ export function createModel<T extends IModel>(model: typeof Model, payload: NewM
   };
 }
 
-export function updateModel<T extends IModel>(model: typeof Model, payload: PartialModel<T>): IModelUpdate {
+export function updateModel<T extends IModel>(model: typeof Model, payload: PartialModel<T>): IModelPayloadAction {
   return {
     type: ModelActionType.UPDATE_MODEL,
     modelName: model.modelName,
@@ -53,6 +53,37 @@ export function successfulListModel<T extends IModel>(model: typeof Model, items
   };
 }
 
+export function startSearchingModel(model: typeof Model): IModelAction {
+  return {
+    type: ModelActionType.START_SEARCHING_MODEL,
+    modelName: model.modelName,
+  };
+}
+
+export function successfulSearchModel<T extends IModel>(model: typeof Model, items: T[]): ISuccessfulListModel {
+  return {
+    type: ModelActionType.SUCCESSFUL_SEARCH_MODEL,
+    modelName: model.modelName,
+    items,
+  };
+}
+
+export function startGettingModel(model: typeof Model, id: string): IModelIdAction {
+  return {
+    type: ModelActionType.START_GETTING_MODEL,
+    modelName: model.modelName,
+    id,
+  };
+}
+
+export function successfulGetModel<T extends IModel>(model: typeof Model, payload: T): IModelPayloadAction {
+  return {
+    type: ModelActionType.SUCCESSFUL_GET_MODEL,
+    modelName: model.modelName,
+    payload,
+  };
+}
+
 export function startSyncingModel(model: typeof Model, id: string): IModelIdAction {
   return {
     type: ModelActionType.START_SYNCING_MODEL,
@@ -61,10 +92,26 @@ export function startSyncingModel(model: typeof Model, id: string): IModelIdActi
   };
 }
 
-export function successfulSyncModel<T extends IBackendModel>(model: typeof Model, payload: T): IModelUpdate {
+export function successfulSyncModel<T extends IBackendModel>(model: typeof Model, payload: T): IModelPayloadAction {
   return {
     type: ModelActionType.SUCCESSFUL_SYNC_MODEL,
     modelName: model.modelName,
     payload,
+  };
+}
+
+export function startDestroyingModel(model: typeof Model, id: string): IModelIdAction {
+  return {
+    type: ModelActionType.START_DESTROYING_MODEL,
+    modelName: model.modelName,
+    id,
+  };
+}
+
+export function successfulDestroyModel(model: typeof Model, id: string): IModelIdAction {
+  return {
+    type: ModelActionType.SUCCESSFUL_DESTROY_MODEL,
+    modelName: model.modelName,
+    id,
   };
 }
