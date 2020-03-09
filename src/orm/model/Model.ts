@@ -124,6 +124,14 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     return backRelationFieldName;
   }
 
+  public static forBackend<TFields extends IModel, TAdditional = {}>(
+    ref: TFields & TAdditional & ORMId,
+  ): IBackendModel {
+    ref = this.scrubLocalFields(ref);
+    ref = this.scrubExcludedFields(ref);
+    return this.normalizeRelationships(ref);
+  }
+
   private static _localFieldKeys: Set<string>;
   private static _relationalFields: {[fieldName: string]: ForeignKey | OneToOne | ManyToMany};
   private static _relationshipMap: {[fieldName: string]: string};
@@ -134,6 +142,44 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
       delete copy[fieldName];
     });
     return copy;
+  }
+
+  private static scrubLocalFields<TFields extends IModel, TAdditional = {}>(
+    ref: TFields & TAdditional & ORMId,
+  ) {
+    return this.scrubProperties(this.localFieldKeys, ref);
+  }
+
+  private static scrubExcludedFields<TFields extends IModel, TAdditional = {}>(
+    ref: TFields & TAdditional & ORMId,
+  ) {
+    const model = this.constructor as typeof Model;
+    return model.scrubProperties(model.excludedFieldKeys, ref);
+  }
+
+  private static normalizeRelationships<TFields extends IModel>(ref: TFields) {
+    // Get each non-virtual relationship. Delete any key in the ref
+    // corresponding to the relationship. Replace it with a key
+
+    const model = this.constructor as typeof Model;
+    Object.entries(model.relationalFields).forEach(([fieldName, fieldDefinition]) => {
+      if (!ref.hasOwnProperty(fieldName)) {
+        return;
+      }
+
+      if (fieldDefinition instanceof ManyToMany) {
+        const relatedRefs = (this as any)[fieldName].all().toRefArray();
+        (ref as any)[fieldName] = relatedRefs.map((relatedRef: IModel) => relatedRef.id);
+      } else {
+        const relatedInstance = (this as any)[fieldName];
+        if (relatedInstance != null) {
+          (ref as any)[`${fieldName}Id`] = relatedInstance.ref.id;
+        }
+        delete ref[fieldName];
+      }
+    });
+
+    return ref;
   }
 
   private static isManyRelationship(fieldName: string) {
@@ -311,12 +357,6 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     this.touchRelatedInstances();
   }
 
-  public forBackend(): IBackendModel {
-    let ref = this.scrubLocalFields(this.ref);
-    ref = this.scrubExcludedFields(ref);
-    return this.normalizeRelationships(ref);
-  }
-
   private touchRelatedInstances() {
     const model = this.constructor as typeof Model;
     const relationships = model.getRelationshipMap();
@@ -332,40 +372,5 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
         Model.touchRelatedInstance(relatedInstances, RelatedModel);
       }
     });
-  }
-
-  private scrubLocalFields = (ref: TFields & TAdditional & ORMId) => {
-    const model = this.constructor as typeof Model;
-    return model.scrubProperties(model.localFieldKeys, ref);
-  }
-
-  private scrubExcludedFields = (ref: TFields & TAdditional & ORMId) => {
-    const model = this.constructor as typeof Model;
-    return model.scrubProperties(model.excludedFieldKeys, ref);
-  }
-
-  private normalizeRelationships = (ref: TFields) => {
-    // Get each non-virtual relationship. Delete any key in the ref
-    // corresponding to the relationship. Replace it with a key
-
-    const model = this.constructor as typeof Model;
-    Object.entries(model.relationalFields).forEach(([fieldName, fieldDefinition]) => {
-      if (!ref.hasOwnProperty(fieldName)) {
-        return;
-      }
-
-      if (fieldDefinition instanceof ManyToMany) {
-        const relatedRefs = (this as any)[fieldName].all().toRefArray();
-        (ref as any)[fieldName] = relatedRefs.map((relatedRef: IModel) => relatedRef.id);
-      } else {
-        const relatedInstance = (this as any)[fieldName];
-        if (relatedInstance != null) {
-          (ref as any)[`${fieldName}Id`] = relatedInstance.ref.id;
-        }
-        delete ref[fieldName];
-      }
-    });
-
-    return ref;
   }
 }
