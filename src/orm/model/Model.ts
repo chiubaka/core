@@ -181,6 +181,10 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
         const relatedModelName = relationships[fieldName];
         const RelatedModel = this.modelForName(relatedModelName);
 
+        if (value == null) {
+          return;
+        }
+
         // Branch based on whether or not there are many related instances included
         // or just one.
         // The cases in which there are many will always be some form of either many-to-many
