@@ -193,8 +193,12 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
         // which means we need to process an array, not just a single value.
 
         if (this.isManyRelationship(fieldName)) {
+          if (!(value instanceof Array)) {
+            return;
+          }
+
           // If we're given a list of scalar objects, we treat it as if it's a list of IDs.
-          if (value instanceof Array && value.length > 0 && !(value[0] instanceof Object)) {
+          if (value.length > 0 && !(value[0] instanceof Object)) {
             value = value.map((id) => {
               return {
                 id,
@@ -234,7 +238,8 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
     instance: ModelWithFields<any>,
   ) {
     if (!(values instanceof Array)) {
-      throw Error(`Encountered non-array value for many-to-many field ${fieldName}`);
+      console.error(values);
+      throw Error(`Encountered non-array value ${values} for many-to-many field ${fieldName}`);
     }
 
     return values.map((value: IModel) => {
