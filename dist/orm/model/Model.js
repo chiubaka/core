@@ -134,11 +134,11 @@ class Model extends redux_orm_1.Model {
         const relatedInstanceMap = {};
         // Iterate through the given properties
         Object.entries(props).forEach(([fieldName, value]) => {
-            // We only want to deal with non-scalar values, which represent either
-            // related instances or lists of related instances.
-            // Otherwise we may incorrectly process IDs in the form of numbers or strings
+            // If we're given a scalar object, we treat it as if it's an ID.
             if (!(value instanceof Object)) {
-                return;
+                value = {
+                    id: value,
+                };
             }
             // For each one that matches a relationship on the model...
             if (relationships.hasOwnProperty(fieldName)) {
