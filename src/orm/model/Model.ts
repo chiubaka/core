@@ -176,13 +176,6 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
 
     // Iterate through the given properties
     Object.entries(props).forEach(([fieldName, value]) => {
-      // If we're given a scalar object, we treat it as if it's an ID.
-      if (!(value instanceof Object)) {
-        value = {
-          id: value,
-        };
-      }
-
       // For each one that matches a relationship on the model...
       if (relationships.hasOwnProperty(fieldName)) {
         const relatedModelName = relationships[fieldName];
@@ -200,6 +193,15 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
         // which means we need to process an array, not just a single value.
 
         if (this.isManyRelationship(fieldName)) {
+          // If we're given a list of scalar objects, we treat it as if it's a list of IDs.
+          if (value instanceof Array && value.length > 0 && !(value[0] instanceof Object)) {
+            value = value.map((id) => {
+              return {
+                id,
+              };
+            });
+          }
+
           relatedInstanceMap[fieldName] = this.upsertManyRelatedInstances(
             fieldName,
             value as IModel[],
@@ -207,8 +209,15 @@ export abstract class Model<TFields extends IModel, TAdditional = {}, TVirtualFi
             instance,
           );
         } else {
+          // If we're given a scalar object, we treat it as if it's an ID.
+          if (!(value instanceof Object)) {
+            value = {
+              id: value,
+            };
+          }
+
           relatedInstanceMap[fieldName] = RelatedModel.upsert({
-            ...value,
+            ...value as object,
             lastUpdated: Date.now(),
           });
         }
