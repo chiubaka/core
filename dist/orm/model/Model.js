@@ -134,12 +134,6 @@ class Model extends redux_orm_1.Model {
         const relatedInstanceMap = {};
         // Iterate through the given properties
         Object.entries(props).forEach(([fieldName, value]) => {
-            // If we're given a scalar object, we treat it as if it's an ID.
-            if (!(value instanceof Object)) {
-                value = {
-                    id: value,
-                };
-            }
             // For each one that matches a relationship on the model...
             if (relationships.hasOwnProperty(fieldName)) {
                 const relatedModelName = relationships[fieldName];
@@ -155,9 +149,26 @@ class Model extends redux_orm_1.Model {
                 // In all of these cases, it's valid to embed multiple other models in this model,
                 // which means we need to process an array, not just a single value.
                 if (this.isManyRelationship(fieldName)) {
+                    if (!(value instanceof Array)) {
+                        return;
+                    }
+                    // If we're given a list of scalar objects, we treat it as if it's a list of IDs.
+                    if (value.length > 0 && !(value[0] instanceof Object)) {
+                        value = value.map((id) => {
+                            return {
+                                id,
+                            };
+                        });
+                    }
                     relatedInstanceMap[fieldName] = this.upsertManyRelatedInstances(fieldName, value, RelatedModel, instance);
                 }
                 else {
+                    // If we're given a scalar object, we treat it as if it's an ID.
+                    if (!(value instanceof Object)) {
+                        value = {
+                            id: value,
+                        };
+                    }
                     relatedInstanceMap[fieldName] = RelatedModel.upsert(Object.assign({}, value, { lastUpdated: Date.now() }));
                 }
             }
@@ -166,7 +177,8 @@ class Model extends redux_orm_1.Model {
     }
     static upsertManyRelatedInstances(fieldName, values, RelatedModel, instance) {
         if (!(values instanceof Array)) {
-            throw Error(`Encountered non-array value for many-to-many field ${fieldName}`);
+            console.error(values);
+            throw Error(`Encountered non-array value ${values} for many-to-many field ${fieldName}`);
         }
         return values.map((value) => {
             const relatedInstance = RelatedModel.upsert(Object.assign({}, value, { lastUpdated: Date.now() }));
