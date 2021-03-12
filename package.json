@@ -43,7 +43,7 @@
     "isomorphic-fetch": "^2.2.1",
     "jest": "^24.8.0",
     "lint-staged": "^9.2.1",
-    "madge": "^3.4.4",
+    "madge": "^4.0.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.1.0",
